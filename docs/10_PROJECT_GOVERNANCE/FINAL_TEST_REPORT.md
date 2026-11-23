@@ -1,7 +1,7 @@
 # Final Test Report — RailwayVision AI (working tree, 2026-11-23)
 
-Status: implementation and automated testing pass locally. Publication to GitHub is
-`BLOCKED_GITHUB_AUTH` (no remote, no `gh`, target repository not found).
+Status: implementation and automated testing pass locally. Published to GitHub Public on
+2026-11-23 at <https://github.com/Fadliansyah27/Fadliansyah27> (commit `435bfd0`).
 This is not a production or KCIC acceptance report.
 
 ## Environment
@@ -48,13 +48,14 @@ and client-side note validation).
 - Signed Android/iOS builds; background sync; push notifications.
 - Any AI detection, accuracy, dataset, or KCIC acceptance claim.
 
-## Publication blockers
+## Publication outcome
 
-1. No Git remote; `gh` CLI absent.
-2. `git ls-remote https://github.com/Fadliansyah27/RailwayVision-AI.git` returns
-   "Repository not found" (repository absent or inaccessible).
-3. Creating the target public repository requires an authenticated token with `repo`
-   scope or `gh auth login`.
-
-Owner authorization for public release was given in the request; the remaining blocker
-is technical authentication, not permission.
+1. Public repository created as `Fadliansyah27/Fadliansyah27` (owner request) on
+   2026-11-23; visibility verified `public` via the GitHub API.
+2. `git push -u origin main` succeeded without force push; remote and local `main`
+   both point to `435bfd021dc887ddb65b8eb2586a9a5760faac99`.
+3. Manual secret-pattern scan and tracked `.env`/key file checks were clean at push
+   time. Gitleaks was not available; no gitleaks result is claimed.
+4. Owner authorization for public release was given explicitly in the request; the
+   earlier authentication blocker was resolved using the existing GitHub credential
+   without exposing its value.

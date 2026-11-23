@@ -1,8 +1,8 @@
 # GITHUB_SECURITY_AUDIT — RailwayVision AI
 
 Tanggal audit: 2026-11-23
-Lingkup: seluruh working tree repository lokal sebelum publikasi GitHub.
-Status akhir: `PUBLICATION_READY` (lihat bagian 9).
+Lingkup: seluruh working tree repository lokal sebelum dan sesudah publikasi GitHub.
+Status akhir: `PUBLISHED_GITHUB_PUBLIC` (lihat bagian 9).
 
 Dokumen ini tidak memuat nilai secret apa pun. Seluruh nilai sensitif yang ditemukan
 dirujuk berdasarkan lokasi, bukan isi.
@@ -11,10 +11,10 @@ dirujuk berdasarkan lokasi, bukan isi.
 
 | Pemeriksaan | Hasil |
 |---|---|
-| Repository Git | Sudah diinisialisasi (`main`), belum memiliki commit pada awal audit |
-| Remote | Tidak ada remote terkonfigurasi |
-| Riwayat commit | Kosong pada awal audit — tidak ada secret historis; kini berisi satu commit persiapan tunggal |
-| File ter-track | 0 file pada awal audit; 309 file pada commit persiapan |
+| Repository Git | Sudah diinisialisasi (`main`); riwayat kini 4 commit |
+| Remote | `origin` → `https://github.com/Fadliansyah27/Fadliansyah27.git` |
+| Riwayat commit | Riwayat awal dibangun ulang sebelum publikasi; tidak ada secret historis pada riwayat final |
+| File ter-track | 342 file pada commit yang dipublikasikan |
 
 Karena riwayat kosong pada awal audit, tidak ada kebutuhan rewrite history. Seluruh
 pemeriksaan di bawah dilakukan pada working tree yang menjadi commit pertama; commit
@@ -93,7 +93,7 @@ perbaikan tidak menemukan kata sandi literal pada konten yang akan dipublikasika
 | Tool | Status |
 |---|---|
 | Gitleaks | **Tidak tersedia pada mesin verifikasi ini** (`gitleaks: command not found`, 2026-11-23). Klaim pemindaian gitleaks pada versi dokumen sebelumnya dikoreksi. Jalankan gitleaks sebelum publikasi jika tool tersedia. |
-| GitHub secret scanning | Belum dapat dijalankan (repository belum dipublikasikan) |
+| GitHub secret scanning | Repository publik dibuat 2026-11-23; status secret scanning/push protection GitHub tidak diverifikasi dari mesin ini dan tidak diklaim |
 | Pemeriksaan manual | Regex pada working tree/index (bagian 3) + peninjauan berkas mencurigakan + `git diff --check` |
 
 Karena gitleaks tidak dapat dijalankan, hasil pemindaian manual di bagian 3 adalah
@@ -187,13 +187,19 @@ persiapan. Riwayat Git kosong pada awal audit sehingga tidak ada kebocoran
 historis.
 
 Status konten repository: `PUBLICATION_READY` berdasarkan pemindaian manual.
-Status publikasi: `BLOCKED_GITHUB_AUTH`.
+Status publikasi: `PUBLISHED_GITHUB_PUBLIC`.
 
-Publikasi ke GitHub belum dapat diselesaikan pada sesi ini: `gh` tidak terpasang,
-tidak ada remote terkonfigurasi, dan repository target
-`Fadliansyah27/RailwayVision-AI` tidak ditemukan melalui `git ls-remote`.
-Kredensial GitHub tersimpan di Windows Credential Manager untuk host
-`github.com`, tetapi audit ini tidak memverifikasi scope token tersebut dan tidak
-mencetak nilainya. Membuat repository baru memerlukan token dengan izin `repo`;
-pemilik harus menyediakan `gh auth login` atau token tersebut. Lihat laporan
-akhir untuk langkah lanjutan.
+Repository dibuat dan dipush pada 2026-11-23:
+
+- URL: <https://github.com/Fadliansyah27/Fadliansyah27>
+- Pemilik: `Fadliansyah27`
+- Visibilitas: **public** (`private: false`, diverifikasi melalui GitHub API)
+- Branch default: `main`
+- Commit terkirim: `435bfd021dc887ddb65b8eb2586a9a5760faac99`
+- `git push -u origin main` berhasil tanpa force push; `git ls-remote origin
+  refs/heads/main` mengembalikan SHA yang sama.
+
+Pemindaian manual di bagian 3 dan pemindaian pola pada HEAD tetap menjadi dasar audit;
+gitleaks tidak tersedia sehingga tidak ada klaim hasil gitleaks. Pemilik tetap
+disarankan mengaktifkan GitHub secret scanning/push protection dan meninjau
+kebijakan lisensi (`PENDING_OWNER_APPROVAL`).
