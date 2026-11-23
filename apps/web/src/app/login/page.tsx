@@ -1,11 +1,11 @@
 "use client";
 
 import { KeyRound, Loader2, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
+import { AuthBrandLockup, AuthPhotoBackdrop, AuthPhotoBanner } from "@/components/auth-photo";
 import { Chip } from "@/components/ui";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -75,42 +75,8 @@ export default function LoginPage() {
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       <section className="relative hidden flex-col justify-between overflow-hidden bg-[#0b0b0f] px-10 py-10 text-white lg:flex">
-        <Image
-          src="/login-halim-whoosh.png"
-          alt="Kereta cepat Whoosh berhenti di peron Stasiun Halim"
-          fill
-          quality={90}
-          sizes="(min-width: 1024px) 51vw, 100vw"
-          className="object-cover"
-          style={{ objectPosition: "72% 58%" }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0b0f]/90 via-[#0b0b0f]/35 to-[#0b0b0f]/10"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0b0f]/80 via-[#0b0b0f]/25 to-transparent"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute left-0 top-0 h-56 w-[480px]"
-          style={{
-            backgroundImage:
-              "radial-gradient(ellipse at top left, rgba(11,11,15,0.9), transparent 70%)",
-          }}
-          aria-hidden="true"
-        />
-        <div className="relative flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-white font-semibold text-primary">
-            RV
-          </div>
-          <div>
-            <p className="text-sm font-semibold tracking-tight">RailwayVision AI</p>
-            <p className="text-[11px] text-[color:var(--rv-sidebar-muted)]">
-              Pendukung keputusan inspeksi · prototipe PT KCIC
-            </p>
-          </div>
-        </div>
+        <AuthPhotoBackdrop />
+        <AuthBrandLockup />
 
         <div className="relative max-w-md space-y-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--rv-sidebar-muted)]">
@@ -145,29 +111,7 @@ export default function LoginPage() {
 
       <section className="flex items-center justify-center px-4 py-12 sm:px-10">
         <div className="w-full max-w-md">
-          <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden rounded-2xl lg:hidden">
-            <Image
-              src="/login-halim-whoosh.png"
-              alt="Kereta cepat Whoosh berhenti di peron Stasiun Halim"
-              fill
-              sizes="(min-width: 640px) 28rem, 100vw"
-              className="object-cover"
-              style={{ objectPosition: "68% 55%" }}
-            />
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0b0f]/85 via-[#0b0b0f]/20 to-[#0b0b0f]/10"
-              aria-hidden="true"
-            />
-            <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 p-4">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-white text-sm font-semibold text-primary">
-                RV
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">RailwayVision AI</p>
-                <p className="text-[11px] text-white/75">Pendukung keputusan inspeksi</p>
-              </div>
-            </div>
-          </div>
+          <AuthPhotoBanner className="mb-6 lg:hidden" />
 
           <div className="flex items-center justify-between gap-3">
             <div>
