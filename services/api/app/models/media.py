@@ -58,9 +58,7 @@ class Dataset(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     split_train: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     split_validation: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     split_test: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(24), default="draft", index=True, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(24), default="draft", index=True, nullable=False)
     approval_notes: Mapped[str] = mapped_column(Text, default="", nullable=False)
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -88,9 +86,7 @@ class AIModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     dataset_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     class_names: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
-    training_config: Mapped[dict[str, Any]] = mapped_column(
-        JSON, default=dict, nullable=False
-    )
+    training_config: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
     evaluation_metrics: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     evaluation_notes: Mapped[str] = mapped_column(Text, default="", nullable=False)
     known_limitations: Mapped[str] = mapped_column(Text, default="", nullable=False)
@@ -109,9 +105,7 @@ class AIModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class AIJob(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "ai_jobs"
 
-    status: Mapped[str] = mapped_column(
-        String(16), default="queued", index=True, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(16), default="queued", index=True, nullable=False)
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

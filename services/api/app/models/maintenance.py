@@ -18,9 +18,7 @@ class Finding(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     priority: Mapped[str] = mapped_column(String(16), default="medium", nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(24), default="confirmed", index=True, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(24), default="confirmed", index=True, nullable=False)
     resolution_notes: Mapped[str] = mapped_column(Text, default="", nullable=False)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -72,12 +70,8 @@ class WorkOrder(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     finding: Mapped[Finding] = relationship(lazy="selectin")
     scope: Mapped[Scope] = relationship(lazy="selectin")
-    assignee: Mapped[User] = relationship(
-        lazy="selectin", foreign_keys=[assignee_id]
-    )
-    created_by: Mapped[User] = relationship(
-        lazy="selectin", foreign_keys=[created_by_id]
-    )
+    assignee: Mapped[User] = relationship(lazy="selectin", foreign_keys=[assignee_id])
+    created_by: Mapped[User] = relationship(lazy="selectin", foreign_keys=[created_by_id])
 
 
 class Notification(UUIDPrimaryKeyMixin, TimestampMixin, Base):

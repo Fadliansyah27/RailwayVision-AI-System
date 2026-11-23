@@ -27,8 +27,7 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
 
     cors_allowed_origins: str = (
-        "http://localhost:3000,http://localhost:3001,"
-        "http://127.0.0.1:3000,http://127.0.0.1:3001"
+        "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
     )
     max_json_body_bytes: int = 1_048_576
     enable_hsts: bool = False
@@ -90,8 +89,7 @@ class Settings(BaseSettings):
                 )
             if "localhost" in self.redis_url or "127.0.0.1" in self.redis_url:
                 raise ValueError(
-                    "REDIS_URL must point to the approved non-local service "
-                    "for staging/production"
+                    "REDIS_URL must point to the approved non-local service for staging/production"
                 )
             if not self.enable_hsts:
                 raise ValueError("ENABLE_HSTS must be true for staging/production")

@@ -12,7 +12,7 @@ void main() {
     final summary = summarizeReadiness(readiness);
 
     expect(summary.tone, HealthTone.success);
-    expect(summary.label, 'All systems operational');
+    expect(summary.label, 'Seluruh sistem beroperasi');
   });
 
   test('warns when only the asynchronous worker is unavailable', () {
@@ -24,7 +24,7 @@ void main() {
     final summary = summarizeReadiness(readiness);
 
     expect(summary.tone, HealthTone.warning);
-    expect(summary.label, contains('AI worker offline'));
+    expect(summary.label, contains('worker AI offline'));
   });
 
   test('reports degraded service when a required dependency fails', () {

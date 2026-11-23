@@ -80,15 +80,15 @@ function Navigation({ roles, onNavigate }: { roles: RoleCode[]; onNavigate?: () 
                       aria-current={active ? "page" : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                         active
-                          ? "bg-white/10 font-medium text-white"
+                          ? "bg-primary font-semibold text-white shadow-sm shadow-black/20 hover:bg-primary-strong"
                           : "text-[color:var(--rv-sidebar-muted)] hover:bg-white/5 hover:text-white"
                       }`}
                     >
-                      <Icon className="size-4 shrink-0" aria-hidden="true" />
+                      <Icon
+                        className={`size-4 shrink-0 ${active ? "text-white" : ""}`}
+                        aria-hidden="true"
+                      />
                       <span className="flex-1">{item.label}</span>
-                      {active ? (
-                        <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-                      ) : null}
                     </Link>
                   </li>
                 );
@@ -182,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ) : null}
 
       <div className="flex min-h-screen min-w-0 flex-col">
-        <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-border border-t-[3px] border-t-primary bg-surface/95 backdrop-blur">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
               type="button"
@@ -209,7 +209,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="hidden items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-canvas sm:flex"
               aria-label="Buka profil"
             >
-              <div className="flex size-9 items-center justify-center rounded-full bg-canvas text-xs font-semibold text-secondary ring-1 ring-border">
+              <div className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary ring-1 ring-primary/20">
                 {user ? initials(user.full_name) : <UserRound className="size-4" />}
               </div>
               <div className="hidden max-w-44 md:block">

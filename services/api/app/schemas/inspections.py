@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.common import AssetBrief, InspectionBrief, ScopeOut, UserBrief
 
@@ -55,10 +55,52 @@ class InspectionReviewOut(BaseModel):
     created_at: datetime
 
 
+class ChecklistEntryUpdate(BaseModel):
+    item_code: str = Field(min_length=2, max_length=48)
+    result: Literal["pass", "fail", "not_applicable"] | None = None
+    notes: str = Field(default="", max_length=2000)
+
+
+class InspectionChecklistUpdate(BaseModel):
+    version: int | None = Field(default=None, ge=1)
+    entries: list[ChecklistEntryUpdate] = Field(min_length=1, max_length=100)
+
+    @model_validator(mode="after")
+    def _unique_entries(self) -> "InspectionChecklistUpdate":
+        codes = [entry.item_code.upper() for entry in self.entries]
+        if len(set(codes)) != len(codes):
+            raise ValueError("Setiap item checklist hanya boleh diperbarui sekali per permintaan.")
+        return self
+
+
+class InspectionChecklistItemOut(BaseModel):
+    item_code: str
+    item_label: str
+    position: int
+    is_required: bool
+    result: str | None
+    notes: str
+    recorded_by: UserBrief | None
+    updated_at: datetime
+
+
+class InspectionChecklistOut(BaseModel):
+    template_id: uuid.UUID | None
+    template_code: str | None
+    template_name: str | None
+    template_version: int | None
+    total: int
+    required_total: int
+    answered: int
+    required_unanswered: int
+    items: list[InspectionChecklistItemOut]
+
+
 class InspectionDetail(InspectionOut):
     media_count: int = 0
     pending_detections: int = 0
     reviews: list[InspectionReviewOut] = Field(default_factory=list)
+    checklist: InspectionChecklistOut | None = None
 
 
 class InspectionListPage(BaseModel):
@@ -81,7 +123,11 @@ class InspectionHistoryEntry(BaseModel):
 
 
 __all__ = [
+    "ChecklistEntryUpdate",
     "InspectionBrief",
+    "InspectionChecklistItemOut",
+    "InspectionChecklistOut",
+    "InspectionChecklistUpdate",
     "InspectionCreate",
     "InspectionDetail",
     "InspectionHistoryEntry",

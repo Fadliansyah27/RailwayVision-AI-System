@@ -5,6 +5,7 @@ from app.api.routes import (
     assets,
     audit,
     auth,
+    checklists,
     dashboard,
     inspections,
     maintenance,
@@ -20,6 +21,7 @@ api_router.include_router(dashboard.router)
 api_router.include_router(auth.router)
 api_router.include_router(users.router)
 api_router.include_router(assets.router)
+api_router.include_router(checklists.router)
 api_router.include_router(inspections.router)
 api_router.include_router(media.router)
 api_router.include_router(ai_registry.router)

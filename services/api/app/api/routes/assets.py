@@ -43,9 +43,7 @@ def _asset_out(asset: Asset) -> AssetOut:
     )
 
 
-async def _get_accessible_asset(
-    db: AsyncSession, ctx: AuthContext, asset_id: uuid.UUID
-) -> Asset:
+async def _get_accessible_asset(db: AsyncSession, ctx: AuthContext, asset_id: uuid.UUID) -> Asset:
     stmt = (
         select(Asset)
         .join(Scope, Asset.scope_id == Scope.id)
@@ -73,9 +71,7 @@ async def _resolve_location(
     return location
 
 
-async def _resolve_category(
-    db: AsyncSession, category_id: uuid.UUID
-) -> AssetCategory:
+async def _resolve_category(db: AsyncSession, category_id: uuid.UUID) -> AssetCategory:
     category = await db.get(AssetCategory, category_id)
     if category is None:
         raise AppError(422, "validation_error", "Kategori aset tidak dikenal.")
@@ -88,8 +84,8 @@ async def list_categories(
     db: AsyncSession = Depends(get_db),
 ) -> list[CategoryOut]:
     categories = (
-        await db.execute(select(AssetCategory).order_by(AssetCategory.name.asc()))
-    ).scalars().all()
+        (await db.execute(select(AssetCategory).order_by(AssetCategory.name.asc()))).scalars().all()
+    )
     return [CategoryOut.model_validate(category) for category in categories]
 
 
@@ -163,8 +159,7 @@ async def create_location(
 ) -> LocationOut:
     scope = (
         await db.execute(
-            select(Scope)
-            .where(
+            select(Scope).where(
                 Scope.id == payload.scope_id,
                 accessible_scope_condition(ctx.scope_path),
             )

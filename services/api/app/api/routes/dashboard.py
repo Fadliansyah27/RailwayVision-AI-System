@@ -46,16 +46,12 @@ MONTH_LABELS = (
     "Nov",
     "Des",
 )
-OPEN_FINDING_STATUSES = frozenset(
-    {"confirmed", "assigned", "in_progress", "awaiting_verification"}
-)
+OPEN_FINDING_STATUSES = frozenset({"confirmed", "assigned", "in_progress", "awaiting_verification"})
 OVERDUE_AFTER_DAYS = 14
 TREND_MONTHS = 6
 
 
-async def _status_counts(
-    db: AsyncSession, model: Any, scope_path: str
-) -> dict[str, int]:
+async def _status_counts(db: AsyncSession, model: Any, scope_path: str) -> dict[str, int]:
     rows = (
         await db.execute(
             select(model.status, func.count())
@@ -136,16 +132,12 @@ async def dashboard_overview(
     finding_counts = _filled_counts(
         await _status_counts(db, Finding, ctx.scope_path), FINDING_STATUSES
     )
-    open_findings = sum(
-        finding_counts[status] for status in OPEN_FINDING_STATUSES
-    )
+    open_findings = sum(finding_counts[status] for status in OPEN_FINDING_STATUSES)
 
     work_order_counts = _filled_counts(
         await _status_counts(db, WorkOrder, ctx.scope_path), WORK_ORDER_STATUSES
     )
-    active_work_orders = sum(
-        work_order_counts[status] for status in ACTIVE_WORK_ORDER_STATUSES
-    )
+    active_work_orders = sum(work_order_counts[status] for status in ACTIVE_WORK_ORDER_STATUSES)
     overdue_cutoff = datetime.now(UTC) - timedelta(days=OVERDUE_AFTER_DAYS)
     overdue_work_orders = (
         await db.execute(
@@ -161,15 +153,19 @@ async def dashboard_overview(
     ).scalar_one()
 
     recent_rows = (
-        await db.execute(
-            select(Inspection)
-            .join(Scope, Inspection.scope_id == Scope.id)
-            .options(selectinload(Inspection.asset))
-            .where(accessible_scope_condition(ctx.scope_path))
-            .order_by(Inspection.inspected_at.desc())
-            .limit(5)
+        (
+            await db.execute(
+                select(Inspection)
+                .join(Scope, Inspection.scope_id == Scope.id)
+                .options(selectinload(Inspection.asset))
+                .where(accessible_scope_condition(ctx.scope_path))
+                .order_by(Inspection.inspected_at.desc())
+                .limit(5)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     return DashboardOverviewOut(
         generated_at=datetime.now(UTC),

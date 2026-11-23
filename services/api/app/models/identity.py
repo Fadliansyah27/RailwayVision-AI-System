@@ -99,9 +99,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     @property
     def permission_codes(self) -> frozenset[str]:
-        return frozenset(
-            permission.code for role in self.roles for permission in role.permissions
-        )
+        return frozenset(permission.code for role in self.roles for permission in role.permissions)
 
 
 class AuthSession(UUIDPrimaryKeyMixin, Base):
@@ -113,9 +111,7 @@ class AuthSession(UUIDPrimaryKeyMixin, Base):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     user_agent: Mapped[str | None] = mapped_column(String(255))
     ip_address: Mapped[str | None] = mapped_column(String(64))
@@ -124,9 +120,7 @@ class AuthSession(UUIDPrimaryKeyMixin, Base):
 class PasswordResetRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "password_reset_requests"
 
-    status: Mapped[str] = mapped_column(
-        String(16), default="pending", index=True, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(16), default="pending", index=True, nullable=False)
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     token_hash: Mapped[str | None] = mapped_column(
         String(64), unique=True, index=True, nullable=True

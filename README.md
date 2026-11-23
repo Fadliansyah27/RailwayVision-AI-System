@@ -55,10 +55,15 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
 ### Web (`apps/web`)
 
 - Login, pemulihan kata sandi, sesi via cookie HttpOnly, dan navigasi berbasis peran.
+- Identitas visual merah `#C61F33` yang konsisten pada navigasi aktif, tombol utama,
+  penanda status, dan app bar seluler (`docs/DESIGN_SYSTEM.md`).
 - Dasbor operasional dengan KPI langsung dari PostgreSQL, tren enam bulan (WIB),
   status temuan/perintah kerja, dan status platform.
 - Register aset dan lokasi dengan filter, pencarian, dan paginasi sesuai cakupan.
 - Inspeksi: draf, pengiriman, pemrosesan AI, verifikasi manusia, dan pemantauan status.
+- Checklist inspeksi per jenis: template master (satu aktif per jenis), salinan item saat
+  draf dibuat, pencatatan hasil per item, dan pengiriman diblokir backend jika item wajib
+  belum diisi (`422 checklist_incomplete`).
 - Unggah media dua tahap dengan progres, verifikasi SHA-256, karantina berkas tidak valid,
   serta pratinjau dan unduh yang diaudit.
 - Peninjauan indikasi AI dan keputusan pemeriksa (terima/kembalikan/tidak konklusif).
@@ -66,7 +71,8 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
 - Notifikasi dalam aplikasi.
 - Laporan periode dengan ringkasan status dan ekspor PDF/Excel serta cetak.
 - Riwayat aktivitas (audit) dengan filter.
-- Administrasi pengguna, peran, cakupan, dan tautan reset kata sandi sekali pakai.
+- Administrasi pengguna, peran, cakupan, tautan reset kata sandi sekali pakai, dan
+  template checklist inspeksi.
 - Register model AI dan dataset: pengajuan, persetujuan/penolakan bercatatan,
   penerapan (deploy) dan pensiun model, riwayat siklus hidup.
 
@@ -90,9 +96,14 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
 
 ### Seluler (`apps/mobile`)
 
-- Kerangka aplikasi Flutter dengan navigasi dan halaman status.
-- **Belum** memiliki login, kamera, unggah, draf luring, atau sinkronisasi. Lihat
-  bagian 21.
+- Aplikasi lapangan Flutter (Fase B) dengan identitas merah: login sesi aman, daftar dan detail
+  inspeksi milik pengguna, pengisian checklist dengan pemeriksaan versi, penyimpanan draf luring,
+  pengambilan bukti dari kamera/galeri, unggah dua fase dengan SHA-256 klien, dan antrean unggah
+  luring (persisten di perangkat, in-memory pada Flutter web).
+- Hak akses tetap ditegakkan API; aplikasi tidak melakukan keputusan keselamatan dan tidak
+  terhubung ke kendali kereta atau persinyalan.
+- Sudah diverifikasi dengan `flutter analyze`, 7 tes Flutter, dan `flutter build web` release.
+  Uji ujung-ke-ujung terhadap API live dan perangkat fisik belum dilakukan pada fase ini.
 
 ## 5. Arsitektur sistem
 
@@ -256,8 +267,12 @@ flutter pub get
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000   # emulator Android
 ```
 
-Gunakan `http://localhost:8000` untuk simulator iOS. Saat ini aplikasi seluler adalah
-kerangka status; modul lapangan belum tersedia.
+Gunakan `http://localhost:8000` untuk desktop/web lokal. Untuk Flutter web, tambahkan origin
+aplikasi ke `CORS_ALLOWED_ORIGINS` pada API agar permintaan sah diizinkan. Antrean bukti luring
+hanya persisten pada target non-web; pada web antrean disimpan di memori.
+
+Status: alur lapangan Fase B sudah diimplementasikan dan diuji pada level widget/analisis,
+tetapi belum diverifikasi ujung-ke-ujung terhadap API live atau perangkat fisik.
 
 ## 15. Cara menjalankan AI worker
 
@@ -297,9 +312,10 @@ flutter test
 
 Hasil verifikasi lokal terakhir (2026-11-23):
 
-- API: **73 tes lulus**, ruff bersih.
+- API: **77 tes lulus**, ruff bersih.
 - AI worker: **8 tes lulus**.
 - Web: **38 tes lulus**, TypeScript dan ESLint bersih.
+- Seluler: `flutter analyze` bersih, **7 tes Flutter lulus**, `flutter build web` release berhasil.
 - Build container `api` dan `web` berhasil; seluruh layanan Compose healthy.
 
 Angka di atas adalah hasil eksekusi lokal, bukan sertifikasi. Lihat
@@ -335,7 +351,8 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
    dan status backup.
 2. Reset data DEMO yang aman (hanya data demo, tidak pernah data operasional).
 3. Transport notifikasi tambahan (email/WhatsApp) sesuai kebijakan KCIC.
-4. Aplikasi lapangan Flutter: login, kamera, kompresi, unggah, draf luring, sinkronisasi.
+4. Aplikasi lapangan Flutter: verifikasi ujung-ke-ujung terhadap API live dan perangkat fisik,
+   lalu perluasan ke notifikasi dan perintah kerja lapangan.
 5. Alat anotasi dan manajemen dataset yang terhubung ke registri.
 6. Model AI terotorisasi dengan evaluasi terukur, setelah dataset dan protokol evaluasi
    disetujui pemilik data.
@@ -354,7 +371,7 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
 | 6 | Verifikasi manusia dan tinjauan bukti | Selesai (lokal) |
 | 7 | Temuan, perintah kerja, notifikasi | Selesai (lokal) |
 | 8 | Dasbor KPI, laporan PDF/Excel, registri model & dataset | Tersedia (lokal); operasi sistem lain dalam pengerjaan |
-| 9 | Aplikasi lapangan Flutter | Kerangka saja |
+| 9 | Aplikasi lapangan Flutter | Implementasi Fase B tersedia (lokal), teruji di level widget; E2E live **belum** |
 | 10 | Pengujian integrasi/keamanan menyeluruh dan UAT | Sebagian; UAT resmi **belum dilakukan** |
 
 Tidak ada fase yang boleh dianggap "production-ready" sampai gerbang penerimaan,

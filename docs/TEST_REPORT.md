@@ -9,6 +9,29 @@ This report covers the 0.7.0 Phase 7 pass. The 0.6.0 and 0.5.0 results are retai
 history. Features that remain unimplemented (reports/exports, real KPIs, authorized model
 evaluation, mobile capture) were not run and are listed as gaps, not passes.
 
+## 0.8.0-dev — Fase B Flutter field application (2026-11-23)
+
+Re-run after the Fase A checklist work and the Fase B Flutter implementation.
+
+| ID | Area | Command | Result |
+|---|---|---|---|
+| T-API-UNIT | API unit/integration | `pytest -q` (`services/api`) | **77 passed** |
+| T-WEB-TYPES | Web typecheck | `tsc --noEmit` (`apps/web`) | Pass |
+| T-WEB-LINT | Web lint | `npm run lint` | Pass |
+| T-WEB-UNIT | Web unit tests | `npm test` | **38 passed / 5 files** |
+| T-MOB-ANALYZE | Flutter static analysis | `flutter analyze` (`apps/mobile`) | Pass, 0 issues |
+| T-MOB-UNIT | Flutter widget/unit tests | `flutter test` | **7 passed / 2 files** |
+| T-MOB-BUILD | Flutter web release build | `flutter build web --release` | Success |
+
+Flutter coverage added in this pass: signed-out login gate, sign-in to the Indonesian shell
+with live readiness and workload text, unreachable-API retry state, and readiness summarization
+(healthy/worker-offline/degraded) with payload parsing. The offline upload store is injected as
+an in-memory implementation in widget tests so platform plugins are not required.
+
+Not run / not claimed: Flutter end-to-end against the live API, physical-device camera capture,
+signed Android/iOS builds, and any AI accuracy evaluation. `gitleaks` and the GitHub CLI were
+not available on this machine; secret scanning was limited to tracked-file pattern checks.
+
 ## 0.7.0 — Phase 7: findings, work orders, notifications
 
 ### Automated

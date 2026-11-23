@@ -20,7 +20,7 @@ Tidak ada item berstatus `FAILED`. Tidak ada klaim production-ready atau persetu
 | 7A | Dashboard dari database | COMPLETED | `GET /api/v1/dashboard/overview`, `components/operational-overview.tsx` |
 | 7B | User/role/permission/scope/organisasi | PARTIAL | Pengguna, peran, izin, cakupan ada; entitas `organizations` belum dimodelkan |
 | 7C | Asset management | PARTIAL | Register aset + lokasi; master kategori/hierarki aset belum dimodelkan |
-| 7D | Inspection management + checklist | PARTIAL | Inspeksi, media, status, riwayat ada; **checklist inspeksi belum diimplementasikan** |
+| 7D | Inspection management + checklist | PARTIAL | Inspeksi, media, status, riwayat, checklist master + snapshot + guard submit ada; koreksi kategori dan integrasi kamera/SOP resmi belum |
 | 7E | AI detection (jobs, confidence, bbox, segmen) | PARTIAL | Job AI + indikasi demo ada; tidak ada bbox/segmentasi; model nyata belum ada |
 | 7F | Technical review termasuk koreksi kategori | PARTIAL | Antrean, bukti, terima/kembalikan/tidak konklusif, catatan; koreksi kategori belum ada |
 | 7G | Supervisor approval | COMPLETED | Persetujuan/penolakan/pengembalian + riwayat keputusan |
@@ -34,7 +34,7 @@ Tidak ada item berstatus `FAILED`. Tidak ada klaim production-ready atau persetu
 | 10 | Dataset/AI pipeline dan evaluasi terukur | BLOCKED + PENDING_KCIC_VALIDATION | Tidak ada dataset/model/metrik nyata; dilarang mengarang; pipeline demo saja |
 | 11 | Security aplikasi | COMPLETED (lokal) | Argon2id, JWT, rate limit, object-level auth, media privat, validasi unggah, audit |
 | 11 | Security infrastruktur (TLS, at-rest, secret manager, backup) | PARTIAL | Belum ada TLS/at-rest/secret manager/backup di stack lokal |
-| 12 | Kualitas per modul (UI, backend, DB, izin, validasi, tes) | PARTIAL | Modul yang ada lulus tes (73 API, 8 worker, 38 web); modul yang belum ada tidak dihitung |
+| 12 | Kualitas per modul (UI, backend, DB, izin, validasi, tes) | PARTIAL | Modul yang ada lulus tes (77 API, 8 worker, 38 web); modul yang belum ada tidak dihitung |
 | 13 | Deployment & environment separation | PARTIAL | Docker Compose development; staging/produksi/backup/rollback belum ada |
 | 14 | Audit lalu implementasi bertahap | COMPLETED | Fase 1–8 selesai lokal; fase 9 sebagian; fase 10 belum |
 | 15 | Penandaan `PENDING_KCIC_VALIDATION` | COMPLETED | `docs/10_PROJECT_GOVERNANCE/KCIC_VALIDATION_REGISTER.md` |
@@ -43,17 +43,16 @@ Tidak ada item berstatus `FAILED`. Tidak ada klaim production-ready atau persetu
 
 ## Gap fungsional yang belum ada (prioritas implementasi berikutnya)
 
-1. **Checklist inspeksi** (master item, hasil per inspeksi) — modul 7D.
-2. **Master data aset**: tipe/kategori, hierarki, organisasi — modul 7B/7C.
-3. **Aplikasi lapangan Flutter**: login, kamera, unggah, draf luring, sinkronisasi.
-4. **Dataset governance lengkap**: anotasi, QC, versioning, split, evaluasi.
-5. **AI nyata** beserta metrik — bergantung pada dataset dan persetujuan (BLOCKED).
-6. **Laporan AI dan work order** terpisah.
-7. **Konsol operasi**: riwayat job AI, log terbatas peran, riwayat deploy, status backup.
-8. **Entitas belum dimodelkan**: organizations, asset_types, inspection_types,
-   inspection_checklist_items/results, camera_profiles, media_derivatives,
-   defect_categories, follow_up_proposals/approvals, work_order_updates, system_settings.
-9. **Hardening deployment**: TLS, enkripsi at-rest, secret manager, backup/DR, staging.
+1. **Master data aset**: tipe/kategori, hierarki, organisasi — modul 7B/7C.
+2. **Aplikasi lapangan Flutter**: login, kamera, unggah, draf luring, sinkronisasi.
+3. **Dataset governance lengkap**: anotasi, QC, versioning, split, evaluasi.
+4. **AI nyata** beserta metrik — bergantung pada dataset dan persetujuan (BLOCKED).
+5. **Laporan AI dan work order** terpisah.
+6. **Konsol operasi**: riwayat job AI, log terbatas peran, riwayat deploy, status backup.
+7. **Entitas belum dimodelkan**: organizations, asset_types, inspection_types,
+   camera_profiles, media_derivatives, defect_categories, follow_up_proposals/approvals,
+   work_order_updates, system_settings.
+8. **Hardening deployment**: TLS, enkripsi at-rest, secret manager, backup/DR, staging.
 
 ## Catatan
 

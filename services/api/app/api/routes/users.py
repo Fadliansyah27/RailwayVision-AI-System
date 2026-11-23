@@ -50,17 +50,13 @@ _USER_OPTIONS = (
 
 
 async def _resolve_roles(db: AsyncSession, role_codes: list[str]) -> list[Role]:
-    roles = (
-        await db.execute(select(Role).where(Role.code.in_(role_codes)))
-    ).scalars().all()
+    roles = (await db.execute(select(Role).where(Role.code.in_(role_codes)))).scalars().all()
     if len({role.code for role in roles}) != len(set(role_codes)):
         raise AppError(422, "validation_error", "Satu atau lebih peran tidak dikenal.")
     return list(roles)
 
 
-async def _resolve_scope(
-    db: AsyncSession, ctx: AuthContext, scope_id: uuid.UUID
-) -> Scope:
+async def _resolve_scope(db: AsyncSession, ctx: AuthContext, scope_id: uuid.UUID) -> Scope:
     scope = await db.get(Scope, scope_id)
     if scope is None or not (
         scope.path == ctx.scope_path or scope.path.startswith(f"{ctx.scope_path}/")
@@ -69,9 +65,7 @@ async def _resolve_scope(
     return scope
 
 
-async def _get_accessible_user(
-    db: AsyncSession, ctx: AuthContext, user_id: uuid.UUID
-) -> User:
+async def _get_accessible_user(db: AsyncSession, ctx: AuthContext, user_id: uuid.UUID) -> User:
     stmt = (
         select(User)
         .join(Scope, User.scope_id == Scope.id)
@@ -269,9 +263,7 @@ async def list_roles(
     ctx: AuthContext = Depends(require_permission("users:manage")),
     db: AsyncSession = Depends(get_db),
 ) -> list[RoleOut]:
-    roles = (
-        await db.execute(select(Role).order_by(Role.code.asc()))
-    ).scalars().all()
+    roles = (await db.execute(select(Role).order_by(Role.code.asc()))).scalars().all()
     return [RoleOut.model_validate(role) for role in roles]
 
 
@@ -282,19 +274,17 @@ async def update_role_permissions(
     ctx: AuthContext = Depends(require_permission("users:manage")),
     db: AsyncSession = Depends(get_db),
 ) -> RoleOut:
-    role = (
-        await db.execute(select(Role).where(Role.id == role_id))
-    ).scalar_one_or_none()
+    role = (await db.execute(select(Role).where(Role.id == role_id))).scalar_one_or_none()
     if role is None:
         raise AppError(404, "not_found", "Peran tidak ditemukan.")
     if role.code == RoleCode.ADMINISTRATOR:
         raise AppError(409, "conflict", "Izin administrator sengaja dibuat tetap.")
 
     permissions = (
-        await db.execute(
-            select(Permission).where(Permission.code.in_(payload.permission_codes))
-        )
-    ).scalars().all()
+        (await db.execute(select(Permission).where(Permission.code.in_(payload.permission_codes))))
+        .scalars()
+        .all()
+    )
     if len(permissions) != len(set(payload.permission_codes)):
         raise AppError(422, "validation_error", "Satu atau lebih izin tidak dikenal.")
 
@@ -314,9 +304,7 @@ async def update_role_permissions(
     await db.commit()
     role = (
         await db.execute(
-            select(Role)
-            .options(selectinload(Role.permissions))
-            .where(Role.id == role_id)
+            select(Role).options(selectinload(Role.permissions)).where(Role.id == role_id)
         )
     ).scalar_one()
     return RoleOut.model_validate(role)
@@ -328,8 +316,8 @@ async def list_permissions(
     db: AsyncSession = Depends(get_db),
 ) -> list[PermissionOut]:
     permissions = (
-        await db.execute(select(Permission).order_by(Permission.code.asc()))
-    ).scalars().all()
+        (await db.execute(select(Permission).order_by(Permission.code.asc()))).scalars().all()
+    )
     return [PermissionOut.model_validate(permission) for permission in permissions]
 
 
@@ -339,12 +327,16 @@ async def list_scopes(
     db: AsyncSession = Depends(get_db),
 ) -> list[ScopeOut]:
     scopes = (
-        await db.execute(
-            select(Scope)
-            .where(accessible_scope_condition(ctx.scope_path))
-            .order_by(Scope.path.asc())
+        (
+            await db.execute(
+                select(Scope)
+                .where(accessible_scope_condition(ctx.scope_path))
+                .order_by(Scope.path.asc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [ScopeOut.model_validate(scope) for scope in scopes]
 
 
@@ -419,9 +411,7 @@ async def list_password_reset_requests(
     ]
 
 
-@router.post(
-    "/users/{user_id}/password-reset-token", response_model=PasswordResetTokenOut
-)
+@router.post("/users/{user_id}/password-reset-token", response_model=PasswordResetTokenOut)
 async def issue_password_reset_token(
     user_id: uuid.UUID,
     ctx: AuthContext = Depends(require_permission("users:manage")),

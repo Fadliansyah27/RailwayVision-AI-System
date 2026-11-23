@@ -28,9 +28,7 @@ class DatasetOut(BaseModel):
 
 
 class DatasetCreate(BaseModel):
-    code: str = Field(
-        min_length=3, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$"
-    )
+    code: str = Field(min_length=3, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
     name: str = Field(min_length=3, max_length=160)
     version: str = Field(min_length=1, max_length=32)
     source: str = Field(min_length=3, max_length=240)

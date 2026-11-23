@@ -269,16 +269,45 @@ Requires `inspections:write`. Body
 `routine`); `location_reference` ≤ 200 chars (free text — do not enter unapproved KCIC
 coordinates); notes ≤ 4,000 chars; `inspected_at` defaults to now UTC, naive values are
 treated as UTC. Creates a `draft` owned by the caller with a generated reference
-`INS-YYYYMMDD-XXXXXX`. `201`; audit `inspection.created`.
+`INS-YYYYMMDD-XXXXXX`. If an active checklist template exists for the inspection type, its
+items are snapshotted into `inspection_checklist_results` in the same transaction. `201`;
+audit `inspection.created` (metadata includes `checklist_items`).
 
 #### GET `/api/v1/inspections/{inspection_id}`
-Requires `inspections:read`. Returns `InspectionOut` plus `media_count` (media objects with status `ready`), `pending_detections` (AI jobs with status `queued` or `running`), and `reviews` — the newest 20 human review decisions with `decision`, `notes`, `reviewer`, and `created_at`.
+Requires `inspections:read`. Returns `InspectionOut` plus `media_count` (media objects with status `ready`), `pending_detections` (AI jobs with status `queued` or `running`), `reviews` — the newest 20 human review decisions — and `checklist` (or `null`), containing template code/name/version, totals, and per-item `result`, `notes`, `recorded_by`, and `updated_at`.
 
 #### PATCH `/api/v1/inspections/{inspection_id}`
-Requires `inspections:write`. Only the assigned inspector (or `inspections:manage` holder) may edit, and only while `status == "draft"`. Body: optional `inspection_type`, `location_reference`, `notes`, `inspected_at`, and `version` for optimistic concurrency. If `version` is supplied and differs from the stored version, the API returns `409 conflict` ("modified by another session"). A successful edit increments `version`; audit `inspection.updated`.
+Requires `inspections:write`. Only the assigned inspector (or `inspections:manage` holder) may edit, and only while `status == "draft"`. Body: optional `inspection_type`, `location_reference`, `notes`, `inspected_at`, and `version` for optimistic concurrency. If `version` is supplied and differs from the stored version, the API returns `409 conflict` ("modified by another session"). Changing `inspection_type` re-snapshots the checklist only when no answers exist; otherwise it returns `409 conflict`. A successful edit increments `version`; audit `inspection.updated`.
+
+#### PATCH `/api/v1/inspections/{inspection_id}/checklist`
+Requires `inspections:write` and draft ownership (or `inspections:manage`). Body:
+`{"version": n, "entries": [{"item_code": "SURFACE", "result": "pass|fail|not_applicable|null", "notes": "..."}]}`.
+Codes must belong to the inspection's snapshot (`422 unknown_checklist_item` otherwise);
+one entry per code; notes ≤ 2,000 chars. A stale `version` returns `409`. The edit records
+`recorded_by_id`, increments the inspection version, audits `inspection.checklist_updated`,
+and returns the full inspection detail. If a legacy draft has no snapshot, the API attempts
+to snapshot the currently active template; if none exists it returns `409 conflict`.
 
 #### POST `/api/v1/inspections/{inspection_id}/submit`
-Requires `inspections:submit`. Transitions `draft` → `submitted`, increments `version`, audit `inspection.submitted`. Editing or submitting a non-draft inspection returns `409 conflict`; a non-owner without `inspections:manage` gets `403 forbidden`.
+Requires `inspections:submit`. Transitions `draft` → `submitted`, increments `version`, audit `inspection.submitted`. If any required checklist item is unanswered, returns `422 checklist_incomplete` and does not change status. Editing or submitting a non-draft inspection returns `409 conflict`; a non-owner without `inspections:manage` gets `403 forbidden`.
+
+### Checklist master data
+
+#### GET `/api/v1/master/checklist-templates`
+Requires `inspections:read`. Query: `page`, `page_size` (1–100), `inspection_type`, `is_active`.
+Returns templates with ordered items.
+
+#### POST `/api/v1/master/checklist-templates`
+Requires `inspections:manage`. Body:
+`{"code": "ROUTINE-V1", "name": "...", "inspection_type": "routine", "is_active": true, "items": [{"code": "SURFACE", "label": "...", "position": 1, "is_required": true}]}`.
+Codes are normalized to uppercase; item codes and positions must be unique. Activating a
+template deactivates other active templates of the same inspection type. `201`; audit
+`checklist_template.created`.
+
+#### PATCH `/api/v1/master/checklist-templates/{template_id}`
+Requires `inspections:manage`. Body: optional `name`, `is_active`. Activating deactivates
+active peers for the same type. Templates are never hard-deleted, and edits never mutate
+existing inspection snapshots. Audit `checklist_template.updated`.
 
 #### POST `/api/v1/inspections/{inspection_id}/cancel`
 Requires `inspections:manage`. Allowed from `draft`, `submitted`, `ai_processing`,

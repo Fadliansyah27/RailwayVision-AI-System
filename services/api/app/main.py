@@ -73,9 +73,7 @@ def create_app() -> FastAPI:
         media_max_bytes=settings.media_max_bytes,
         media_path_prefix=f"{settings.api_v1_prefix}/media/",
     )
-    app.add_middleware(
-        SecurityHeadersMiddleware, enable_hsts=settings.enable_hsts
-    )
+    app.add_middleware(SecurityHeadersMiddleware, enable_hsts=settings.enable_hsts)
     app.add_middleware(RequestContextMiddleware)
 
     register_exception_handlers(app)

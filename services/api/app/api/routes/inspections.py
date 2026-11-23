@@ -24,6 +24,7 @@ from app.models.inspections import Inspection, InspectionReview
 from app.models.media import AIJob, MediaObject
 from app.schemas.common import AssetBrief, Page, ScopeOut
 from app.schemas.inspections import (
+    InspectionChecklistUpdate,
     InspectionCreate,
     InspectionDetail,
     InspectionOut,
@@ -34,6 +35,13 @@ from app.schemas.inspections import (
 )
 from app.services.access import accessible_scope_condition, user_brief
 from app.services.audit import record_audit
+from app.services.checklists import (
+    checklist_for_inspection,
+    ensure_checklist_complete,
+    load_checklist_results,
+    replace_checklist_snapshot,
+    snapshot_checklist,
+)
 
 router = APIRouter(tags=["inspections"])
 
@@ -84,9 +92,7 @@ async def _get_accessible_inspection(
     return inspection
 
 
-async def _get_accessible_asset(
-    db: AsyncSession, ctx: AuthContext, asset_id: uuid.UUID
-) -> Asset:
+async def _get_accessible_asset(db: AsyncSession, ctx: AuthContext, asset_id: uuid.UUID) -> Asset:
     stmt = (
         select(Asset)
         .join(Scope, Asset.scope_id == Scope.id)
@@ -101,10 +107,7 @@ async def _get_accessible_asset(
 def _assert_can_edit(ctx: AuthContext, inspection: Inspection) -> None:
     if inspection.status not in EDITABLE_STATUSES:
         raise AppError(409, "conflict", "Hanya inspeksi draf yang dapat diubah.")
-    if (
-        inspection.inspector_id != ctx.user.id
-        and "inspections:manage" not in ctx.permissions
-    ):
+    if inspection.inspector_id != ctx.user.id and "inspections:manage" not in ctx.permissions:
         raise AppError(
             403,
             "forbidden",
@@ -170,9 +173,7 @@ async def create_inspection(
         location_reference=payload.location_reference.strip(),
         notes=payload.notes.strip(),
         inspected_at=(
-            _normalize_datetime(payload.inspected_at)
-            if payload.inspected_at
-            else datetime.now(UTC)
+            _normalize_datetime(payload.inspected_at) if payload.inspected_at else datetime.now(UTC)
         ),
         asset_id=asset.id,
         inspector_id=ctx.user.id,
@@ -180,6 +181,7 @@ async def create_inspection(
     )
     db.add(inspection)
     await db.flush()
+    checklist_items = await snapshot_checklist(db, inspection)
     await record_audit(
         db,
         action="inspection.created",
@@ -187,7 +189,11 @@ async def create_inspection(
         target_type="inspection",
         target_id=inspection.id,
         scope_id=inspection.scope_id,
-        metadata={"reference": inspection.reference, "asset": asset.code},
+        metadata={
+            "reference": inspection.reference,
+            "asset": asset.code,
+            "checklist_items": checklist_items,
+        },
     )
     await db.commit()
     return _inspection_out(await _get_accessible_inspection(db, ctx, inspection.id))
@@ -222,9 +228,7 @@ async def get_inspection(
     return await _inspection_detail(db, inspection)
 
 
-async def _inspection_detail(
-    db: AsyncSession, inspection: Inspection
-) -> InspectionDetail:
+async def _inspection_detail(db: AsyncSession, inspection: Inspection) -> InspectionDetail:
     base = _inspection_out(inspection)
     media_count = (
         await db.execute(
@@ -247,17 +251,22 @@ async def _inspection_detail(
         )
     ).scalar_one()
     reviews = (
-        await db.execute(
-            select(InspectionReview)
-            .where(InspectionReview.inspection_id == inspection.id)
-            .order_by(InspectionReview.created_at.desc())
-            .limit(20)
+        (
+            await db.execute(
+                select(InspectionReview)
+                .where(InspectionReview.inspection_id == inspection.id)
+                .order_by(InspectionReview.created_at.desc())
+                .limit(20)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return InspectionDetail(
         **base.model_dump(),
         media_count=media_count,
         pending_detections=pending_detections,
+        checklist=await checklist_for_inspection(db, inspection.id),
         reviews=[
             InspectionReviewOut(
                 id=review.id,
@@ -286,8 +295,12 @@ async def update_inspection(
         )
 
     changed: list[str] = []
-    if payload.inspection_type is not None:
+    if (
+        payload.inspection_type is not None
+        and payload.inspection_type != inspection.inspection_type
+    ):
         inspection.inspection_type = payload.inspection_type
+        await replace_checklist_snapshot(db, inspection)
         changed.append("inspection_type")
     if payload.location_reference is not None:
         inspection.location_reference = payload.location_reference.strip()
@@ -321,6 +334,7 @@ async def submit_inspection(
 ) -> InspectionOut:
     inspection = await _get_accessible_inspection(db, ctx, inspection_id)
     _assert_can_edit(ctx, inspection)
+    await ensure_checklist_complete(db, inspection.id)
     inspection.status = "submitted"
     inspection.version += 1
     await record_audit(
@@ -334,6 +348,70 @@ async def submit_inspection(
     )
     await db.commit()
     return _inspection_out(await _get_accessible_inspection(db, ctx, inspection_id))
+
+
+@router.patch("/inspections/{inspection_id}/checklist", response_model=InspectionDetail)
+async def update_inspection_checklist(
+    inspection_id: uuid.UUID,
+    payload: InspectionChecklistUpdate,
+    ctx: AuthContext = Depends(require_permission("inspections:write")),
+    db: AsyncSession = Depends(get_db),
+) -> InspectionDetail:
+    inspection = await _get_accessible_inspection(db, ctx, inspection_id)
+    _assert_can_edit(ctx, inspection)
+    if payload.version is not None and payload.version != inspection.version:
+        raise AppError(
+            409, "conflict", "Inspeksi ini diubah oleh sesi lain. Muat ulang lalu coba lagi."
+        )
+
+    rows = await load_checklist_results(db, inspection.id)
+    if not rows:
+        await snapshot_checklist(db, inspection)
+        await db.flush()
+        rows = await load_checklist_results(db, inspection.id)
+    if not rows:
+        raise AppError(
+            409,
+            "conflict",
+            "Tidak ada template checklist aktif untuk jenis inspeksi ini.",
+        )
+
+    by_code = {row.item_code.upper(): row for row in rows}
+    unknown = [
+        entry.item_code for entry in payload.entries if entry.item_code.upper() not in by_code
+    ]
+    if unknown:
+        raise AppError(
+            422,
+            "unknown_checklist_item",
+            f"Item checklist tidak dikenal: {', '.join(unknown[:5])}.",
+        )
+
+    for entry in payload.entries:
+        row = by_code[entry.item_code.upper()]
+        row.result = entry.result
+        row.notes = entry.notes.strip()
+        row.recorded_by_id = ctx.user.id
+
+    inspection.version += 1
+    answered = sum(1 for row in rows if row.result is not None)
+    await record_audit(
+        db,
+        action="inspection.checklist_updated",
+        actor=ctx.user,
+        target_type="inspection",
+        target_id=inspection.id,
+        scope_id=inspection.scope_id,
+        metadata={
+            "reference": inspection.reference,
+            "entries": len(payload.entries),
+            "answered": answered,
+            "version": inspection.version,
+        },
+    )
+    await db.commit()
+    refreshed = await _get_accessible_inspection(db, ctx, inspection_id)
+    return await _inspection_detail(db, refreshed)
 
 
 @router.post("/inspections/{inspection_id}/cancel", response_model=InspectionOut)

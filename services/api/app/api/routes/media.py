@@ -145,10 +145,7 @@ async def _get_accessible_media(
 def _assert_can_attach(ctx: AuthContext, inspection: Inspection) -> None:
     if inspection.status in TERMINAL_STATUSES:
         raise AppError(409, "conflict", "Inspeksi ini tidak lagi menerima media.")
-    if (
-        inspection.inspector_id != ctx.user.id
-        and "inspections:manage" not in ctx.permissions
-    ):
+    if inspection.inspector_id != ctx.user.id and "inspections:manage" not in ctx.permissions:
         raise AppError(
             403,
             "forbidden",
@@ -156,9 +153,7 @@ def _assert_can_attach(ctx: AuthContext, inspection: Inspection) -> None:
         )
 
 
-@router.post(
-    "/inspections/{inspection_id}/media", response_model=MediaOut, status_code=201
-)
+@router.post("/inspections/{inspection_id}/media", response_model=MediaOut, status_code=201)
 async def create_media_intent(
     inspection_id: uuid.UUID,
     payload: MediaIntent,
@@ -213,10 +208,7 @@ async def upload_media_content(
     media = await _get_accessible_media(db, ctx, media_id)
     if media.status != "pending_upload":
         raise AppError(409, "conflict", "Unggahan ini sudah selesai.")
-    if (
-        media.uploaded_by_id != ctx.user.id
-        and "inspections:manage" not in ctx.permissions
-    ):
+    if media.uploaded_by_id != ctx.user.id and "inspections:manage" not in ctx.permissions:
         raise AppError(403, "forbidden", "Hanya pengunggah yang dapat menyelesaikan unggahan ini.")
 
     header_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
@@ -269,9 +261,7 @@ async def upload_media_content(
             )
             await db.commit()
             raise AppError(422, "validation_error", f"Unggahan ditolak: {reason}.")
-        await storage.put_bytes(
-            media.bucket, media.object_key, bytes(buffer), media.content_type
-        )
+        await storage.put_bytes(media.bucket, media.object_key, bytes(buffer), media.content_type)
     except StorageUnavailable as exc:
         raise AppError(503, "service_unavailable", "Penyimpanan media tidak tersedia.") from exc
 
@@ -363,9 +353,7 @@ async def get_media_content(
     return response
 
 
-@router.post(
-    "/inspections/{inspection_id}/ai-jobs", response_model=AIJobOut, status_code=201
-)
+@router.post("/inspections/{inspection_id}/ai-jobs", response_model=AIJobOut, status_code=201)
 async def create_ai_job(
     inspection_id: uuid.UUID,
     payload: AIJobCreate,
@@ -452,9 +440,7 @@ async def create_ai_job(
     try:
         await queue.enqueue_demo_quality_check(str(job_id))
     except AppError:
-        failed = (
-            await db.execute(select(AIJob).where(AIJob.id == job_id))
-        ).scalar_one()
+        failed = (await db.execute(select(AIJob).where(AIJob.id == job_id))).scalar_one()
         failed.status = "failed"
         failed.error_code = "queue_unavailable"
         failed.finished_at = _now()
@@ -487,9 +473,7 @@ async def list_ai_jobs(
     inspection = await _get_accessible_inspection(db, ctx, inspection_id)
     total = (
         await db.execute(
-            select(func.count())
-            .select_from(AIJob)
-            .where(AIJob.inspection_id == inspection.id)
+            select(func.count()).select_from(AIJob).where(AIJob.inspection_id == inspection.id)
         )
     ).scalar_one()
     stmt = (
@@ -515,9 +499,7 @@ async def list_models(
     ),
     db: AsyncSession = Depends(get_db),
 ) -> Page[AIModelOut]:
-    models = (
-        await db.execute(select(AIModel).order_by(AIModel.created_at.asc()))
-    ).scalars().all()
+    models = (await db.execute(select(AIModel).order_by(AIModel.created_at.asc()))).scalars().all()
     usage_rows = (
         await db.execute(
             select(

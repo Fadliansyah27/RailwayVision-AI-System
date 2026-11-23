@@ -90,9 +90,7 @@ class MinioStorage:
                     await self._run(self.client.make_bucket, bucket)
             self._buckets_ready = True
 
-    async def put_bytes(
-        self, bucket: str, key: str, data: bytes, content_type: str
-    ) -> None:
+    async def put_bytes(self, bucket: str, key: str, data: bytes, content_type: str) -> None:
         await self.ensure_buckets()
         await self._run(
             self.client.put_object,

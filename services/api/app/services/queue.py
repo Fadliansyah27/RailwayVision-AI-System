@@ -21,15 +21,11 @@ class CeleryTaskQueue(TaskQueue):
         )
 
     async def enqueue_demo_quality_check(self, job_id: str) -> None:
-        send = functools.partial(
-            self._client.send_task, "ai.demo_quality_check", args=[job_id]
-        )
+        send = functools.partial(self._client.send_task, "ai.demo_quality_check", args=[job_id])
         try:
             await anyio.to_thread.run_sync(send)
         except Exception as exc:
-            raise AppError(
-                503, "service_unavailable", "Antrean tugas AI tidak tersedia."
-            ) from exc
+            raise AppError(503, "service_unavailable", "Antrean tugas AI tidak tersedia.") from exc
 
 
 _queue: CeleryTaskQueue | None = None

@@ -82,22 +82,22 @@ class ReadinessSummary {
 ReadinessSummary summarizeReadiness(Readiness readiness) {
   if (!readiness.isOperational) {
     return const ReadinessSummary(
-      label: 'Service degraded',
-      detail: 'A required dependency (database or queue) is unavailable.',
+      label: 'Layanan terganggu',
+      detail: 'Dependensi wajib (basis data atau antrean) tidak tersedia.',
       tone: HealthTone.critical,
     );
   }
   if (readiness.component('worker') != 'ok') {
     return const ReadinessSummary(
-      label: 'Operational — AI worker offline',
+      label: 'Beroperasi — worker AI offline',
       detail:
-          'The API is serving requests. AI jobs will queue until the worker heartbeat resumes.',
+          'API tetap melayani permintaan. Pekerjaan AI akan mengantre sampai worker aktif kembali.',
       tone: HealthTone.warning,
     );
   }
   return const ReadinessSummary(
-    label: 'All systems operational',
-    detail: 'API, PostgreSQL, Redis, and the AI worker heartbeat are healthy.',
+    label: 'Seluruh sistem beroperasi',
+    detail: 'API, PostgreSQL, Redis, dan heartbeat worker AI dalam kondisi sehat.',
     tone: HealthTone.success,
   );
 }

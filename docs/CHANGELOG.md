@@ -2,9 +2,31 @@
 
 All notable changes to RailwayVision AI are recorded here. Dates are UTC. This project is a decision-support prototype; nothing here implies production approval.
 
-## [Unreleased] — 0.8.0-dev — dashboard, reports, model lifecycle
+## [Unreleased] — 0.8.0-dev — dashboard, reports, model lifecycle, checklists
 
 ### Added
+- Configurable inspection checklists: `checklist_templates`, `checklist_template_items`,
+  and `inspection_checklist_results` (Alembic `c4d5e6f7a8b9`). Master API
+  `GET/POST/PATCH /master/checklist-templates` requires `inspections:manage` for writes and
+  keeps at most one active template per inspection type. Inspection creation snapshots the
+  active template; `PATCH /inspections/{id}/checklist` records per-item results/notes while
+  the record is a draft; submit returns `422 checklist_incomplete` while required items are
+  unanswered. Template changes never mutate existing snapshots. Audit events:
+  `checklist_template.created/updated`, `inspection.checklist_updated`.
+- Web checklist panel on inspection detail (progress, per-item result/notes, optimistic
+  version check) and an administration tab for template creation/activation.
+- Design tokens aligned to the mandated palette (`#C61F33`, `#A8192D`, `#FCECEF`, `#F8F9FB`,
+  `#101820`, `#667085`, `#E5E7EB`); AI/focus accents moved into the red family. Active
+  sidebar navigation, header accent, primary actions, Flutter app bar, filled buttons, FAB,
+  and navigation indicator now carry the red identity. Documented in `docs/DESIGN_SYSTEM.md`.
+- Flutter field application (Fase B): login/session restore with secure token storage and
+  single-flight refresh rotation; Indonesian workspace shell with live readiness and
+  server-computed workload; inspection list and detail with status chips; checklist editing
+  with optimistic versioning plus `checklist_incomplete` handling; offline checklist drafts
+  with explicit sync and version-conflict recovery; camera/gallery evidence with client
+  SHA-256; two-phase media upload; offline upload queue (persistent on native, in-memory on
+  web). Verified with `flutter analyze`, 7 Flutter tests, and a release web build. Live
+  API/device end-to-end testing remains pending.
 - `GET /api/v1/dashboard/overview`: live KPI counts (inspections, findings, work
   orders), status breakdowns, six-month inspection trend bucketed in Asia/Jakarta,
   and the five most recent inspections — all scope-filtered from PostgreSQL.
@@ -42,7 +64,7 @@ All notable changes to RailwayVision AI are recorded here. Dates are UTC. This p
   files; the password now comes only from `DEMO_SEED_PASSWORD` at runtime.
 
 ### Tests
-- API suite: 73 passed (dashboard, reports, and AI registry/navigation coverage added).
+- API suite: 77 passed (checklist snapshot, submit guard, RBAC, and template activation coverage added).
 - Web: 38 passed; TypeScript and ESLint clean. Worker: 8 passed.
 - Live checks: dashboard counts, `/models` rendering, PDF/XLSX export, migration applied
   to PostgreSQL (`8f1c2d3e4a50`).

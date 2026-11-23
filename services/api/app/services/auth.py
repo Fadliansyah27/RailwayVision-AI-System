@@ -28,11 +28,7 @@ async def load_user(db: AsyncSession, user_id) -> User | None:
 
 
 async def load_user_by_email(db: AsyncSession, email: str) -> User | None:
-    stmt = (
-        select(User)
-        .options(*_USER_LOAD_OPTIONS)
-        .where(User.email == email.strip().lower())
-    )
+    stmt = select(User).options(*_USER_LOAD_OPTIONS).where(User.email == email.strip().lower())
     return (await db.execute(stmt)).scalar_one_or_none()
 
 

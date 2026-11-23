@@ -24,6 +24,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
+import { ChecklistPanel } from "@/components/checklist-panel";
 import { DemoBadge, InspectionStatusChip } from "@/components/records";
 import { FindingsPanel } from "@/components/findings-panel";
 import { MediaPanel } from "@/components/media-panel";
@@ -306,6 +307,15 @@ export default function InspectionDetailPage() {
     setHistoryKey((value) => value + 1);
   }, []);
 
+  const handleChecklistUpdated = useCallback(
+    (data: InspectionDetail) => {
+      applyInspection(data);
+      setNotice("Checklist tersimpan. Versi catatan dinaikkan dan perubahan diaudit.");
+      setHistoryKey((value) => value + 1);
+    },
+    [applyInspection],
+  );
+
   const handleReviewed = useCallback(
     (data: InspectionDetail) => {
       applyInspection(data);
@@ -552,6 +562,14 @@ export default function InspectionDetailPage() {
               </div>
             </dl>
           </Card>
+
+          <ChecklistPanel
+            key={`${inspection.id}-${inspection.version}`}
+            inspection={inspection}
+            token={token}
+            editable={editable}
+            onUpdated={handleChecklistUpdated}
+          />
 
           <Card>
             <CardHeader

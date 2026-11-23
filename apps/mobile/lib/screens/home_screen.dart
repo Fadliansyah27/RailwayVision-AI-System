@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../core/format.dart';
 import '../core/theme.dart';
+import '../models/session.dart';
 import '../models/system_status.dart';
 import '../services/api_client.dart';
 import '../widgets/section_card.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.apiClient});
+  const HomeScreen({
+    super.key,
+    required this.api,
+    required this.user,
+    required this.onUnauthorized,
+    required this.onOpenInspections,
+  });
 
-  final ApiClient apiClient;
+  final ApiClient api;
+  final SessionUser user;
+  final VoidCallback onUnauthorized;
+  final VoidCallback onOpenInspections;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   SystemSnapshot? _snapshot;
   String? _error;
   bool _loading = true;
+  int? _draftCount;
+  int? _submittedCount;
 
   @override
   void initState() {
@@ -31,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _error = null;
     });
     try {
-      final snapshot = await widget.apiClient.fetchStatus();
+      final snapshot = await widget.api.fetchStatus();
       if (!mounted) {
         return;
       }
@@ -39,37 +52,75 @@ class _HomeScreenState extends State<HomeScreen> {
         _snapshot = snapshot;
         _loading = false;
       });
-    } catch (_) {
+    } on ApiException catch (error) {
       if (!mounted) {
         return;
       }
       setState(() {
-        _error =
-            'Unable to reach the API at ${widget.apiClient.baseUrl}. Check that the API container is running and that the device can reach it.';
+        _error = error.isNetworkFailure
+            ? 'Tidak dapat menghubungi API di ${widget.api.baseUrl}. '
+                'Periksa jaringan dan pastikan layanan berjalan.'
+            : error.message;
         _loading = false;
+      });
+    }
+    await _loadWorkload();
+  }
+
+  Future<void> _loadWorkload() async {
+    try {
+      final draft = await widget.api.listInspections(
+        mine: true,
+        status: 'draft',
+        pageSize: 1,
+      );
+      final submitted = await widget.api.listInspections(
+        mine: true,
+        status: 'submitted',
+        pageSize: 1,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _draftCount = draft.total;
+        _submittedCount = submitted.total;
+      });
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      if (error.isUnauthorized) {
+        widget.onUnauthorized();
+        return;
+      }
+      setState(() {
+        _draftCount = null;
+        _submittedCount = null;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final firstName = widget.user.fullName.split(' ').first;
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
-          const InfoBanner(
-            title: 'Foundation build (Phase 1).',
-            message:
-                'Only platform health is live today. Sign-in, inspections, AI analysis, and work orders arrive in later phases. No operational data is simulated.',
+          _GreetingCard(
+            name: firstName,
+            role: widget.user.roleSummary,
+            scopeName: widget.user.scope.name,
           ),
           const SizedBox(height: 12),
           SectionCard(
-            title: 'Platform status',
-            description: 'Queried directly from the API and its dependencies.',
+            title: 'Status platform',
+            description: 'Diambil langsung dari API dan dependensinya.',
             trailing: IconButton(
-              tooltip: 'Refresh status',
+              tooltip: 'Muat ulang status',
               onPressed: _loading ? null : _load,
               icon: _loading
                   ? const SizedBox(
@@ -82,13 +133,38 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _buildStatus(context),
           ),
           const SizedBox(height: 12),
-          const _WorkloadCard(),
+          SectionCard(
+            title: 'Beban tugas saya',
+            description: 'Dihitung server untuk cakupan Anda.',
+            child: Column(
+              children: [
+                _WorkloadRow(
+                  label: 'Draf perlu diselesaikan',
+                  value: _draftCount,
+                  onTap: widget.onOpenInspections,
+                ),
+                const Divider(height: 18),
+                _WorkloadRow(
+                  label: 'Menunggu peninjauan',
+                  value: _submittedCount,
+                  onTap: widget.onOpenInspections,
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: widget.onOpenInspections,
+                  icon: const Icon(Icons.checklist, size: 18),
+                  label: const Text('Buka daftar inspeksi'),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 12),
           const _SafetyBoundaryCard(),
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'Decision-support prototype. Not a train-control or safety-clearance system.',
+              'Prototipe pendukung keputusan. Bukan sistem kendali kereta '
+              'atau izin keselamatan.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: RvColors.secondary,
@@ -103,15 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildStatus(BuildContext context) {
     final snapshot = _snapshot;
-
     if (snapshot == null && _loading) {
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const LinearProgressIndicator(minHeight: 3),
           const SizedBox(height: 12),
           Text(
-            'Checking API, PostgreSQL, Redis, and AI worker…',
+            'Memeriksa API, PostgreSQL, Redis, dan worker AI…',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: RvColors.secondary,
                 ),
@@ -119,7 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       );
     }
-
     if (snapshot == null && _error != null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +214,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     _error!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: RvColors.ink,
                           height: 1.5,
                         ),
                   ),
@@ -152,31 +225,20 @@ class _HomeScreenState extends State<HomeScreen> {
           FilledButton.icon(
             onPressed: _load,
             icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('Retry connection'),
+            label: const Text('Coba lagi'),
           ),
         ],
       );
     }
-
     if (snapshot == null) {
       return const SizedBox.shrink();
     }
 
     final summary = summarizeReadiness(snapshot.readiness);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SummaryBanner(summary: summary),
-        if (_error != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            'Showing the last known status. The most recent refresh failed.',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: RvColors.warning,
-                ),
-          ),
-        ],
         const SizedBox(height: 12),
         Row(
           children: [
@@ -203,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _ServiceTile(
                 icon: Icons.memory_outlined,
-                name: 'Redis queue',
+                name: 'Antrean Redis',
                 state: snapshot.readiness.component('redis'),
               ),
             ),
@@ -211,50 +273,125 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _ServiceTile(
                 icon: Icons.bolt_outlined,
-                name: 'AI worker',
+                name: 'Worker AI',
                 state: snapshot.readiness.component('worker'),
-                note: 'Informational',
+                note: 'Informatif',
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
         Text(
-          'API ${snapshot.meta?.version ?? 'unknown'} · '
-          '${snapshot.meta?.environment ?? 'unknown'} environment · '
-          'checked ${TimeOfDay.fromDateTime(snapshot.checkedAt).format(context)}',
+          'API ${snapshot.meta?.version ?? 'tidak diketahui'} · '
+          '${snapshot.meta?.environment ?? 'tidak diketahui'} · '
+          'diperiksa ${formatDateTime(snapshot.checkedAt)}',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: RvColors.secondary,
               ),
         ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: RvColors.aiSoft,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: RvColors.ai.withValues(alpha: 0.2)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      ],
+    );
+  }
+}
+
+class _GreetingCard extends StatelessWidget {
+  const _GreetingCard({
+    required this.name,
+    required this.role,
+    required this.scopeName,
+  });
+
+  final String name;
+  final String role;
+  final String scopeName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [RvColors.primary, RvColors.primaryStrong],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              const Icon(Icons.verified_user_outlined,
-                  size: 16, color: RvColors.ai),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  snapshot.meta?.aiDisclaimer ??
-                      'AI-generated suggestions are advisory and preliminary. They must be verified by an authorized reviewer.',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: RvColors.ink,
-                        height: 1.5,
-                      ),
+              const Icon(Icons.waving_hand_outlined,
+                  size: 18, color: Colors.white70),
+              const SizedBox(width: 6),
+              Text(
+                'Selamat bertugas, $name',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
                 ),
               ),
+              const Spacer(),
+              const DemoBadge(onBrand: true),
             ],
           ),
+          const SizedBox(height: 6),
+          Text(
+            '$role · $scopeName',
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Lengkapi checklist, lampirkan bukti, lalu kirim untuk peninjauan '
+            'manusia. Hak akses divalidasi server pada setiap aksi.',
+            style: TextStyle(color: Colors.white, height: 1.5, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WorkloadRow extends StatelessWidget {
+  const _WorkloadRow({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final int? value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+            Text(
+              value?.toString() ?? '—',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: RvColors.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right, size: 18, color: RvColors.secondary),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -288,7 +425,6 @@ class _SummaryBanner extends StatelessWidget {
           Icons.help_outline,
         ),
     };
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -309,7 +445,6 @@ class _SummaryBanner extends StatelessWidget {
                   summary.label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: RvColors.ink,
                       ),
                 ),
                 const SizedBox(height: 2),
@@ -345,10 +480,9 @@ class _ServiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final healthy = state == 'ok';
-    final label = healthy ? 'Healthy' : 'Unavailable';
+    final label = healthy ? 'Sehat' : 'Tidak tersedia';
     final color = healthy ? RvColors.success : RvColors.critical;
     final background = healthy ? RvColors.successSoft : RvColors.criticalSoft;
-
     return Container(
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
@@ -398,74 +532,20 @@ class _ServiceTile extends StatelessWidget {
   }
 }
 
-class _WorkloadCard extends StatelessWidget {
-  const _WorkloadCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return SectionCard(
-      title: 'Your workload',
-      description: 'Personal workload appears after authentication (Phase 2).',
-      child: Column(
-        children: [
-          _WorkloadRow(label: 'Assigned inspections', hint: 'Phase 3'),
-          const Divider(height: 20),
-          _WorkloadRow(label: 'Open work items', hint: 'Phase 7'),
-        ],
-      ),
-    );
-  }
-}
-
-class _WorkloadRow extends StatelessWidget {
-  const _WorkloadRow({required this.label, required this.hint});
-
-  final String label;
-  final String hint;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ),
-        Text(
-          '—',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: RvColors.secondary.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          hint,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: RvColors.secondary,
-              ),
-        ),
-      ],
-    );
-  }
-}
-
 class _SafetyBoundaryCard extends StatelessWidget {
   const _SafetyBoundaryCard();
 
   static const _items = [
-    'AI output is advisory. Authorized reviewers make every engineering decision.',
-    'No train-control, signalling, interlocking, dispatch, or safety-clearance functions.',
-    'No automated “safe” or “unsafe” verdict exists anywhere in the system.',
-    'Synthetic or explicitly authorized data only until KCIC approves datasets.',
+    'Keluaran AI bersifat saran. Keputusan teknik diambil peninjau berwenang.',
+    'Tidak ada fungsi kendali kereta, persinyalan, interlocking, atau dispatch.',
+    'Tidak ada vonis otomatis “aman” atau “tidak aman” di seluruh sistem.',
+    'Hanya data sintetis atau data yang disetujui KCIC yang boleh dipakai.',
   ];
 
   @override
   Widget build(BuildContext context) {
     return SectionCard(
-      title: 'Safety boundary',
+      title: 'Batas keselamatan',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

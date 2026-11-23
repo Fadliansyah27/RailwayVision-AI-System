@@ -184,11 +184,7 @@ async def refresh(
 
     stmt = select(AuthSession).where(AuthSession.token_hash == hash_refresh_token(token))
     session = (await db.execute(stmt)).scalar_one_or_none()
-    if (
-        session is None
-        or session.revoked_at is not None
-        or as_utc(session.expires_at) <= utcnow()
-    ):
+    if session is None or session.revoked_at is not None or as_utc(session.expires_at) <= utcnow():
         raise AppError(401, "unauthorized", "Sesi tidak lagi valid.")
 
     user = await load_user(db, session.user_id)
@@ -326,9 +322,7 @@ async def request_password_reset(
             latest.token_hash = None
             latest.token_expires_at = None
             latest.used_at = None
-        await record_audit(
-            db, action="auth.password_reset_requested", actor=user
-        )
+        await record_audit(db, action="auth.password_reset_requested", actor=user)
         await db.commit()
     return {"status": "accepted"}
 

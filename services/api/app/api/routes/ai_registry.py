@@ -26,9 +26,7 @@ def _now() -> datetime:
 
 
 async def _get_model(db: AsyncSession, model_id: uuid.UUID) -> AIModel:
-    model = (
-        await db.execute(select(AIModel).where(AIModel.id == model_id))
-    ).scalar_one_or_none()
+    model = (await db.execute(select(AIModel).where(AIModel.id == model_id))).scalar_one_or_none()
     if model is None:
         raise AppError(404, "not_found", "Model tidak ditemukan.")
     return model
@@ -91,9 +89,7 @@ def _dataset_out(dataset: Dataset) -> DatasetOut:
         status=dataset.status,
         approval_notes=dataset.approval_notes,
         approved_at=dataset.approved_at,
-        approved_by=(
-            user_brief(dataset.approved_by) if dataset.approved_by is not None else None
-        ),
+        approved_by=(user_brief(dataset.approved_by) if dataset.approved_by is not None else None),
         created_at=dataset.created_at,
         updated_at=dataset.updated_at,
     )
@@ -155,9 +151,7 @@ async def approve_model(
 ) -> AIModelOut:
     model = await _get_model(db, model_id)
     if model.approval_status != "pending_approval":
-        raise AppError(
-            409, "conflict", "Hanya model yang menunggu persetujuan dapat disetujui."
-        )
+        raise AppError(409, "conflict", "Hanya model yang menunggu persetujuan dapat disetujui.")
     if not model.evaluation_metrics:
         raise AppError(
             409,
@@ -194,9 +188,7 @@ async def reject_model(
 ) -> AIModelOut:
     model = await _get_model(db, model_id)
     if model.approval_status != "pending_approval":
-        raise AppError(
-            409, "conflict", "Hanya model yang menunggu persetujuan dapat ditolak."
-        )
+        raise AppError(409, "conflict", "Hanya model yang menunggu persetujuan dapat ditolak.")
     model.approval_status = "rejected"
     model.approval_notes = payload.notes.strip()
     await record_audit(
@@ -223,21 +215,23 @@ async def deploy_model(
             409, "conflict", "Model demonstrasi tidak dapat diterapkan sebagai model operasional."
         )
     if model.approval_status != "approved":
-        raise AppError(
-            409, "conflict", "Model harus disetujui sebelum dapat diterapkan."
-        )
+        raise AppError(409, "conflict", "Model harus disetujui sebelum dapat diterapkan.")
     if model.status == "active":
         raise AppError(409, "conflict", "Model ini sudah aktif.")
 
     peers = (
-        await db.execute(
-            select(AIModel).where(
-                AIModel.family == model.family,
-                AIModel.id != model.id,
-                AIModel.status == "active",
+        (
+            await db.execute(
+                select(AIModel).where(
+                    AIModel.family == model.family,
+                    AIModel.id != model.id,
+                    AIModel.status == "active",
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     previous = [f"{peer.code}:{peer.version}" for peer in peers]
     for peer in peers:
         peer.status = "retired"
@@ -298,16 +292,20 @@ async def model_history(
 ) -> list[dict]:
     await _get_model(db, model_id)
     events = (
-        await db.execute(
-            select(AuditEvent)
-            .where(
-                AuditEvent.target_type == "ai_model",
-                AuditEvent.target_id == str(model_id),
+        (
+            await db.execute(
+                select(AuditEvent)
+                .where(
+                    AuditEvent.target_type == "ai_model",
+                    AuditEvent.target_id == str(model_id),
+                )
+                .order_by(AuditEvent.created_at.desc())
+                .limit(50)
             )
-            .order_by(AuditEvent.created_at.desc())
-            .limit(50)
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [
         {
             "id": str(event.id),
@@ -327,12 +325,16 @@ async def list_datasets(
     db: AsyncSession = Depends(get_db),
 ) -> list[DatasetOut]:
     datasets = (
-        await db.execute(
-            select(Dataset)
-            .options(selectinload(Dataset.approved_by))
-            .order_by(Dataset.created_at.desc())
+        (
+            await db.execute(
+                select(Dataset)
+                .options(selectinload(Dataset.approved_by))
+                .order_by(Dataset.created_at.desc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [_dataset_out(dataset) for dataset in datasets]
 
 
@@ -428,9 +430,7 @@ async def approve_dataset(
 ) -> DatasetOut:
     dataset = await _load_dataset(db, dataset_id)
     if dataset.status != "pending_approval":
-        raise AppError(
-            409, "conflict", "Hanya dataset yang menunggu persetujuan dapat disetujui."
-        )
+        raise AppError(409, "conflict", "Hanya dataset yang menunggu persetujuan dapat disetujui.")
     dataset.status = "approved"
     dataset.approval_notes = payload.notes.strip()
     dataset.approved_at = _now()
@@ -457,9 +457,7 @@ async def reject_dataset(
 ) -> DatasetOut:
     dataset = await _load_dataset(db, dataset_id)
     if dataset.status != "pending_approval":
-        raise AppError(
-            409, "conflict", "Hanya dataset yang menunggu persetujuan dapat ditolak."
-        )
+        raise AppError(409, "conflict", "Hanya dataset yang menunggu persetujuan dapat ditolak.")
     dataset.status = "rejected"
     dataset.approval_notes = payload.notes.strip()
     await record_audit(

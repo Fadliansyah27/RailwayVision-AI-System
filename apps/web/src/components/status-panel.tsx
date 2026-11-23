@@ -177,7 +177,7 @@ export function SystemStatusPanel() {
               <button
                 type="button"
                 onClick={refresh}
-                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-ink/90"
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-strong"
               >
                 <RefreshCw className="size-3.5" aria-hidden="true" />
                 Coba sambung ulang

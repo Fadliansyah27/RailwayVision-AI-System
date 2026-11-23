@@ -529,9 +529,7 @@ async def list_work_orders(
         conditions.append(WorkOrder.assignee_id == ctx.user.id)
     if search:
         term = f"%{search.strip()}%"
-        conditions.append(
-            or_(WorkOrder.reference.ilike(term), WorkOrder.title.ilike(term))
-        )
+        conditions.append(or_(WorkOrder.reference.ilike(term), WorkOrder.title.ilike(term)))
 
     total = (
         await db.execute(
@@ -592,13 +590,17 @@ async def list_assignees(
     if not user_ids:
         return []
     rows = (
-        await db.execute(
-            select(User)
-            .join(Scope, User.scope_id == Scope.id)
-            .where(User.id.in_(user_ids))
-            .order_by(User.full_name)
+        (
+            await db.execute(
+                select(User)
+                .join(Scope, User.scope_id == Scope.id)
+                .where(User.id.in_(user_ids))
+                .order_by(User.full_name)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [
         AssigneeOut(
             id=user.id,
@@ -701,9 +703,7 @@ async def update_work_order(
     changed: list[str] = []
     previous_assignee_id = work_order.assignee_id
     if payload.assignee_id is not None and payload.assignee_id != work_order.assignee_id:
-        assignee = await _get_assignee(
-            db, ctx, payload.assignee_id, work_order.finding.scope.path
-        )
+        assignee = await _get_assignee(db, ctx, payload.assignee_id, work_order.finding.scope.path)
         work_order.assignee_id = assignee.id
         changed.append("assignee")
     if payload.title is not None:
@@ -793,8 +793,7 @@ async def complete_work_order(
         raise AppError(
             409,
             "conflict",
-            "Hanya perintah kerja terbuka atau sedang dikerjakan yang dapat "
-            "dilaporkan selesai.",
+            "Hanya perintah kerja terbuka atau sedang dikerjakan yang dapat dilaporkan selesai.",
         )
     work_order.status = "awaiting_verification"
     work_order.completion_notes = payload.notes.strip()
@@ -936,8 +935,7 @@ async def cancel_work_order(
             kind="work_order.cancelled",
             title=f"Perintah kerja {work_order.reference} dibatalkan",
             body=(
-                "Pengelola perintah kerja membatalkan penugasan ini. "
-                "Buka untuk membaca alasannya."
+                "Pengelola perintah kerja membatalkan penugasan ini. Buka untuk membaca alasannya."
             ),
             target_type="work_order",
             target_id=str(work_order.id),

@@ -75,9 +75,9 @@ def _resolve_range(
             "Tanggal awal tidak boleh melewati tanggal akhir.",
         )
     start_utc = datetime.combine(start_date, time.min, tzinfo=JAKARTA).astimezone(UTC)
-    end_utc = datetime.combine(
-        end_date + timedelta(days=1), time.min, tzinfo=JAKARTA
-    ).astimezone(UTC)
+    end_utc = datetime.combine(end_date + timedelta(days=1), time.min, tzinfo=JAKARTA).astimezone(
+        UTC
+    )
     return start_date, end_date, start_utc, end_utc
 
 
@@ -117,22 +117,26 @@ async def _load_summary(
     end_utc: datetime,
 ) -> ReportSummaryOut:
     inspection_rows = (
-        await db.execute(
-            select(Inspection)
-            .join(Scope, Inspection.scope_id == Scope.id)
-            .options(
-                selectinload(Inspection.asset),
-                selectinload(Inspection.inspector),
+        (
+            await db.execute(
+                select(Inspection)
+                .join(Scope, Inspection.scope_id == Scope.id)
+                .options(
+                    selectinload(Inspection.asset),
+                    selectinload(Inspection.inspector),
+                )
+                .where(
+                    accessible_scope_condition(ctx.scope_path),
+                    Inspection.inspected_at >= start_utc,
+                    Inspection.inspected_at < end_utc,
+                )
+                .order_by(Inspection.inspected_at.asc())
+                .limit(MAX_REPORT_ROWS)
             )
-            .where(
-                accessible_scope_condition(ctx.scope_path),
-                Inspection.inspected_at >= start_utc,
-                Inspection.inspected_at < end_utc,
-            )
-            .order_by(Inspection.inspected_at.asc())
-            .limit(MAX_REPORT_ROWS)
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     inspection_counts = _filled(
         await _status_counts(
@@ -199,10 +203,7 @@ async def _load_summary(
 
 
 def _period_label(summary: ReportSummaryOut) -> str:
-    return (
-        f"{summary.date_from.strftime('%d-%m-%Y')} s.d. "
-        f"{summary.date_to.strftime('%d-%m-%Y')}"
-    )
+    return f"{summary.date_from.strftime('%d-%m-%Y')} s.d. {summary.date_to.strftime('%d-%m-%Y')}"
 
 
 def _local_time(value: datetime) -> str:
@@ -307,18 +308,12 @@ def _build_pdf(summary: ReportSummaryOut) -> bytes:
         author="RailwayVision AI",
     )
     styles = getSampleStyleSheet()
-    body = ParagraphStyle(
-        "Body", parent=styles["BodyText"], fontSize=8.5, leading=11
-    )
+    body = ParagraphStyle("Body", parent=styles["BodyText"], fontSize=8.5, leading=11)
     cell = ParagraphStyle("Cell", parent=body, fontSize=8, leading=10)
     elements: list[Any] = [
-        Paragraph(
-            "<b>RailwayVision AI - Laporan Inspeksi (DEMO)</b>", styles["Title"]
-        ),
+        Paragraph("<b>RailwayVision AI - Laporan Inspeksi (DEMO)</b>", styles["Title"]),
         Paragraph(f"Periode: {_period_label(summary)}", body),
-        Paragraph(
-            f"Dibuat: {_local_time(summary.generated_at)} WIB", body
-        ),
+        Paragraph(f"Dibuat: {_local_time(summary.generated_at)} WIB", body),
         Spacer(1, 4 * mm),
     ]
 
@@ -362,9 +357,7 @@ def _build_pdf(summary: ReportSummaryOut) -> bytes:
         table_data.append(
             [
                 row.reference,
-                Paragraph(
-                    html.escape(f"{row.asset.code} - {row.asset.name}"), cell
-                ),
+                Paragraph(html.escape(f"{row.asset.code} - {row.asset.name}"), cell),
                 INSPECTION_TYPE_LABELS.get(row.inspection_type, row.inspection_type),
                 INSPECTION_STATUS_LABELS.get(row.status, row.status),
                 Paragraph(html.escape(row.inspector.full_name), cell),
@@ -454,9 +447,7 @@ async def export_inspections_xlsx(
     filename = f"railwayvision-inspeksi-{start_date:%Y%m%d}-{end_date:%Y%m%d}.xlsx"
     return StreamingResponse(
         io.BytesIO(content),
-        media_type=(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ),
+        media_type=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 

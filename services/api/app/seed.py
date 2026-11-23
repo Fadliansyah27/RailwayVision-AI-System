@@ -113,8 +113,14 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
         if user is not None:
             continue
         roles = (
-            await db.execute(select(Role).where(Role.code.in_([str(code) for code in role_codes])))
-        ).scalars().all()
+            (
+                await db.execute(
+                    select(Role).where(Role.code.in_([str(code) for code in role_codes]))
+                )
+            )
+            .scalars()
+            .all()
+        )
         user = User(
             email=email,
             full_name=full_name,
@@ -155,12 +161,8 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
             await db.flush()
         return location
 
-    location_north = await get_or_create_location(
-        "DEMO-LOC-N1", "DEMO Halaman Utara 01", north
-    )
-    location_south = await get_or_create_location(
-        "DEMO-LOC-S1", "DEMO Halaman Selatan 01", south
-    )
+    location_north = await get_or_create_location("DEMO-LOC-N1", "DEMO Halaman Utara 01", north)
+    location_south = await get_or_create_location("DEMO-LOC-S1", "DEMO Halaman Selatan 01", south)
 
     async def get_or_create_asset(
         code: str,
@@ -199,9 +201,7 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
     ).scalar_one_or_none()
     if inspector is not None:
         existing = (
-            await db.execute(
-                select(Inspection).where(Inspection.reference == "DEMO-INS-0001")
-            )
+            await db.execute(select(Inspection).where(Inspection.reference == "DEMO-INS-0001"))
         ).scalar_one_or_none()
         if existing is None:
             db.add(
@@ -220,9 +220,7 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
 
 async def seed_ai_registry(db: AsyncSession) -> None:
     model = (
-        await db.execute(
-            select(AIModel).where(AIModel.code == "demo-image-quality")
-        )
+        await db.execute(select(AIModel).where(AIModel.code == "demo-image-quality"))
     ).scalar_one_or_none()
     if model is not None:
         return

@@ -234,10 +234,54 @@ export interface InspectionReview {
   created_at: string;
 }
 
+export interface InspectionChecklistItem {
+  item_code: string;
+  item_label: string;
+  position: number;
+  is_required: boolean;
+  result: string | null;
+  notes: string;
+  recorded_by: UserBrief | null;
+  updated_at: string;
+}
+
+export interface InspectionChecklist {
+  template_id: string | null;
+  template_code: string | null;
+  template_name: string | null;
+  template_version: number | null;
+  total: number;
+  required_total: number;
+  answered: number;
+  required_unanswered: number;
+  items: InspectionChecklistItem[];
+}
+
+export interface ChecklistTemplateItem {
+  id: string;
+  code: string;
+  label: string;
+  position: number;
+  is_required: boolean;
+}
+
+export interface ChecklistTemplate {
+  id: string;
+  code: string;
+  name: string;
+  inspection_type: string;
+  version: number;
+  is_active: boolean;
+  items: ChecklistTemplateItem[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface InspectionDetail extends InspectionSummary {
   media_count: number;
   pending_detections: number;
   reviews: InspectionReview[];
+  checklist: InspectionChecklist | null;
 }
 
 export interface FindingBrief {

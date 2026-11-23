@@ -1,4 +1,10 @@
 from app.models.assets import Asset, AssetCategory, Location
+from app.models.checklists import (
+    CHECKLIST_RESULT_VALUES,
+    ChecklistTemplate,
+    ChecklistTemplateItem,
+    InspectionChecklistResult,
+)
 from app.models.identity import (
     AuditEvent,
     AuthSession,
@@ -29,6 +35,10 @@ __all__ = [
     "Asset",
     "AssetCategory",
     "AuditEvent",
+    "CHECKLIST_RESULT_VALUES",
+    "ChecklistTemplate",
+    "ChecklistTemplateItem",
+    "InspectionChecklistResult",
     "AuthSession",
     "Finding",
     "Inspection",

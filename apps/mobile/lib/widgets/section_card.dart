@@ -68,18 +68,26 @@ class SectionCard extends StatelessWidget {
 }
 
 class DemoBadge extends StatelessWidget {
-  const DemoBadge({super.key, this.label = 'DEMO'});
+  const DemoBadge({super.key, this.label = 'DEMO', this.onBrand = false});
 
   final String label;
+  final bool onBrand;
 
   @override
   Widget build(BuildContext context) {
+    final foreground = onBrand ? Colors.white : RvColors.warning;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: RvColors.warningSoft,
+        color: onBrand
+            ? Colors.white.withValues(alpha: 0.16)
+            : RvColors.warningSoft,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: RvColors.warning.withValues(alpha: 0.25)),
+        border: Border.all(
+          color: onBrand
+              ? Colors.white.withValues(alpha: 0.45)
+              : RvColors.warning.withValues(alpha: 0.25),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -87,8 +95,8 @@ class DemoBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
-              color: RvColors.warning,
+            decoration: BoxDecoration(
+              color: foreground,
               shape: BoxShape.circle,
             ),
           ),
@@ -96,7 +104,7 @@ class DemoBadge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: RvColors.warning,
+                  color: foreground,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.6,
                 ),

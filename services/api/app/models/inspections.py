@@ -15,12 +15,8 @@ class Inspection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     reference: Mapped[str] = mapped_column(String(32), unique=True, index=True, nullable=False)
     status: Mapped[str] = mapped_column(String(24), default="draft", index=True, nullable=False)
-    inspection_type: Mapped[str] = mapped_column(
-        String(24), default="routine", nullable=False
-    )
-    location_reference: Mapped[str] = mapped_column(
-        String(200), default="", nullable=False
-    )
+    inspection_type: Mapped[str] = mapped_column(String(24), default="routine", nullable=False)
+    location_reference: Mapped[str] = mapped_column(String(200), default="", nullable=False)
     notes: Mapped[str] = mapped_column(Text, default="", nullable=False)
     inspected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)

@@ -3,7 +3,9 @@
 Last updated: 2026-11-23
 Current release: `0.7.0` (Phase 7: findings, work orders, notifications).
 Working tree also contains unreleased `0.8.0-dev` work: operational dashboard, PDF/Excel
-reports, AI model lifecycle registry, dataset registry, and the `/models` console.
+reports, AI model lifecycle registry, dataset registry, the `/models` console, configurable
+inspection checklists, the red-identity design system (`docs/DESIGN_SYSTEM.md`), and the
+Flutter field application (Fase B).
 
 Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 `docs/10_PROJECT_GOVERNANCE/PROMPT_COMPLIANCE.md` dan
@@ -21,8 +23,8 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 | 5 | AI engine with authorized dataset/model and evaluation | Blocked for accuracy claims | Demo pipeline delivered in Phase 4; no authorized model or dataset |
 | 6 | Human verification and review workflow | Complete (local), extended in 0.6.0 | `docs/PHASE_6_REPORT.md`; review start, three-way decision, reopen |
 | 7 | Findings, work orders, notifications | Complete (local), 0.7.0 | `docs/PHASE_7_REPORT.md`; 10 API tests, live lifecycle and browser verification |
-| 8 | Dashboard KPIs, charts, PDF/Excel reports | In progress (local, unreleased 0.8.0-dev): dashboard, reports, model/dataset registry delivered; ops-console items pending | `app/api/routes/dashboard.py`, `reports.py`, `ai_registry.py`; `/` and `/reports` and `/models`; 73 API tests |
-| 9 | Flutter field application (login, capture, upload, history) | Not started | App is a status shell |
+| 8 | Dashboard KPIs, charts, PDF/Excel reports, inspection checklists | In progress (local, unreleased 0.8.0-dev): dashboard, reports, model/dataset registry, checklist master + snapshot + submit guard delivered; ops-console items pending | `app/api/routes/dashboard.py`, `reports.py`, `ai_registry.py`, `checklists.py`; `/` and `/reports`, `/models`, administration checklist tab; 77 API tests |
+| 9 | Flutter field application (login, capture, upload, history) | Implemented locally (Fase B), widget-tested; live E2E pending | Login/session with secure storage and refresh rotation, inspection list/detail, checklist edit with optimistic version, offline draft sync, camera/gallery evidence, two-phase upload with client SHA-256, offline upload queue; `flutter analyze` clean, 7 Flutter tests, release web build |
 | 10 | Integration and security testing (TEST_PLAN/SECURITY_AGENT) | Not started | Phase-level checks only |
 
 ## What actually works today
@@ -51,7 +53,7 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
   cancel, review start, accept/return/inconclusive decisions, and supervisor reopen —
   all transitions validated in the backend.
 - Web: login, forgot/reset password, guarded routes, session restore via HttpOnly cookie,
-  profile page, administration console with four tabs, audit viewer, role-driven navigation,
+  profile page, administration console with five tabs, audit viewer, role-driven navigation,
   real audit activity on the overview.
 - Asset register UI: summary counters, scoped list with search/status/category/location
   filters and pagination, asset detail with inspection history, create/edit forms, and a
@@ -59,6 +61,13 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 - Inspection UI: list with status/mine filters and per-status summary, draft capture with
   asset preselect, type, and location reference, detail with version-checked editing,
   submit/cancel/reopen, review start and three-way review panel, and audit-backed history.
+- Inspection checklists: administrator-managed templates (one active per inspection type),
+  automatic item snapshot when a draft is created, per-item result/notes with optimistic
+  versioning, and backend enforcement on submit (`422 checklist_incomplete`). Template edits
+  never mutate existing snapshots; all changes are audited.
+- Visual identity: mandated red palette (`#C61F33`/`#A8192D`/`#FCECEF`) with red active
+  navigation, header accent, primary actions, and a red Flutter app bar/FAB/navigation;
+  tokens documented in `docs/DESIGN_SYSTEM.md`.
 - Same-origin web → API proxy (`/api/v1`, `/health`) so the refresh cookie stays first-party.
 - Media evidence: private MinIO buckets, API-mediated two-phase upload, client+server SHA-256,
   signature/size validation, quarantine of mismatches, scoped preview/download with per-read
@@ -90,6 +99,13 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
   a findings panel on the inspection detail page. The overview marks Phase 7 delivered.
 - Demo seed: 6 users, 3 scopes, 6 categories, 2 locations, 3 assets, 1 inspection,
   1 demo AI model — all labelled DEMO.
+- Flutter field application (Fase B): secure token storage, login gate with demo-account hints,
+  session restore and refresh rotation with 401 fallback, Indonesian workspace shell with live
+  readiness and server-computed workload, inspection list/detail, checklist editing with
+  optimistic version checks and `checklist_incomplete` messaging, offline checklist drafts with
+  explicit sync/conflict handling, camera/gallery capture with client-side SHA-256, two-phase
+  media upload, and an offline upload queue (persistent on native, in-memory on web). All access
+  decisions remain server-enforced.
 
 ## Not implemented (do not assume)
 
@@ -105,7 +121,9 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 - Work-order due dates, overdue tracking, scheduling, or notifications outside the app.
 - Operations console: AI job history, role-restricted log viewer, backup status, deployment
   history, and safe DEMO-only reset.
-- Mobile authentication, camera, upload, drafts, offline sync.
+- Mobile: no live API or physical-device end-to-end run yet; no Android/iOS signed builds;
+  web offline queue is memory-only; no push notifications or background sync; no offline
+  media preview cache beyond queued bytes.
 - Asset deletion/archiving, QR labels, and asset status history.
 - Session/device management UI.
 
@@ -127,10 +145,13 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
   migration `7d2a4c9e3b10`; live API lifecycle (finding → work order → start → complete →
   verify → finding closed), notification delivery, and browser verification
   (`docs/PHASE_7_REPORT.md`).
-- Unreleased 0.8.0-dev local gate: **passed locally on 2026-11-23** — 73 API, 8 worker,
+- Unreleased 0.8.0-dev local gate: **passed locally on 2026-11-23** — 77 API, 8 worker,
   38 web tests; ruff, TypeScript, and ESLint clean; containers rebuilt; migration
   `8f1c2d3e4a50` applied; dashboard, report export, and `/models` console verified in the
   browser. This is not a release gate.
+- Fase B local gate: **passed locally on 2026-11-23** — `flutter analyze` clean, 7 Flutter
+  tests passed, `flutter build web --release` succeeded, and the existing 77 API / 38 web tests
+  still pass. Live API/device end-to-end remains pending and is not claimed.
 - Release gate: per `TEST_PLAN.md` §4; not satisfied. No KCIC validation exists.
 
 ## Known blockers / stakeholder decisions
@@ -145,7 +166,8 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 
 ## Next step
 
-Phase 8: dashboard KPIs from live data, charts, and PDF/Excel reporting over the existing
-inspection, finding, and work-order records. The Phase 5 authorized model/evaluation work
-remains blocked until a dataset, model artifact, and evaluation protocol are approved; the demo
-AI output stays advisory and no detection or accuracy claim is made.
+Fase C: AI-result presentation and work-order/report flows on top of the verified checklist and
+field-capture foundation, followed by Fase D operations console and backup status. The Phase 5
+authorized model/evaluation work remains blocked until a dataset, model artifact, and evaluation
+protocol are approved; the demo AI output stays advisory and no detection or accuracy claim is
+made.

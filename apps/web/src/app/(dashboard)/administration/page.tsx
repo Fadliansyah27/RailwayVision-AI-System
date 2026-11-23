@@ -3,6 +3,7 @@
 import { Loader2, ShieldX } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { ChecklistTemplates } from "@/components/admin/checklist-templates";
 import { PasswordResetManagement } from "@/components/admin/password-reset-management";
 import { RoleManagement } from "@/components/admin/role-management";
 import { ScopeManagement } from "@/components/admin/scope-management";
@@ -17,13 +18,18 @@ import {
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
-type Tab = "users" | "roles" | "scopes" | "resets";
+type Tab = "users" | "roles" | "scopes" | "resets" | "checklists";
 
 const TABS: { id: Tab; label: string; description: string }[] = [
   { id: "users", label: "Pengguna", description: "Akun, peran, dan penugasan cakupan" },
   { id: "roles", label: "Peran & izin", description: "Matriks izin per peran" },
   { id: "scopes", label: "Cakupan", description: "Batas visibilitas organisasi" },
   { id: "resets", label: "Reset kata sandi", description: "Tautan pemulihan sekali pakai" },
+  {
+    id: "checklists",
+    label: "Checklist",
+    description: "Template daftar periksa per jenis inspeksi",
+  },
 ];
 
 export default function AdministrationPage() {
@@ -76,7 +82,7 @@ export default function AdministrationPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Tata kelola · Fase 2"
+        eyebrow="Tata kelola · akses & master data"
         title="Administrasi"
         description="Kelola akun DEMO, matriks izin yang ditegakkan server, dan cakupan organisasi. Setiap perubahan ditulis API ke riwayat aktivitas."
       />
@@ -91,14 +97,14 @@ export default function AdministrationPage() {
             onClick={() => setTab(item.id)}
             className={`rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
               tab === item.id
-                ? "border-ink bg-ink text-white"
+                ? "border-primary bg-primary text-white"
                 : "border-border bg-surface text-ink hover:bg-canvas"
             }`}
           >
             <span className="block font-semibold">{item.label}</span>
             <span
               className={`block text-[10px] ${
-                tab === item.id ? "text-white/70" : "text-secondary"
+                tab === item.id ? "text-white/75" : "text-secondary"
               }`}
             >
               {item.description}
@@ -150,6 +156,7 @@ export default function AdministrationPage() {
             <ScopeManagement token={token ?? ""} scopes={scopes} onScopesChange={setScopes} />
           ) : null}
           {tab === "resets" ? <PasswordResetManagement token={token ?? ""} /> : null}
+          {tab === "checklists" ? <ChecklistTemplates token={token ?? ""} /> : null}
         </>
       ) : null}
     </div>

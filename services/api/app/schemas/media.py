@@ -80,9 +80,7 @@ class AIModelOut(AIModelBrief):
 
 
 class AIModelCreate(BaseModel):
-    code: str = Field(
-        min_length=3, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$"
-    )
+    code: str = Field(min_length=3, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
     name: str = Field(min_length=3, max_length=160)
     version: str = Field(min_length=1, max_length=32)
     family: str = Field(default="", max_length=64)
@@ -90,9 +88,7 @@ class AIModelCreate(BaseModel):
     description: str = Field(default="", max_length=2000)
     is_demo: bool = False
     dataset_version: str | None = Field(default=None, max_length=64)
-    checksum_sha256: str | None = Field(
-        default=None, pattern=r"^[a-f0-9]{64}$"
-    )
+    checksum_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     class_names: list[str] = Field(default_factory=list, max_length=64)
     training_config: dict = Field(default_factory=dict)
     evaluation_metrics: dict | None = None

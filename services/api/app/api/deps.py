@@ -37,9 +37,7 @@ def _bearer_token(request: Request) -> str:
     return token
 
 
-async def get_auth_context(
-    request: Request, db: AsyncSession = Depends(get_db)
-) -> AuthContext:
+async def get_auth_context(request: Request, db: AsyncSession = Depends(get_db)) -> AuthContext:
     payload = decode_access_token(_bearer_token(request))
     try:
         user_id = uuid.UUID(str(payload["sub"]))
@@ -68,9 +66,7 @@ async def get_auth_context(
     if user is None or not user.is_active:
         raise AppError(401, "unauthorized", "Sesi tidak lagi valid.")
 
-    return AuthContext(
-        user=user, session=session, permissions=user.permission_codes
-    )
+    return AuthContext(user=user, session=session, permissions=user.permission_codes)
 
 
 def require_permission(permission: str):

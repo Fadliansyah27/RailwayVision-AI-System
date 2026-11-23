@@ -42,9 +42,7 @@ def error_payload(code: str, message: str) -> dict[str, Any]:
     }
 
 
-async def http_exception_handler(
-    request: Request, exc: StarletteHTTPException
-) -> JSONResponse:
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     code = _STATUS_CODES.get(exc.status_code, "http_error")
     message = exc.detail if isinstance(exc.detail, str) else "Permintaan gagal"
     if exc.status_code >= 500:

@@ -37,8 +37,9 @@ tersebut belum dikirim ke remote mana pun.
 Riwayat lokal awal (dua commit) pernah memuat kata sandi demo literal dan surel
 pribadi pada metadata commit. Riwayat tersebut dibangun ulang menjadi satu commit
 sebelum ada remote; commit lama tidak pernah dikirim, tidak reachable dari branch,
-dan tidak ikut terkirim oleh `git push` biasa. Pemindaian gitleaks pada riwayat
-final bersih.
+dan tidak ikut terkirim oleh `git push` biasa. Pemindaian manual pada riwayat
+final tidak menemukan secret. `gitleaks` tidak tersedia pada verifikasi akhir
+2026-11-23 (lihat bagian 4), sehingga tidak ada klaim hasil gitleaks.
 
 ## 3. Pola secret yang diperiksa
 
@@ -91,15 +92,14 @@ perbaikan tidak menemukan kata sandi literal pada konten yang akan dipublikasika
 
 | Tool | Status |
 |---|---|
-| Gitleaks 8.30.1 | Terpasang dan dijalankan: `gitleaks git . --redact` pada seluruh riwayat Git yang akan dipublikasikan (±1,65 MB) → **no leaks found** |
+| Gitleaks | **Tidak tersedia pada mesin verifikasi ini** (`gitleaks: command not found`, 2026-11-23). Klaim pemindaian gitleaks pada versi dokumen sebelumnya dikoreksi. Jalankan gitleaks sebelum publikasi jika tool tersedia. |
 | GitHub secret scanning | Belum dapat dijalankan (repository belum dipublikasikan) |
-| Pemeriksaan manual | Pola regex pada index/HEAD (bagian 3) + peninjauan isi file mencurigakan |
+| Pemeriksaan manual | Regex pada working tree/index (bagian 3) + peninjauan berkas mencurigakan + `git diff --check` |
 
-Gitleaks tidak menandai kata sandi demo literal (entropi rendah, pola bukan token);
-temuan itu berasal dari review manual dan sudah diremediasi (bagian 3.1). Karena itu
-hasil gitleaks dilaporkan sebagai lapisan tambahan, bukan bukti tunggal. Setelah
-repository dipublikasikan, aktifkan **GitHub Secret Scanning** dan **push protection**
-melalui pengaturan repository, dan pertimbangkan gitleaks sebagai pre-push hook/CI.
+Karena gitleaks tidak dapat dijalankan, hasil pemindaian manual di bagian 3 adalah
+satu-satunya dasar audit. Ini bukan bukti setara gitleaks; pemilik harus
+memasang dan menjalankan gitleaks (atau mengaktifkan push protection GitHub)
+sebelum mengandalkan repository sebagai publik.
 
 ## 5. File yang dikecualikan dari publikasi
 
@@ -168,9 +168,9 @@ Hasil pada commit persiapan tunggal:
   baris pada dokumen lama; normalisasi ini tidak mengubah semantik kode.
 - `.env` tidak ter-track; hanya tiga berkas `.env.example` yang masuk.
 - Pemindaian pola secret dan surel pribadi pada index/HEAD: tidak ada kecocokan.
-- `gitleaks git . --redact` pada seluruh riwayat: ±1,65 MB, **no leaks found**.
-  Pemindaian direktori penuh menghasilkan false positive dari artefak build yang
-  di-ignore (`.next`), sehingga yang dilaporkan adalah hasil arsip commit.
+  `gitleaks` **tidak dijalankan** karena tidak tersedia pada PATH saat verifikasi
+  akhir 2026-11-23; dokumen ini tidak mengklaim hasil gitleaks.
+  Aktifkan GitHub Secret Scanning dan push protection setelah repository dibuat.
 - Tidak ada berkas >1 MB dan tidak ada ekstensi sensitif (key, dump, media, model)
   yang ter-track.
 - Verifikasi setelah perubahan terakhir: API 73 tes lulus dan ruff bersih; AI
@@ -186,10 +186,14 @@ basis data, atau artefak model di working tree yang dipublikasikan pada commit
 persiapan. Riwayat Git kosong pada awal audit sehingga tidak ada kebocoran
 historis.
 
-Status konten repository: `PUBLICATION_READY`. Status publikasi: `BLOCKED_GITHUB_AUTH`
-(GitHub CLI sudah terpasang, tetapi belum ada login; belum ada remote; belum ada
-konfirmasi akhir pemilik).
+Status konten repository: `PUBLICATION_READY` berdasarkan pemindaian manual.
+Status publikasi: `BLOCKED_GITHUB_AUTH`.
 
-Publikasi ke GitHub belum dapat diselesaikan pada sesi ini karena GitHub CLI
-tidak terpasang dan tidak ada autentikasi GitHub aktif di mesin audit
-(`BLOCKED_GITHUB_AUTH`). Langkah lanjutan tercantum pada laporan akhir.
+Publikasi ke GitHub belum dapat diselesaikan pada sesi ini: `gh` tidak terpasang,
+tidak ada remote terkonfigurasi, dan repository target
+`Fadliansyah27/RailwayVision-AI` tidak ditemukan melalui `git ls-remote`.
+Kredensial GitHub tersimpan di Windows Credential Manager untuk host
+`github.com`, tetapi audit ini tidak memverifikasi scope token tersebut dan tidak
+mencetak nilainya. Membuat repository baru memerlukan token dengan izin `repo`;
+pemilik harus menyediakan `gh auth login` atau token tersebut. Lihat laporan
+akhir untuk langkah lanjutan.
