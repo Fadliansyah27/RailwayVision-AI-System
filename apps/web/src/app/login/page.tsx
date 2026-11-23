@@ -145,13 +145,27 @@ export default function LoginPage() {
 
       <section className="flex items-center justify-center px-4 py-12 sm:px-10">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-white">
-              RV
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-ink">RailwayVision AI</p>
-              <p className="text-[11px] text-secondary">Pendukung keputusan inspeksi</p>
+          <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden rounded-2xl lg:hidden">
+            <Image
+              src="/login-halim-whoosh.png"
+              alt="Kereta cepat Whoosh berhenti di peron Stasiun Halim"
+              fill
+              sizes="(min-width: 640px) 28rem, 100vw"
+              className="object-cover"
+              style={{ objectPosition: "68% 55%" }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0b0f]/85 via-[#0b0b0f]/20 to-[#0b0b0f]/10"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 p-4">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-white text-sm font-semibold text-primary">
+                RV
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">RailwayVision AI</p>
+                <p className="text-[11px] text-white/75">Pendukung keputusan inspeksi</p>
+              </div>
             </div>
           </div>
 
