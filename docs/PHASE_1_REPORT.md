@@ -117,10 +117,15 @@ Readiness response observed:
 
 ## 6. Screenshots
 
-- Dashboard (live status panel): [phase-1-dashboard.png](screenshots/phase-1-dashboard.png)
-- System status page: [phase-1-system-status.png](screenshots/phase-1-system-status.png)
+> **Arsip Phase 1.** Kedua tangkapan di bawah adalah arsip historis dari build Phase 1:
+> antarmuka masih berbahasa Inggris dan memakai label "DEMO PROTOTYPE". Tampilan saat
+> ini sudah berbahasa Indonesia dengan label "PROTOTIPE"/"SINTETIS". Jangan gunakan
+> gambar ini sebagai representasi UI terkini.
 
-Both were captured from the running Compose stack at `http://127.0.0.1:3000`. Mobile UI was validated by widget tests only (no emulator screenshot captured).
+- Dashboard (live status panel, arsip Phase 1): [phase-1-dashboard.png](screenshots/phase-1-dashboard.png)
+- System status page (arsip Phase 1): [phase-1-system-status.png](screenshots/phase-1-system-status.png)
+
+Both were captured from the running Compose stack at `http://127.0.0.1:3000` during Phase 1. Mobile UI was validated by widget tests only (no emulator screenshot captured).
 
 ## 7. Automated tests and checks actually run
 
