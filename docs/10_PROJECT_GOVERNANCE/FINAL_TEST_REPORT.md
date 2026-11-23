@@ -1,7 +1,8 @@
 # Final Test Report — RailwayVision AI (working tree, 2026-11-23)
 
 Status: implementation and automated testing pass locally. Published to GitHub Public on
-2026-11-23 at <https://github.com/Fadliansyah27/Fadliansyah27> (commit `435bfd0`).
+2026-11-23 at <https://github.com/Fadliansyah27/RailwayVision-AI-System> (renamed from
+`Fadliansyah27` at the owner's request; commit `6034a33`).
 This is not a production or KCIC acceptance report.
 
 ## Environment
@@ -51,7 +52,9 @@ and client-side note validation).
 ## Publication outcome
 
 1. Public repository created as `Fadliansyah27/Fadliansyah27` (owner request) on
-   2026-11-23; visibility verified `public` via the GitHub API.
+   2026-11-23, then renamed by the owner's request to
+   `Fadliansyah27/RailwayVision-AI-System`; visibility verified `public` via the
+   GitHub API after the rename.
 2. `git push -u origin main` succeeded without force push; remote and local `main`
    both point to `435bfd021dc887ddb65b8eb2586a9a5760faac99`.
 3. Manual secret-pattern scan and tracked `.env`/key file checks were clean at push

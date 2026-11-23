@@ -12,7 +12,7 @@ dirujuk berdasarkan lokasi, bukan isi.
 | Pemeriksaan | Hasil |
 |---|---|
 | Repository Git | Sudah diinisialisasi (`main`); riwayat kini 4 commit |
-| Remote | `origin` → `https://github.com/Fadliansyah27/Fadliansyah27.git` |
+| Remote | `origin` → `https://github.com/Fadliansyah27/RailwayVision-AI-System.git` |
 | Riwayat commit | Riwayat awal dibangun ulang sebelum publikasi; tidak ada secret historis pada riwayat final |
 | File ter-track | 342 file pada commit yang dipublikasikan |
 
@@ -191,7 +191,9 @@ Status publikasi: `PUBLISHED_GITHUB_PUBLIC`.
 
 Repository dibuat dan dipush pada 2026-11-23:
 
-- URL: <https://github.com/Fadliansyah27/Fadliansyah27>
+- URL: <https://github.com/Fadliansyah27/RailwayVision-AI-System>
+- Nama proyek: RailwayVision AI System (slug repository `RailwayVision-AI-System`;
+  GitHub tidak mengizinkan spasi pada nama repository)
 - Pemilik: `Fadliansyah27`
 - Visibilitas: **public** (`private: false`, diverifikasi melalui GitHub API)
 - Branch default: `main`
