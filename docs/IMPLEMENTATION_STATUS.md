@@ -5,7 +5,7 @@ Current release: `0.7.0` (Phase 7: findings, work orders, notifications).
 Working tree also contains unreleased `0.8.0-dev` work: operational dashboard, PDF/Excel
 reports, AI model lifecycle registry, dataset registry, the `/models` console, configurable
 inspection checklists, the red-identity design system (`docs/DESIGN_SYSTEM.md`), and the
-Flutter field application (Fase B).
+Flutter field application (Fase B–C).
 
 Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 `docs/10_PROJECT_GOVERNANCE/PROMPT_COMPLIANCE.md` dan
@@ -26,7 +26,7 @@ kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` 
 | 6 | Human verification and review workflow | Complete (local), extended in 0.6.0 | `docs/PHASE_6_REPORT.md`; review start, three-way decision, reopen |
 | 7 | Findings, work orders, notifications | Complete (local), 0.7.0 | `docs/PHASE_7_REPORT.md`; 10 API tests, live lifecycle and browser verification |
 | 8 | Dashboard KPIs, charts, PDF/Excel reports, inspection checklists | In progress (local, unreleased 0.8.0-dev): dashboard, reports, model/dataset registry, checklist master + snapshot + submit guard delivered; ops-console items pending | `app/api/routes/dashboard.py`, `reports.py`, `ai_registry.py`, `checklists.py`; `/` and `/reports`, `/models`, administration checklist tab; 77 API tests |
-| 9 | Flutter field application (login, capture, upload, history) | Implemented locally (Fase B), widget-tested; live E2E pending | Login/session with secure storage and refresh rotation, inspection list/detail, checklist edit with optimistic version, offline draft sync, camera/gallery evidence, two-phase upload with client SHA-256, offline upload queue; `flutter analyze` clean, 7 Flutter tests, release web build |
+| 9 | Flutter field application (login, capture, upload, history, work orders) | Implemented locally (Fase B–C), widget-tested + live API layer; on-screen E2E pending | Login/session with secure storage and refresh rotation, inspection list/detail, checklist edit with optimistic version, offline draft sync, camera/gallery evidence, two-phase upload with client SHA-256, offline upload queue, work-order list/detail with permission-gated transitions; `flutter analyze` clean, 11 Flutter tests, live API smoke, release web build |
 | 10 | Integration and security testing (TEST_PLAN/SECURITY_AGENT) | Not started | Phase-level checks only |
 
 ## What actually works today
@@ -101,13 +101,17 @@ kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` 
   a findings panel on the inspection detail page. The overview marks Phase 7 delivered.
 - Demo seed: 6 users, 3 scopes, 6 categories, 2 locations, 3 assets, 1 inspection,
   1 demo AI model — all labelled DEMO.
-- Flutter field application (Fase B): secure token storage, login gate with demo-account hints,
+- Flutter field application (Fase B–C): secure token storage, login gate with demo-account hints,
   session restore and refresh rotation with 401 fallback, Indonesian workspace shell with live
   readiness and server-computed workload, inspection list/detail, checklist editing with
   optimistic version checks and `checklist_incomplete` messaging, offline checklist drafts with
   explicit sync/conflict handling, camera/gallery capture with client-side SHA-256, two-phase
-  media upload, and an offline upload queue (persistent on native, in-memory on web). All access
-  decisions remain server-enforced.
+  media upload, and an offline upload queue (persistent on native, in-memory on web).
+  Work orders: "assigned to me" / scoped list with status filters, detail (finding, priority,
+  asset, assignee, instructions, notes), and start/complete/verify/cancel actions with
+  required notes and confirmation. Actions are shown only when the session holds the matching
+  permission; every transition remains server-validated and audited. All access decisions
+  remain server-enforced.
 
 ## Not implemented (do not assume)
 
@@ -126,7 +130,8 @@ kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` 
 - Mobile: no on-screen/canvas UI automation against the live API and no physical-device
   testing; the live check covers the app's `ApiClient` only. No Android/iOS signed builds;
   web offline queue is memory-only; no push notifications or background sync; no offline
-  media preview cache beyond queued bytes.
+  media preview cache beyond queued bytes. Work orders are read/transition-only on mobile:
+  no creation, reassignment, or editing; findings have no dedicated mobile screen.
 - Asset deletion/archiving, QR labels, and asset status history.
 - Session/device management UI.
 
@@ -152,11 +157,11 @@ kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` 
   38 web tests; ruff, TypeScript, and ESLint clean; containers rebuilt; migration
   `8f1c2d3e4a50` applied; dashboard, report export, and `/models` console verified in the
   browser. This is not a release gate.
-- Fase B local gate: **passed locally on 2026-11-23** — `flutter analyze` clean, 7 Flutter
+- Fase B–C local gate: **passed locally on 2026-11-23** — `flutter analyze` clean, 11 Flutter
   widget tests passed, one live API-layer smoke test passed against the running Compose stack
-  (login, readiness, scoped inspections, detail, assets, logout), `flutter build web --release`
-  succeeded, and the existing 77 API / 38 web tests still pass. On-screen UI automation and
-  physical-device testing remain pending and are not claimed.
+  (login, readiness, scoped inspections, detail, work orders, assets, logout),
+  `flutter build web --release` succeeded, and the existing 77 API / 38 web tests still pass.
+  On-screen UI automation and physical-device testing remain pending and are not claimed.
 - Release gate: per `TEST_PLAN.md` §4; not satisfied. No KCIC validation exists.
 
 ## Known blockers / stakeholder decisions
@@ -171,8 +176,10 @@ kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` 
 
 ## Next step
 
-Fase C: AI-result presentation and work-order/report flows on top of the verified checklist and
-field-capture foundation, followed by Fase D operations console and backup status. The Phase 5
+Fase C work orders are available on mobile (list, detail, permission-gated transitions) on top of
+the verified checklist and field-capture foundation. Next: Fase D operations console (AI job
+history, role-restricted log viewer, backup status, deployment history, safe DEMO-only reset), with
+backup status reported honestly as not configured until environment policy exists. The Phase 5
 authorized model/evaluation work remains blocked until a dataset, model artifact, and evaluation
 protocol are approved; the demo AI output stays advisory and no detection or accuracy claim is
 made.

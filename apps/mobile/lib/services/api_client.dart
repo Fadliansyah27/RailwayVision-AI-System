@@ -7,6 +7,7 @@ import '../core/config.dart';
 import '../models/inspection.dart';
 import '../models/session.dart';
 import '../models/system_status.dart';
+import '../models/work_order.dart';
 import 'token_store.dart';
 
 class ApiException implements Exception {
@@ -290,6 +291,89 @@ class ApiClient {
         .whereType<Map>()
         .map((entry) => AssetOption.fromJson(entry.cast<String, dynamic>()))
         .toList(growable: false);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Work orders
+  // ---------------------------------------------------------------------------
+
+  Future<WorkOrderPage> listWorkOrders({
+    bool mine = false,
+    String? status,
+    int page = 1,
+    int pageSize = 50,
+  }) async {
+    final query = <String, String>{
+      'page': '$page',
+      'page_size': '$pageSize',
+      if (mine) 'mine': 'true',
+      if (status != null && status.isNotEmpty) 'status': status,
+    };
+    final uri = Uri.parse('$baseUrl/api/v1/work-orders')
+        .replace(queryParameters: query);
+    final json = await _sendJson('GET', uri);
+    final items = json['items'];
+    return WorkOrderPage(
+      items: items is List
+          ? items
+              .whereType<Map>()
+              .map((entry) => WorkOrder.fromJson(entry.cast<String, dynamic>()))
+              .toList(growable: false)
+          : const [],
+      total: (json['total'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Future<WorkOrder> fetchWorkOrder(String workOrderId) async {
+    final json = await _sendJson(
+      'GET',
+      _uri('/api/v1/work-orders/$workOrderId'),
+    );
+    return WorkOrder.fromJson(json);
+  }
+
+  Future<WorkOrder> startWorkOrder(String workOrderId) async {
+    final json = await _sendJson(
+      'POST',
+      _uri('/api/v1/work-orders/$workOrderId/start'),
+    );
+    return WorkOrder.fromJson(json);
+  }
+
+  Future<WorkOrder> completeWorkOrder(
+    String workOrderId, {
+    required String notes,
+  }) async {
+    final json = await _sendJson(
+      'POST',
+      _uri('/api/v1/work-orders/$workOrderId/complete'),
+      body: {'notes': notes},
+    );
+    return WorkOrder.fromJson(json);
+  }
+
+  Future<WorkOrder> verifyWorkOrder(
+    String workOrderId, {
+    required String notes,
+  }) async {
+    final json = await _sendJson(
+      'POST',
+      _uri('/api/v1/work-orders/$workOrderId/verify'),
+      body: {'notes': notes},
+    );
+    return WorkOrder.fromJson(json);
+  }
+
+  Future<WorkOrder> cancelWorkOrder(
+    String workOrderId, {
+    required String notes,
+  }) async {
+    final json = await _sendJson(
+      'POST',
+      _uri('/api/v1/work-orders/$workOrderId/cancel'),
+      body: {'notes': notes},
+    );
+    return WorkOrder.fromJson(json);
   }
 
   // ---------------------------------------------------------------------------

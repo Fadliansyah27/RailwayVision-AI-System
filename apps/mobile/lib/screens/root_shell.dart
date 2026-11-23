@@ -88,7 +88,11 @@ class _RootShellState extends State<RootShell> {
         editor: _editor,
         uploader: _uploader,
       ),
-      const WorkScreen(),
+      WorkScreen(
+        api: widget.api,
+        user: user,
+        onUnauthorized: widget.session.handleUnauthorized,
+      ),
       ProfileScreen(
         session: widget.session,
         apiBaseUrl: widget.api.baseUrl,

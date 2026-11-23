@@ -35,8 +35,8 @@ halamannya dapat dibuka.
 | AI worker: `pytest -c pyproject.toml -q` | 8 lulus |
 | Web: `tsc --noEmit`, `npm run lint`, `vitest run` | bersih; 38 lulus |
 | Flutter: `flutter analyze` | 0 isu |
-| Flutter: `flutter test` | 7 lulus (+1 live test di-skip tanpa kredensial) |
-| Flutter live smoke (`test/live_api_test.dart`) terhadap Compose lokal | lulus — login, readiness, daftar/detail inspeksi, aset, logout |
+| Flutter: `flutter test` | 11 lulus (+1 live test di-skip tanpa kredensial) |
+| Flutter live smoke (`test/live_api_test.dart`) terhadap Compose lokal | lulus — login, readiness, daftar/detail inspeksi, perintah kerja, aset, logout |
 | Flutter: `flutter build web --release` | berhasil |
 | Docker Compose | 6 layanan healthy saat verifikasi live |
 
@@ -96,7 +96,7 @@ dan `docs/TEST_REPORT.md`.
 |---|---|---|
 | Web berbahasa Indonesia dengan identitas merah | WORKING (lokal) | diverifikasi browser |
 | Navigasi berbasis peran, sesi cookie HttpOnly | WORKING (lokal) | proxy same-origin |
-| Seluler Flutter: login, daftar/detail, checklist, draf luring, kamera/galeri, unggah 2 fase, antrean luring | WORKING (level widget + lapisan API live) | 7 tes widget; smoke API live |
+| Seluler Flutter: login, daftar/detail, checklist, draf luring, kamera/galeri, unggah 2 fase, antrean luring, perintah kerja (daftar/detail/transisi berizin) | WORKING (level widget + lapisan API live) | 11 tes widget; smoke API live termasuk daftar/detail perintah kerja |
 | Otomasi UI layar seluler terhadap API live; perangkat fisik; build bertanda tangan | MISSING / belum diuji | Tidak diklaim |
 | Push notification / sinkronisasi latar | MISSING | — |
 

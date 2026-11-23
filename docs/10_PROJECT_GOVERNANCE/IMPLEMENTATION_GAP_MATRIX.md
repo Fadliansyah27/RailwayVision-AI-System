@@ -25,7 +25,7 @@ Status: `IMPLEMENTED` (kode ada), `WORKING` (diuji lokal), `PARTIAL`, `BROKEN`,
 | C04 | Pipeline AI demo (kualitas gambar) | WORKING | `services/ai-worker` | Tidak boleh disebut deteksi kerusakan | — |
 | C05 | Model deteksi terlatih + evaluasi akurasi | BLOCKED | — | Dataset terotorisasi, artefak model, protokol evaluasi | Persetujuan pemilik data |
 | D01 | Web Next.js berbahasa Indonesia, identitas merah | WORKING | `apps/web`, `docs/DESIGN_SYSTEM.md` | Konsistensi token pada halaman baru | — |
-| D02 | Seluler Flutter Fase B (login, inspeksi, checklist, kamera, unggah, antrean luring) | WORKING (widget + API layer live) | `apps/mobile`, 7 tes, 1 smoke live | Otomasi UI layar, perangkat fisik, build bertanda tangan, push/background sync | Perangkat uji |
+| D02 | Seluler Flutter Fase B–C (login, inspeksi, checklist, kamera, unggah, antrean luring, perintah kerja) | WORKING (widget + API layer live) | `apps/mobile`, 11 tes, 1 smoke live | Otomasi UI layar, perangkat fisik, build bertanda tangan, push/background sync; pembuatan/edit perintah kerja tetap di web | Perangkat uji |
 | D03 | Konsol operasi (riwayat job AI, log per peran, backup, deployment, reset DEMO) | MISSING | — | Rencana Fase D | Kebijakan operasi |
 | E01 | Docker Compose + healthcheck | WORKING | `docker-compose.yml`, 6 layanan healthy | Profil produksi | Infrastruktur KCIC |
 | E02 | CI GitHub Actions | IMPLEMENTED (belum jalan di GitHub) | `.github/workflows/ci.yml` | Eksekusi nyata setelah remote tersedia | Remote + auth |

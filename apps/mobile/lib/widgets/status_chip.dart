@@ -53,3 +53,31 @@ class InspectionStatusChip extends StatelessWidget {
     );
   }
 }
+
+class WorkOrderStatusChip extends StatelessWidget {
+  const WorkOrderStatusChip({super.key, required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatusChip(
+      label: workOrderStatusLabel(status),
+      tone: workOrderStatusTone(status),
+    );
+  }
+}
+
+class FindingPriorityChip extends StatelessWidget {
+  const FindingPriorityChip({super.key, required this.priority});
+
+  final String priority;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatusChip(
+      label: 'Prioritas ${findingPriorityLabel(priority).toLowerCase()}',
+      tone: findingPriorityTone(priority),
+    );
+  }
+}

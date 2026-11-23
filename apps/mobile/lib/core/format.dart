@@ -27,6 +27,26 @@ const checklistResultLabels = <String, String>{
   'not_applicable': 'Tidak berlaku',
 };
 
+const workOrderStatusLabels = <String, String>{
+  'open': 'Terbuka',
+  'in_progress': 'Sedang Dikerjakan',
+  'awaiting_verification': 'Menunggu Verifikasi',
+  'completed': 'Selesai',
+  'cancelled': 'Dibatalkan',
+};
+
+const findingPriorityLabels = <String, String>{
+  'low': 'Rendah',
+  'medium': 'Sedang',
+  'high': 'Tinggi',
+};
+
+String workOrderStatusLabel(String status) =>
+    workOrderStatusLabels[status] ?? status;
+
+String findingPriorityLabel(String priority) =>
+    findingPriorityLabels[priority] ?? priority;
+
 String inspectionStatusLabel(String status) =>
     inspectionStatusLabels[status] ?? status;
 
@@ -48,6 +68,32 @@ Tone inspectionStatusTone(String status) {
       return Tone.ai;
     case 'ai_failed':
       return Tone.critical;
+    default:
+      return Tone.neutral;
+  }
+}
+
+Tone workOrderStatusTone(String status) {
+  switch (status) {
+    case 'completed':
+      return Tone.success;
+    case 'awaiting_verification':
+      return Tone.warning;
+    case 'in_progress':
+      return Tone.ai;
+    case 'open':
+      return Tone.warning;
+    default:
+      return Tone.neutral;
+  }
+}
+
+Tone findingPriorityTone(String priority) {
+  switch (priority) {
+    case 'high':
+      return Tone.critical;
+    case 'medium':
+      return Tone.warning;
     default:
       return Tone.neutral;
   }

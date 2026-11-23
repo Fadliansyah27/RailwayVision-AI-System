@@ -96,16 +96,19 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
 
 ### Seluler (`apps/mobile`)
 
-- Aplikasi lapangan Flutter (Fase B) dengan identitas merah: login sesi aman, daftar dan detail
+- Aplikasi lapangan Flutter (Fase B–C) dengan identitas merah: login sesi aman, daftar dan detail
   inspeksi milik pengguna, pengisian checklist dengan pemeriksaan versi, penyimpanan draf luring,
   pengambilan bukti dari kamera/galeri, unggah dua fase dengan SHA-256 klien, dan antrean unggah
   luring (persisten di perangkat, in-memory pada Flutter web).
+- Perintah kerja lapangan: daftar "ditugaskan ke saya" atau seluruh cakupan, filter status, detail
+  temuan dan instruksi, serta tindakan mulai, lapor selesai, verifikasi, dan pembatalan. Catatan
+  wajib dan seluruh transisi tetap divalidasi server; tombol tindakan hanya tampil sesuai izin.
 - Hak akses tetap ditegakkan API; aplikasi tidak melakukan keputusan keselamatan dan tidak
   terhubung ke kendali kereta atau persinyalan.
-- Sudah diverifikasi dengan `flutter analyze`, 7 tes Flutter, `flutter build web` release, dan
+- Sudah diverifikasi dengan `flutter analyze`, 11 tes Flutter, `flutter build web` release, dan
   satu smoke test lapisan API terhadap stack live (login, kesiapan layanan, daftar/detail
-  inspeksi, daftar aset, logout). Uji ujung-ke-ujung level UI dan perangkat fisik belum
-  dilakukan pada fase ini.
+  inspeksi, perintah kerja, daftar aset, logout). Uji ujung-ke-ujung level UI dan perangkat
+  fisik belum dilakukan pada fase ini.
 
 ## 5. Arsitektur sistem
 
@@ -319,9 +322,9 @@ Hasil verifikasi lokal terakhir (2026-11-23):
 - API: **77 tes lulus**, ruff bersih.
 - AI worker: **8 tes lulus**.
 - Web: **38 tes lulus**, TypeScript dan ESLint bersih.
-- Seluler: `flutter analyze` bersih, **7 tes Flutter lulus**, `flutter build web` release
+- Seluler: `flutter analyze` bersih, **11 tes Flutter lulus**, `flutter build web` release
   berhasil, dan **smoke test lapisan API live lulus** (login, kesiapan, inspeksi, detail,
-  aset, logout) pada stack Compose lokal.
+  perintah kerja, aset, logout) pada stack Compose lokal.
 - Build container `api` dan `web` berhasil; seluruh layanan Compose healthy.
 
 Angka di atas adalah hasil eksekusi lokal, bukan sertifikasi. Lihat
@@ -377,7 +380,7 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
 | 6 | Verifikasi manusia dan tinjauan bukti | Selesai (lokal) |
 | 7 | Temuan, perintah kerja, notifikasi | Selesai (lokal) |
 | 8 | Dasbor KPI, laporan PDF/Excel, registri model & dataset | Tersedia (lokal); operasi sistem lain dalam pengerjaan |
-| 9 | Aplikasi lapangan Flutter | Implementasi Fase B tersedia (lokal), teruji di level widget; E2E live **belum** |
+| 9 | Aplikasi lapangan Flutter (inspeksi, bukti, perintah kerja) | Fase B–C tersedia (lokal), teruji widget + lapisan API live; otomasi UI/perangkat **belum** |
 | 10 | Pengujian integrasi/keamanan menyeluruh dan UAT | Sebagian; UAT resmi **belum dilakukan** |
 
 Tidak ada fase yang boleh dianggap "production-ready" sampai gerbang penerimaan,

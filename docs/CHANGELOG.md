@@ -28,6 +28,15 @@ All notable changes to RailwayVision AI are recorded here. Dates are UTC. This p
   web). Verified with `flutter analyze`, 7 Flutter tests, a release web build, and a live
   `ApiClient` smoke test against the local Compose stack (login, readiness, inspections,
   detail, assets, logout). On-screen UI and physical-device end-to-end testing remain pending.
+- Flutter work orders (Fase C): replaced the planned-module placeholder with a live
+  work-order list ("assigned to me" / scoped, status filters, refresh, empty/error states)
+  and detail screen (finding, priority, asset, assignee, instructions, completion and
+  verification notes). Start, complete, verify, and cancel actions are shown only with the
+  matching permission, require confirmation, enforce minimum note length client-side, and
+  rely on server-validated transitions (version conflicts surface the API message with a
+  reload action). Added work-order API client methods, status/priority chips, and four widget
+  tests; extended the live smoke to list/fetch work orders. 11 Flutter tests pass, analyze is
+  clean, and the release web build succeeds.
 - `GET /api/v1/dashboard/overview`: live KPI counts (inspections, findings, work
   orders), status breakdowns, six-month inspection trend bucketed in Asia/Jakarta,
   and the five most recent inspections — all scope-filtered from PostgreSQL.

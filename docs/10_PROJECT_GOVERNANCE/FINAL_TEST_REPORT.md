@@ -22,12 +22,14 @@ the local Docker Compose stack (all six services healthy at the time of the run)
 | Web lint | `npm run lint` | Pass |
 | Web unit tests | `npm test` | **38 passed / 5 files** |
 | Flutter analysis | `flutter analyze` | 0 issues |
-| Flutter tests | `flutter test` | **7 passed / 2 files** (+1 live test skipped without credentials) |
-| Flutter live API smoke | `flutter test test/live_api_test.dart` with `.env` credentials against Compose | **1 passed** — login, readiness (database/redis), scoped inspections, detail, assets, logout |
+| Flutter tests | `flutter test` | **11 passed / 4 files** (+1 live test skipped without credentials) |
+| Flutter live API smoke | `flutter test test/live_api_test.dart` with `.env` credentials against Compose | **1 passed** — login, readiness (database/redis), scoped inspections, detail, work orders, assets, logout |
 | Flutter web build | `flutter build web --release` | Success (`build/web`) |
 
 Flutter tests cover: signed-out login gate, sign-in into the Indonesian shell with live
-readiness/workload text, unreachable-API retry state, and readiness summarization/parsing.
+readiness/workload text, unreachable-API retry state, readiness summarization/parsing, and
+work orders (list, empty state, missing-permission guard, start transition with confirmation,
+and client-side note validation).
 
 ## Security checks performed
 

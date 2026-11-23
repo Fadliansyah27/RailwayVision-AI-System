@@ -13,7 +13,7 @@ void main() {
       Platform.environment['API_BASE_URL'] ?? 'http://localhost:8000';
 
   test(
-    'live API smoke: login, status, inspections, detail, assets, logout',
+    'live API smoke: login, status, inspections, work orders, assets, logout',
     () async {
       final api = ApiClient(
         baseUrl: baseUrl,
@@ -48,6 +48,16 @@ void main() {
 
       final assets = await api.listAssets();
       expect(assets, isNotEmpty);
+
+      if (user.can('work_orders:read')) {
+        final orders = await api.listWorkOrders(mine: true);
+        expect(orders.total, greaterThanOrEqualTo(0));
+        if (orders.items.isNotEmpty) {
+          final order = await api.fetchWorkOrder(orders.items.first.id);
+          expect(order.reference, orders.items.first.reference);
+          expect(order.finding.reference, isNotEmpty);
+        }
+      }
 
       await api.logout();
       expect(api.hasSession, isFalse);

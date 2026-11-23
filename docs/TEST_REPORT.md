@@ -20,8 +20,8 @@ Re-run after the Fase A checklist work and the Fase B Flutter implementation.
 | T-WEB-LINT | Web lint | `npm run lint` | Pass |
 | T-WEB-UNIT | Web unit tests | `npm test` | **38 passed / 5 files** |
 | T-MOB-ANALYZE | Flutter static analysis | `flutter analyze` (`apps/mobile`) | Pass, 0 issues |
-| T-MOB-UNIT | Flutter widget/unit tests | `flutter test` | **7 passed / 2 files** (+1 live test skipped without credentials) |
-| T-MOB-LIVE | Flutter networking layer against live API | `flutter test test/live_api_test.dart` with `DEMO_SEED_PASSWORD` from local `.env` | **Pass** — login, readiness (database/redis healthy), scoped inspection list, inspection detail, asset list, logout |
+| T-MOB-UNIT | Flutter widget/unit tests | `flutter test` | **11 passed / 4 files** (+1 live test skipped without credentials) |
+| T-MOB-LIVE | Flutter networking layer against live API | `flutter test test/live_api_test.dart` with `DEMO_SEED_PASSWORD` from local `.env` | **Pass** — login, readiness (database/redis healthy), scoped inspection list, inspection detail, work-order list/detail, asset list, logout |
 | T-MOB-BUILD | Flutter web release build | `flutter build web --release` | Success |
 
 Flutter coverage added in this pass: signed-out login gate, sign-in to the Indonesian shell
