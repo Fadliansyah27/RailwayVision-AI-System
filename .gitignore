@@ -1,0 +1,120 @@
+# Environment files
+.env
+.env.*
+!.env.example
+!**/.env.example
+!.env.template
+!**/.env.template
+
+# Secrets and private material
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets/
+credentials/
+service-account*.json
+# May contain project API keys; review before ever committing.
+google-services.json
+# SSH/GPG material, credential files, cloud/kube config
+id_rsa*
+id_ed25519*
+id_ecdsa*
+.ssh/
+.gnupg/
+.netrc
+.npmrc
+.pypirc
+kubeconfig*
+*.kubeconfig
+.terraform/
+*.tfstate
+*.tfstate.*
+*.kdbx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.npm/
+npm-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+apps/mobile/build/
+build/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/ios/Pods/
+apps/mobile/ios/.symlinks/
+apps/mobile/ios/Flutter/ephemeral/
+*.iml
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Docker / local data
+infra/data/
+
+# Database dumps and backups
+*.sql
+*.dump
+*.bak
+database_backups/
+
+# Inspection media, private datasets, uploads
+datasets/raw/
+datasets/private/
+private_dataset/
+uploads/
+storage/private/
+*.mp4
+*.mov
+*.avi
+
+# ML artifacts and experiment output
+checkpoints/
+runs/
+wandb/
+mlruns/
+*.pt
+*.pth
+*.onnx
+*.ckpt
+
+# Temporary files
+tmp/
+temp/
+.cache/

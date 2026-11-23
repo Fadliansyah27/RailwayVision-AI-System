@@ -1,0 +1,6 @@
+celery[redis]==5.7.0
+redis==7.4.1
+pydantic-settings==2.16.3
+asyncpg==0.32.0
+minio==7.2.20
+Pillow==12.1.0
