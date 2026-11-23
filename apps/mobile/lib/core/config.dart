@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 abstract final class AppConfig {
   static const String _configuredApiBaseUrl = String.fromEnvironment('API_BASE_URL');
 
-  static const String appVersion = '0.1.0 · Phase 1 foundation';
+  static const String appVersion = '0.8.0-dev';
 
   /// Local development defaults:
   /// - Android emulator reaches the host through 10.0.2.2.

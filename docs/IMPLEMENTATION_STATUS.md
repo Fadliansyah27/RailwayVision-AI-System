@@ -9,7 +9,9 @@ Flutter field application (Fase B).
 
 Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 `docs/10_PROJECT_GOVERNANCE/PROMPT_COMPLIANCE.md` dan
-`docs/10_PROJECT_GOVERNANCE/KCIC_VALIDATION_REGISTER.md`.
+`docs/10_PROJECT_GOVERNANCE/KCIC_VALIDATION_REGISTER.md`. Audit kondisi nyata dan
+kesenjangan fitur ada di `docs/10_PROJECT_GOVERNANCE/EXISTING_PROJECT_AUDIT.md` dan
+`docs/10_PROJECT_GOVERNANCE/IMPLEMENTATION_GAP_MATRIX.md`.
 
 ## Phase status
 
@@ -121,7 +123,8 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
 - Work-order due dates, overdue tracking, scheduling, or notifications outside the app.
 - Operations console: AI job history, role-restricted log viewer, backup status, deployment
   history, and safe DEMO-only reset.
-- Mobile: no live API or physical-device end-to-end run yet; no Android/iOS signed builds;
+- Mobile: no on-screen/canvas UI automation against the live API and no physical-device
+  testing; the live check covers the app's `ApiClient` only. No Android/iOS signed builds;
   web offline queue is memory-only; no push notifications or background sync; no offline
   media preview cache beyond queued bytes.
 - Asset deletion/archiving, QR labels, and asset status history.
@@ -150,8 +153,10 @@ Kepatuhan terhadap master prompt produksi dan status validasi KCIC dicatat di
   `8f1c2d3e4a50` applied; dashboard, report export, and `/models` console verified in the
   browser. This is not a release gate.
 - Fase B local gate: **passed locally on 2026-11-23** — `flutter analyze` clean, 7 Flutter
-  tests passed, `flutter build web --release` succeeded, and the existing 77 API / 38 web tests
-  still pass. Live API/device end-to-end remains pending and is not claimed.
+  widget tests passed, one live API-layer smoke test passed against the running Compose stack
+  (login, readiness, scoped inspections, detail, assets, logout), `flutter build web --release`
+  succeeded, and the existing 77 API / 38 web tests still pass. On-screen UI automation and
+  physical-device testing remain pending and are not claimed.
 - Release gate: per `TEST_PLAN.md` §4; not satisfied. No KCIC validation exists.
 
 ## Known blockers / stakeholder decisions

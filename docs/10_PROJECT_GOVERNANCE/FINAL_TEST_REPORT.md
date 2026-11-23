@@ -7,8 +7,9 @@ This is not a production or KCIC acceptance report.
 ## Environment
 
 Windows 10.0.26300, Python 3.13 (`.venv`), Node.js 24.22.1, Next.js 16.4.6,
-Flutter 3.47.7. Services were not run for this pass; tests use ASGI + SQLite in-memory
-and widget tests with injected in-memory stores.
+Flutter 3.47.7. Unit/integration tests use ASGI + SQLite in-memory and widget tests with
+injected in-memory stores. A separate live smoke test ran the Flutter `ApiClient` against
+the local Docker Compose stack (all six services healthy at the time of the run).
 
 ## Automated results (executed, not inferred)
 
@@ -21,7 +22,8 @@ and widget tests with injected in-memory stores.
 | Web lint | `npm run lint` | Pass |
 | Web unit tests | `npm test` | **38 passed / 5 files** |
 | Flutter analysis | `flutter analyze` | 0 issues |
-| Flutter tests | `flutter test` | **7 passed / 2 files** |
+| Flutter tests | `flutter test` | **7 passed / 2 files** (+1 live test skipped without credentials) |
+| Flutter live API smoke | `flutter test test/live_api_test.dart` with `.env` credentials against Compose | **1 passed** — login, readiness (database/redis), scoped inspections, detail, assets, logout |
 | Flutter web build | `flutter build web --release` | Success (`build/web`) |
 
 Flutter tests cover: signed-out login gate, sign-in into the Indonesian shell with live
@@ -39,10 +41,10 @@ readiness/workload text, unreachable-API retry state, and readiness summarizatio
 
 ## Not tested / not claimed
 
-- Flutter end-to-end against the live API and physical-device camera capture.
+- Flutter on-screen UI end-to-end automation and physical-device camera capture (the live
+  smoke covers the app's networking layer only).
 - Signed Android/iOS builds; background sync; push notifications.
 - Any AI detection, accuracy, dataset, or KCIC acceptance claim.
-- Compose stack health for this pass (no container rebuild performed).
 
 ## Publication blockers
 

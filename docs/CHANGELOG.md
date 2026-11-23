@@ -25,8 +25,9 @@ All notable changes to RailwayVision AI are recorded here. Dates are UTC. This p
   with optimistic versioning plus `checklist_incomplete` handling; offline checklist drafts
   with explicit sync and version-conflict recovery; camera/gallery evidence with client
   SHA-256; two-phase media upload; offline upload queue (persistent on native, in-memory on
-  web). Verified with `flutter analyze`, 7 Flutter tests, and a release web build. Live
-  API/device end-to-end testing remains pending.
+  web). Verified with `flutter analyze`, 7 Flutter tests, a release web build, and a live
+  `ApiClient` smoke test against the local Compose stack (login, readiness, inspections,
+  detail, assets, logout). On-screen UI and physical-device end-to-end testing remain pending.
 - `GET /api/v1/dashboard/overview`: live KPI counts (inspections, findings, work
   orders), status breakdowns, six-month inspection trend bucketed in Asia/Jakarta,
   and the five most recent inspections — all scope-filtered from PostgreSQL.

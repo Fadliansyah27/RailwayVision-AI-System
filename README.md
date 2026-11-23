@@ -102,8 +102,10 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
   luring (persisten di perangkat, in-memory pada Flutter web).
 - Hak akses tetap ditegakkan API; aplikasi tidak melakukan keputusan keselamatan dan tidak
   terhubung ke kendali kereta atau persinyalan.
-- Sudah diverifikasi dengan `flutter analyze`, 7 tes Flutter, dan `flutter build web` release.
-  Uji ujung-ke-ujung terhadap API live dan perangkat fisik belum dilakukan pada fase ini.
+- Sudah diverifikasi dengan `flutter analyze`, 7 tes Flutter, `flutter build web` release, dan
+  satu smoke test lapisan API terhadap stack live (login, kesiapan layanan, daftar/detail
+  inspeksi, daftar aset, logout). Uji ujung-ke-ujung level UI dan perangkat fisik belum
+  dilakukan pada fase ini.
 
 ## 5. Arsitektur sistem
 
@@ -271,8 +273,10 @@ Gunakan `http://localhost:8000` untuk desktop/web lokal. Untuk Flutter web, tamb
 aplikasi ke `CORS_ALLOWED_ORIGINS` pada API agar permintaan sah diizinkan. Antrean bukti luring
 hanya persisten pada target non-web; pada web antrean disimpan di memori.
 
-Status: alur lapangan Fase B sudah diimplementasikan dan diuji pada level widget/analisis,
-tetapi belum diverifikasi ujung-ke-ujung terhadap API live atau perangkat fisik.
+Status: alur lapangan Fase B sudah diimplementasikan dan diuji pada level widget/analisis.
+Lapisan API aplikasi (`ApiClient`) sudah diuji langsung terhadap stack Compose lokal pada
+2026-11-23 (login, kesiapan, inspeksi milik pengguna, detail, aset, logout). Uji ujung-ke-ujung
+level UI (otomasi layar) dan perangkat fisik belum dilakukan.
 
 ## 15. Cara menjalankan AI worker
 
@@ -315,7 +319,9 @@ Hasil verifikasi lokal terakhir (2026-11-23):
 - API: **77 tes lulus**, ruff bersih.
 - AI worker: **8 tes lulus**.
 - Web: **38 tes lulus**, TypeScript dan ESLint bersih.
-- Seluler: `flutter analyze` bersih, **7 tes Flutter lulus**, `flutter build web` release berhasil.
+- Seluler: `flutter analyze` bersih, **7 tes Flutter lulus**, `flutter build web` release
+  berhasil, dan **smoke test lapisan API live lulus** (login, kesiapan, inspeksi, detail,
+  aset, logout) pada stack Compose lokal.
 - Build container `api` dan `web` berhasil; seluruh layanan Compose healthy.
 
 Angka di atas adalah hasil eksekusi lokal, bukan sertifikasi. Lihat
@@ -351,7 +357,7 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
    dan status backup.
 2. Reset data DEMO yang aman (hanya data demo, tidak pernah data operasional).
 3. Transport notifikasi tambahan (email/WhatsApp) sesuai kebijakan KCIC.
-4. Aplikasi lapangan Flutter: verifikasi ujung-ke-ujung terhadap API live dan perangkat fisik,
+4. Aplikasi lapangan Flutter: otomasi UI ujung-ke-ujung dan pengujian perangkat fisik,
    lalu perluasan ke notifikasi dan perintah kerja lapangan.
 5. Alat anotasi dan manajemen dataset yang terhubung ke registri.
 6. Model AI terotorisasi dengan evaluasi terukur, setelah dataset dan protokol evaluasi

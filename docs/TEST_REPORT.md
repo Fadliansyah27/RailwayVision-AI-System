@@ -20,7 +20,8 @@ Re-run after the Fase A checklist work and the Fase B Flutter implementation.
 | T-WEB-LINT | Web lint | `npm run lint` | Pass |
 | T-WEB-UNIT | Web unit tests | `npm test` | **38 passed / 5 files** |
 | T-MOB-ANALYZE | Flutter static analysis | `flutter analyze` (`apps/mobile`) | Pass, 0 issues |
-| T-MOB-UNIT | Flutter widget/unit tests | `flutter test` | **7 passed / 2 files** |
+| T-MOB-UNIT | Flutter widget/unit tests | `flutter test` | **7 passed / 2 files** (+1 live test skipped without credentials) |
+| T-MOB-LIVE | Flutter networking layer against live API | `flutter test test/live_api_test.dart` with `DEMO_SEED_PASSWORD` from local `.env` | **Pass** — login, readiness (database/redis healthy), scoped inspection list, inspection detail, asset list, logout |
 | T-MOB-BUILD | Flutter web release build | `flutter build web --release` | Success |
 
 Flutter coverage added in this pass: signed-out login gate, sign-in to the Indonesian shell
@@ -28,9 +29,11 @@ with live readiness and workload text, unreachable-API retry state, and readines
 (healthy/worker-offline/degraded) with payload parsing. The offline upload store is injected as
 an in-memory implementation in widget tests so platform plugins are not required.
 
-Not run / not claimed: Flutter end-to-end against the live API, physical-device camera capture,
-signed Android/iOS builds, and any AI accuracy evaluation. `gitleaks` and the GitHub CLI were
-not available on this machine; secret scanning was limited to tracked-file pattern checks.
+Not run / not claimed: Flutter UI end-to-end (canvas interaction) against the live API,
+physical-device camera capture, signed Android/iOS builds, and any AI accuracy evaluation.
+The live check covers the dedicated `ApiClient` used by the app, not on-screen automation.
+`gitleaks` and the GitHub CLI were not available on this machine; secret scanning was limited
+to tracked-file pattern checks.
 
 ## 0.7.0 — Phase 7: findings, work orders, notifications
 
