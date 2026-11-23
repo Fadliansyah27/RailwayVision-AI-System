@@ -79,7 +79,6 @@ export default function LoginPage() {
           src="/login-halim-whoosh.png"
           alt="Kereta cepat Whoosh berhenti di peron Stasiun Halim"
           fill
-          priority
           quality={90}
           sizes="(min-width: 1024px) 51vw, 100vw"
           className="object-cover"
@@ -90,7 +89,15 @@ export default function LoginPage() {
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0b0f]/70 via-[#0b0b0f]/15 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0b0f]/80 via-[#0b0b0f]/25 to-transparent"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute left-0 top-0 h-56 w-[480px]"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at top left, rgba(11,11,15,0.9), transparent 70%)",
+          }}
           aria-hidden="true"
         />
         <div className="relative flex items-center gap-3">
