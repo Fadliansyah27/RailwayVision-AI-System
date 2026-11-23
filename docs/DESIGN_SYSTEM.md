@@ -29,8 +29,8 @@ pada komponen utama (tombol putih di atas primary, teks ink di atas canvas/surfa
 
 ## Aturan dominasi merah
 
-- Sidebar web: latar gelap, logo merah, dan **item navigasi aktif berlatar merah penuh**
-  dengan teks putih.
+- Sidebar web: latar merah penuh `#A8192D`, logo putih dengan huruf merah, dan **item
+  navigasi aktif berlatar putih dengan teks merah** agar kontras tetap terbaca.
 - Header web: garis aksen atas merah 3 px.
 - Tombol aksi utama, tab aktif, tautan penting, dan penanda merek memakai primary.
 - Seluler: app bar merah dengan teks/ikon putih, logo `RV` putih dengan huruf merah,

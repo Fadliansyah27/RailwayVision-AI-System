@@ -83,7 +83,7 @@ export default function LoginPage() {
           aria-hidden="true"
         />
         <div className="relative flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary font-semibold">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-white font-semibold text-primary">
             RV
           </div>
           <div>
@@ -112,7 +112,7 @@ export default function LoginPage() {
               "Tanpa fungsi kendali kereta, persinyalan, atau izin keselamatan.",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5">
-                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-white/80" aria-hidden="true" />
                 <span>{item}</span>
               </li>
             ))}
@@ -120,8 +120,8 @@ export default function LoginPage() {
         </div>
 
         <p className="relative text-[11px] leading-5 text-[color:var(--rv-sidebar-muted)]">
-          Lingkungan DEMO. Seluruh akun dan catatan bersifat sintetis dan tidak boleh dianggap sebagai
-          data operasional KCIC.
+          Lingkungan prototipe. Seluruh akun dan catatan bersifat sintetis dan tidak boleh dianggap
+          sebagai data operasional KCIC.
         </p>
       </section>
 

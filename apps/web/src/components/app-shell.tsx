@@ -80,12 +80,12 @@ function Navigation({ roles, onNavigate }: { roles: RoleCode[]; onNavigate?: () 
                       aria-current={active ? "page" : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                         active
-                          ? "bg-primary font-semibold text-white shadow-sm shadow-black/20 hover:bg-primary-strong"
-                          : "text-[color:var(--rv-sidebar-muted)] hover:bg-white/5 hover:text-white"
+                          ? "bg-white font-semibold text-primary-strong shadow-sm shadow-black/20 hover:bg-primary-soft"
+                          : "text-[color:var(--rv-sidebar-muted)] hover:bg-white/10 hover:text-white"
                       }`}
                     >
                       <Icon
-                        className={`size-4 shrink-0 ${active ? "text-white" : ""}`}
+                        className={`size-4 shrink-0 ${active ? "text-primary-strong" : ""}`}
                         aria-hidden="true"
                       />
                       <span className="flex-1">{item.label}</span>
@@ -132,7 +132,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen lg:grid lg:grid-cols-[272px_minmax(0,1fr)]">
       <aside className="hidden bg-sidebar text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-primary font-semibold text-white">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-white font-semibold text-primary">
             RV
           </div>
           <div className="min-w-0">
@@ -162,7 +162,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="relative flex h-full w-72 max-w-[85%] flex-col bg-sidebar text-white shadow-xl">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
               <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-white text-sm font-semibold text-primary">
                   RV
                 </div>
                 <span className="text-sm font-semibold">RailwayVision AI</span>
@@ -202,7 +202,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   : "Ruang kerja terautentikasi"}
               </p>
             </div>
-            <Chip tone="warning">PROTOTIPE DEMO</Chip>
+            <Chip tone="warning">PROTOTIPE</Chip>
             <NotificationBell />
             <Link
               href="/profile"

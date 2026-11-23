@@ -18,8 +18,8 @@
   --rv-ai: var(--rv-primary-strong);
   --rv-ai-soft: var(--rv-primary-soft);
   --rv-focus: var(--rv-primary);
-  --rv-sidebar: #0f1720;
-  --rv-sidebar-muted: #94a3b4;
+  --rv-sidebar: #a8192d;
+  --rv-sidebar-muted: #f6d7dc;
 }
 
 @theme inline {
