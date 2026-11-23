@@ -7,6 +7,10 @@ Acuan: MASTER PROMPT — RailwayVision AI (real-world production software develo
 Status yang dipakai: `COMPLETED` (lokal), `PARTIAL`, `BLOCKED`, `PENDING_KCIC_VALIDATION`.
 Tidak ada item berstatus `FAILED`. Tidak ada klaim production-ready atau persetujuan KCIC.
 
+> **Catatan pasca-Fase D (0.8.0):** penilaian di bawah adalah snapshot pada commit
+> `0a6a92c`. Kondisi terkini: 23 izin, label data `SINTETIS`, dan konsol operasi sudah
+> tersedia. Lihat `docs/IMPLEMENTATION_STATUS.md`.
+
 ## Ringkasan per bagian prompt
 
 | § | Persyaratan | Status | Bukti / catatan |

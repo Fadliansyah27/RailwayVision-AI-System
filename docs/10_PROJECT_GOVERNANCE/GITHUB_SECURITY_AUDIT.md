@@ -4,6 +4,10 @@ Tanggal audit: 2026-11-23
 Lingkup: seluruh working tree repository lokal sebelum dan sesudah publikasi GitHub.
 Status akhir: `PUBLISHED_GITHUB_PUBLIC` (lihat bagian 9).
 
+> **Catatan pasca-Fase D (0.8.0):** label data kini `SINTETIS` (bukan `DEMO`), variabel
+> seed bernama `SEED_SYNTHETIC_DATA`/`SEED_PASSWORD`, dan total izin 23. Temuan historis
+> di bawah tidak diubah.
+
 Dokumen ini tidak memuat nilai secret apa pun. Seluruh nilai sensitif yang ditemukan
 dirujuk berdasarkan lokasi, bukan isi.
 

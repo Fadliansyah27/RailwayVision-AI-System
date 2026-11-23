@@ -6,6 +6,11 @@ Status: `IMPLEMENTED` (kode ada), `WORKING` (diuji lokal), `PARTIAL`, `BROKEN`,
 `PLACEHOLDER`, `MOCK`, `MISSING`, `BLOCKED`, `PENDING_KCIC_VALIDATION`.
 `WORKING` di sini berarti teruji pada stack lokal, bukan kesiapan produksi/KCIC.
 
+> **Pembaruan pasca-Fase D (0.8.0):** baris di bawah menggambarkan baseline commit
+> `0a6a92c`. Sejak `5dc8b22`, izin `ops:manage` ditambahkan (total 23 izin), label data
+> menjadi `SINTETIS`, dan konsol operasi (D03) sudah tersedia. Status terkini:
+> `docs/IMPLEMENTATION_STATUS.md`.
+
 | ID | Kapabilitas | Status | Bukti (lokasi) | Kesenjangan / tindakan berikut | Dependensi |
 |---|---|---|---|---|---|
 | A01 | Login, sesi refresh, logout, ganti kata sandi | WORKING | `services/api/app/api/routes/auth.py`, tes API | MFA dan deteksi reuse token belum ada | Kebijakan keamanan |
