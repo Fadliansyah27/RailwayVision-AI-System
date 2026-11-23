@@ -78,7 +78,7 @@ class BackupStatusOut(BaseModel):
     detail: str
 
 
-class DemoResetPreviewOut(BaseModel):
+class SyntheticResetPreviewOut(BaseModel):
     enabled: bool
     environment: str
     confirmation_phrase: str
@@ -88,11 +88,11 @@ class DemoResetPreviewOut(BaseModel):
     reason: str | None = None
 
 
-class DemoResetRequest(BaseModel):
+class SyntheticResetRequest(BaseModel):
     confirm: str = Field(min_length=1, max_length=64)
 
 
-class DemoResetResult(BaseModel):
+class SyntheticResetResult(BaseModel):
     deleted: dict[str, int]
     total: int
     storage_cleanup: str

@@ -132,7 +132,7 @@ class _RootShellState extends State<RootShell> {
           ],
         ),
         actions: const [
-          DemoBadge(onBrand: true),
+          SyntheticBadge(onBrand: true),
           SizedBox(width: 16),
         ],
       ),

@@ -20,7 +20,7 @@ Implementasi web: `apps/web/src/app/globals.css` (`--rv-*`, dipetakan ke Tailwin
 | Secondary | `#667085` | Teks sekunder dan metadata |
 | Border | `#E5E7EB` | Garis pemisah |
 | Success | `#16A34A` (soft `#E9F6F1`) | Status berhasil/lulus |
-| Warning | `#D97706` (soft `#FDF5E6`) | Status peringatan/DEMO |
+| Warning | `#D97706` (soft `#FDF5E6`) | Status peringatan/SINTETIS |
 | Critical | `#DC2626` (soft `#FDEEEC`) | Status gagal/penolakan |
 
 Catatan aksesibilitas: warna status memakai varian yang mempertahankan kontras teks pada
@@ -54,11 +54,11 @@ Sumber: `apps/web/src/components/ui.tsx` dan `components/admin/form-styles.ts`.
 
 `ThemeData` Flutter menetapkan `ColorScheme.fromSeed(seedColor: #C61F33)` lalu menimpa
 primary/onPrimary. App bar, tombol terisi, FAB, indikator progres, dan navigasi aktif
-mengikuti merah. `DemoBadge` memiliki varian `onBrand` untuk dipakai di app bar merah.
+mengikuti merah. `SyntheticBadge` memiliki varian `onBrand` untuk dipakai di app bar merah.
 
 ## Status dan label
 
-- Setiap data sintetis wajib diberi label `DEMO`; jangan menampilkan angka yang tidak
+- Setiap data sintetis wajib diberi label `SINTETIS`; jangan menampilkan angka yang tidak
   berasal dari API.
 - AI bersifat advisori: gunakan tone AI (merah) dengan teks penjelas, bukan klaim akurasi.
 - Status keselamatan tidak pernah dinyatakan otomatis oleh UI.

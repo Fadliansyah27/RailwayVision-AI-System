@@ -212,7 +212,7 @@ function NewInspectionForm() {
                   ))}
                 </select>
                 <p className="mt-1 text-[11px] text-secondary">
-                  Taksonomi DEMO sementara sampai KCIC menyetujui jenis inspeksi.
+                  Taksonomi sintetis sementara sampai KCIC menyetujui jenis inspeksi.
                 </p>
               </div>
               <div>
@@ -225,7 +225,7 @@ function NewInspectionForm() {
                   value={locationReference}
                   onChange={(event) => setLocationReference(event.target.value)}
                   maxLength={200}
-                  placeholder="Referensi lokal bebas, mis. penanda DEMO chainage"
+                  placeholder="Referensi lokal bebas, mis. penanda sintetis chainage"
                 />
                 <p className="mt-1 text-[11px] text-secondary">
                   Jangan memasukkan koordinat KCIC yang belum disetujui.
@@ -291,7 +291,7 @@ function NewInspectionForm() {
             <div className="flex items-start gap-3">
               <Info className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
               <p className="text-xs leading-5 text-secondary">
-                Gunakan catatan DEMO sintetis saja sampai KCIC menyetujui register aset dan prosedur
+                Gunakan catatan sintetis saja sampai KCIC menyetujui register aset dan prosedur
                 inspeksi.
               </p>
             </div>

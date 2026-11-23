@@ -8,7 +8,7 @@ from app.core.errors import AppError
 
 
 class TaskQueue:
-    async def enqueue_demo_quality_check(self, job_id: str) -> None: ...
+    async def enqueue_synthetic_quality_check(self, job_id: str) -> None: ...
 
 
 class CeleryTaskQueue(TaskQueue):
@@ -20,8 +20,10 @@ class CeleryTaskQueue(TaskQueue):
             backend=settings.celery_result_backend,
         )
 
-    async def enqueue_demo_quality_check(self, job_id: str) -> None:
-        send = functools.partial(self._client.send_task, "ai.demo_quality_check", args=[job_id])
+    async def enqueue_synthetic_quality_check(self, job_id: str) -> None:
+        send = functools.partial(
+            self._client.send_task, "ai.synthetic_quality_check", args=[job_id]
+        )
         try:
             await anyio.to_thread.run_sync(send)
         except Exception as exc:

@@ -1,6 +1,6 @@
 """Server-side rules for findings, work orders, and their linkage.
 
-These are provisional DEMO workflow rules, not KCIC procedures. A finding is a
+These are provisional synthetic workflow rules, not KCIC procedures. A finding is a
 human-verified follow-up observation; a work order is corrective-action tracking.
 Neither is a safety clearance.
 """

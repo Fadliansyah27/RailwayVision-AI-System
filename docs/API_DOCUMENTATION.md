@@ -1,6 +1,6 @@
 # API Documentation (current build)
 
-Version: `0.7.0` (Phase 7: findings, work orders, notifications). Base path: `/api/v1` for business endpoints; health endpoints are unversioned.
+Version: `0.8.0` (Phase 8: dashboard, reports, registry, checklists, operations console). Base path: `/api/v1` for business endpoints; health endpoints are unversioned.
 Interactive OpenAPI: `/docs`, `/redoc`, `/openapi.json` — enabled when `APP_ENV` is `local`, `test`, or `staging`; disabled in `production`.
 
 ## Authentication and authorization
@@ -32,26 +32,27 @@ to the web app.
 
 ### RBAC and scope
 
-Six roles: `administrator`, `inspector`, `reviewer` (Engineering Reviewer), `supervisor`, `ai_ml_engineer`, `auditor`; 22 permissions resolved on every request. Role/permission changes take effect on the next request (no re-login needed).
+Six roles: `administrator`, `inspector`, `reviewer` (Engineering Reviewer), `supervisor`, `ai_ml_engineer`, `auditor`; 23 permissions resolved on every request. Role/permission changes take effect on the next request (no re-login needed).
 
-Each user belongs to one scope with a materialized path (e.g. `/demo-north`, child `/demo-north/km-001`). Reads are restricted to the user's scope and its descendants. Cross-scope object access returns **404**, not 403, so existence is not disclosed. Writes outside scope are rejected the same way.
+Each user belongs to one scope with a materialized path (e.g. `/sintetis-north`, child `/sintetis-north/km-001`). Reads are restricted to the user's scope and its descendants. Cross-scope object access returns **404**, not 403, so existence is not disclosed. Writes outside scope are rejected the same way.
 
 | Permission | Grants |
 |---|---|
 | `assets:read` / `assets:write` | View / create and update assets, categories, locations |
 | `inspections:read` / `inspections:write` / `inspections:submit` / `inspections:manage` | View / draft and edit / submit / cancel inspections |
 | `media:upload` / `media:read` | Request upload intents and send bytes / list, preview, and download evidence |
-| `ai:enqueue` / `detections:read` | Queue a demo analysis job / view demo job status and results |
+| `ai:enqueue` / `detections:read` | Queue a synthetic analysis job / view synthetic job status and results |
 | `review:decide` | Record an accept-or-return human review decision on submitted inspections |
 | `findings:read` / `findings:write` | View findings / record findings on reviewed inspections, edit, reject, reopen |
 | `work_orders:read` / `work_orders:write` / `work_orders:verify` | View work orders / create, edit, cancel, and manage them / verify completed work |
 | `notifications:read` | Read and mark your own in-app notifications |
 | `models:manage` | Register models; list the registry |
 | `users:manage` | Users, roles, permissions, and scope creation |
-| `audit:read` | Audit trail queries |
+| `audit:read` | Audit trail queries and the operations console (logs, deployments, backup) |
+| `reports:read` | Period summaries, PDF/Excel exports, and the reports page |
+| `ops:manage` | Record deployments and run the guarded synthetic-data reset |
 
-Report permissions exist in the catalogue but gate no endpoints yet (Phase 8).
-Inspectors hold `work_orders:read` so they can see work assigned to them; they do not hold
+Report endpoints require `reports:read`. Inspectors hold `work_orders:read` so they can see work assigned to them; they do not hold
 `findings:read` or any work-order management permission.
 
 Only the assigned inspector (or a holder of `inspections:manage`) may edit or submit a draft.
@@ -86,7 +87,7 @@ Service identity and safety notice. Public, non-sensitive.
 ```json
 {
   "name": "RailwayVision AI API",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "environment": "local",
   "api_version": "v1",
   "ai_disclaimer": "AI-generated suggestions are advisory and preliminary. They must be verified by an authorized reviewer. This system does not declare any infrastructure safe or unsafe."
@@ -105,11 +106,11 @@ Public. Body: `{"email": "...", "password": "..."}`. Returns `TokenResponse`; re
   "expires_in": 900,
   "user": {
     "id": "<uuid>",
-    "email": "inspector@demo.railwayvision.example",
-    "full_name": "Demo Inspector",
+    "email": "inspector@sintetis.railwayvision.example",
+    "full_name": "Synthetic Inspector",
     "is_active": true,
     "last_login_at": "2026-11-23T09:00:00Z",
-    "scope": {"id": "<uuid>", "code": "DEMO-NORTH", "name": "North Corridor (DEMO)", "path": "/demo-north"},
+    "scope": {"id": "<uuid>", "code": "SINTETIS-NORTH", "name": "North Corridor (SINTETIS)", "path": "/sintetis-north"},
     "roles": [{"id": "<uuid>", "code": "inspector", "name": "Inspector / Technician"}],
     "permissions": ["assets:read", "inspections:read", "inspections:write", "inspections:submit", "..."]
   },
@@ -180,13 +181,13 @@ Requires `assets:read`. Query: `page` (≥1), `page_size` (1–100, default 20),
   "items": [
     {
       "id": "<uuid>",
-      "code": "DEMO-AST-0001",
-      "name": "DEMO Track Segment 01",
-      "description": "Synthetic demonstration record. Not KCIC operational data.",
+      "code": "SINTETIS-AST-0001",
+      "name": "SINTETIS Track Segment 01",
+      "description": "Synthetic record. Not KCIC operational data.",
       "status": "active",
       "category": {"id": "<uuid>", "code": "TRACK", "name": "Track"},
-      "location": {"id": "<uuid>", "code": "KM-001", "name": "DEMO KM 1", "scope_id": "<uuid>", "description": ""},
-      "scope": {"id": "<uuid>", "code": "DEMO-NORTH", "name": "North Corridor (DEMO)", "path": "/demo-north"},
+      "location": {"id": "<uuid>", "code": "KM-001", "name": "SINTETIS KM 1", "scope_id": "<uuid>", "description": ""},
+      "scope": {"id": "<uuid>", "code": "SINTETIS-NORTH", "name": "North Corridor (SINTETIS)", "path": "/sintetis-north"},
       "created_at": "2026-11-23T09:00:00Z",
       "updated_at": "2026-11-23T09:00:00Z"
     }
@@ -202,9 +203,9 @@ Requires `assets:write`. Body:
 
 ```json
 {
-  "code": "DEMO-AST-9001",
-  "name": "DEMO Track Segment 99",
-  "description": "Synthetic demonstration record.",
+  "code": "SINTETIS-AST-9001",
+  "name": "SINTETIS Track Segment 99",
+  "description": "Synthetic record.",
   "category_id": "<uuid>",
   "location_id": "<uuid> | null",
   "status": "active"
@@ -241,13 +242,13 @@ Statuses: `draft`, `submitted`, `ai_processing`, `ai_processed`, `under_review`,
       "reference": "INS-20261123-1A2B3C",
       "status": "draft",
       "inspection_type": "routine",
-      "location_reference": "DEMO chainage marker 12+000 (synthetic)",
-      "notes": "DEMO inspection note.",
+      "location_reference": "SINTETIS chainage marker 12+000 (synthetic)",
+      "notes": "SINTETIS inspection note.",
       "inspected_at": "2026-11-23T09:10:00Z",
       "version": 1,
-      "asset": {"id": "<uuid>", "code": "DEMO-AST-0001", "name": "DEMO Track Segment 01"},
-      "inspector": {"id": "<uuid>", "full_name": "Demo Inspector"},
-      "scope": {"id": "<uuid>", "code": "DEMO-NORTH", "name": "North Corridor (DEMO)", "path": "/demo-north"},
+      "asset": {"id": "<uuid>", "code": "SINTETIS-AST-0001", "name": "SINTETIS Track Segment 01"},
+      "inspector": {"id": "<uuid>", "full_name": "Synthetic Inspector"},
+      "scope": {"id": "<uuid>", "code": "SINTETIS-NORTH", "name": "North Corridor (SINTETIS)", "path": "/sintetis-north"},
       "created_at": "2026-11-23T09:10:00Z",
       "updated_at": "2026-11-23T09:10:00Z"
     }
@@ -400,9 +401,9 @@ Requires `media:read`. Returns the object bytes (`inline` by default) with
 otherwise; quarantined objects are intentionally unreachable). **Every read audits
 `media.downloaded`.** Cross-scope access returns `404`.
 
-### Demo AI pipeline and model registry
+### Synthetic AI pipeline and model registry
 
-The demo pipeline exercises queueing and worker plumbing. Its output is image-quality
+The synthetic pipeline exercises queueing and worker plumbing. Its output is image-quality
 statistics only: **no detections, severity, confidence, or accuracy** are produced, and the
 result carries an explicit "not defect detection, no accuracy claim" disclaimer.
 
@@ -410,11 +411,11 @@ result carries an explicit "not defect detection, no accuracy claim" disclaimer.
 Requires `ai:enqueue`. Body `{"media_id": "<uuid>"}` where the media belongs to the inspection
 and is `ready`; the inspection must be `submitted`, `ai_processed`, or `ai_failed`. Returns
 `201` with the queued job (status `queued`). Runs the first active
-`is_demo` model. Errors: `409 conflict` when the demo pipeline is disabled
-(`DEMO_AI_ENABLED=false` or `APP_ENV=production`), the media is not ready, a queued/running
-job already exists for the media+model, or no demo model is registered; `404` if the media is
+`is_demo` model. Errors: `409 conflict` when the synthetic pipeline is disabled
+(`SYNTHETIC_AI_ENABLED=false` or `APP_ENV=production`), the media is not ready, a queued/running
+job already exists for the media+model, or no synthetic model is registered; `404` if the media is
 not on this inspection; `503` if the broker is unreachable (the job is marked `failed` with
-`queue_unavailable` and `ai.demo_job_failed` audited). Audits `ai.demo_job_queued`.
+`queue_unavailable` and `ai.synthetic_job_failed` audited). Audits `ai.synthetic_job_queued`.
 
 #### GET `/api/v1/inspections/{inspection_id}/ai-jobs`
 Requires `detections:read`. Scoped page of jobs: `id`, `inspection_id`, `media_id`, `status`
@@ -426,13 +427,13 @@ A successful `result` looks like:
 
 ```json
 {
-  "kind": "demo_image_quality",
+  "kind": "synthetic_image_quality",
   "advisory": true,
-  "disclaimer": "Demo image-quality heuristics only. This is not defect detection, has no accuracy claim, and must not be used for safety or maintenance decisions.",
+  "disclaimer": "Synthetic image-quality heuristics only. This is not defect detection, has no accuracy claim, and must not be used for safety or maintenance decisions.",
   "metrics": {"width": 800, "height": 600, "mean_luminance": 127.6, "contrast_stddev": 47.7, "edge_variance": 12708.0},
   "quality_flags": ["low_light", "possible_blur"],
   "thresholds": {"low_light_mean": 60.0, "low_contrast_stddev": 18.0, "possible_blur_edge_variance": 120.0, "low_resolution_width": 640},
-  "note": "Thresholds are fixed demo constants, not KCIC-approved values."
+  "note": "Thresholds are fixed synthetic constants, not KCIC-approved values."
 }
 ```
 
@@ -444,14 +445,14 @@ Requires `models:manage` or `detections:read`. Returns the registry page (`code`
 Requires `models:manage`. Body `{"code", "name", "version", "modality": "image", "description",
 "is_demo"}`; `code` matches `^[A-Za-z0-9][A-Za-z0-9._-]*$`. `201` on success, `409 conflict`
 for a duplicate code. Audit `model.registered`. Registering a model does not download or
-execute any artifact; only demo models are consumed by the demo worker.
+execute any artifact; only synthetic models are consumed by the synthetic worker.
 
 ### Findings, work orders, notifications
 
 Findings record a human-verified observation from a reviewed or inconclusive inspection. Work
 orders track corrective action, and notifications deliver in-app workflow events. These are
 record-tracking features only: they do not declare infrastructure safe or unsafe, and the
-status rules are provisional DEMO rules (`app/core/maintenance_workflow.py`), not KCIC
+status rules are provisional SINTETIS rules (`app/core/maintenance_workflow.py`), not KCIC
 maintenance procedures. References are human-readable `FND-YYYYMMDD-XXXXXX` and
 `WO-YYYYMMDD-XXXXXX`.
 
@@ -536,7 +537,7 @@ Requires `audit:read`. Query: `page`, `page_size` (1–100, default 25), `action
     {
       "id": "<uuid>",
       "action": "inspection.submitted",
-      "actor_label": "Demo Inspector <inspector@demo.railwayvision.example>",
+      "actor_label": "Synthetic Inspector <inspector@sintetis.railwayvision.example>",
       "target_type": "inspection",
       "target_id": "<uuid>",
       "scope_id": "<uuid> | null",
@@ -551,6 +552,21 @@ Requires `audit:read`. Query: `page`, `page_size` (1–100, default 25), `action
   "page_size": 25
 }
 ```
+
+### Operations console
+
+The `/api/v1/ops` surface backs the web `/operations` page. Every route requires authentication
+and backend permissions; scope filtering applies on reads.
+
+| Method & path | Permission | Notes |
+|---|---|---|
+| GET `/api/v1/ops/ai-jobs` | `detections:read` | Query `page`, `page_size`, `status` (`queued`/`running`/`succeeded`/`failed`, invalid → `422`), `search` (inspection reference or media filename); scope-filtered page of jobs with inspection, media, model, and requester |
+| GET `/api/v1/ops/logs` | `ops:manage` or `audit:read` | Query `level` (`DEBUG`…`CRITICAL`, invalid → `422`), `search`; returns `items`, `retained`, `capacity`, `generated_at`. Bounded in-process buffer; values matching known credential patterns are replaced with `[REDACTED]` |
+| GET `/api/v1/ops/deployments` | `ops:manage` or `audit:read` | Records derived from `deployment.recorded` audit events |
+| POST `/api/v1/ops/deployments` | `ops:manage` | Body `version`, `environment` (`local`/`test`/`staging`/`production`), optional `commit_sha` (7–40 hex), `notes`; environment must equal `APP_ENV` (`422` otherwise); audit `deployment.recorded`; `201` |
+| GET `/api/v1/ops/backup` | `ops:manage` or `audit:read` | Reads `BACKUP_STATUS_FILE`; `status` is `ok`, `stale`, `unavailable`, `invalid`, or `not_configured`. The API never runs a backup and never infers health |
+| GET `/api/v1/ops/synthetic-reset/preview` | `ops:manage` | Returns `enabled`, `environment`, `confirmation_phrase`, `scope_codes`, `counts`, `total`, and a `reason` when disabled |
+| POST `/api/v1/ops/synthetic-reset` | `ops:manage` | Body `{"confirm": "HAPUS DATA SINTETIS"}`; refuses outside `local`/`test` (`409 synthetic_reset_disabled`) and on any other phrase (`422`); deletes only transaction rows in `SINTETIS-*` scopes; audit `synthetic_data.reset`; storage cleanup is best-effort and reported separately |
 
 ## Conventions
 

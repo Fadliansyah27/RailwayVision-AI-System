@@ -84,7 +84,7 @@ export default function AdministrationPage() {
       <PageHeader
         eyebrow="Tata kelola · akses & master data"
         title="Administrasi"
-        description="Kelola akun DEMO, matriks izin yang ditegakkan server, dan cakupan organisasi. Setiap perubahan ditulis API ke riwayat aktivitas."
+        description="Kelola akun SINTETIS, matriks izin yang ditegakkan server, dan cakupan organisasi. Setiap perubahan ditulis API ke riwayat aktivitas."
       />
 
       <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Bagian administrasi">

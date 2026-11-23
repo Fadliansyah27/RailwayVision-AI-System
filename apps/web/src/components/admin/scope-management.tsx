@@ -90,7 +90,7 @@ export function ScopeManagement({
       </Card>
 
       <Card>
-        <CardHeader title="Buat cakupan" description="Tambahkan batas organisasi DEMO." />
+        <CardHeader title="Buat cakupan" description="Tambahkan batas organisasi sintetis." />
         <form className="space-y-3 p-5" onSubmit={handleSubmit}>
           {error ? (
             <p
@@ -120,7 +120,7 @@ export function ScopeManagement({
               pattern="[A-Za-z0-9][A-Za-z0-9_-]*"
               value={code}
               onChange={(event) => setCode(event.target.value)}
-              placeholder="DEMO-EAST"
+              placeholder="SINTETIS-EAST"
               className={`mt-1.5 ${inputClass}`}
             />
           </div>
@@ -135,7 +135,7 @@ export function ScopeManagement({
               maxLength={160}
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="DEMO — Koridor timur"
+              placeholder="SINTETIS — Koridor timur"
               className={`mt-1.5 ${inputClass}`}
             />
           </div>

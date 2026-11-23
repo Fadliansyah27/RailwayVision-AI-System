@@ -832,7 +832,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Observasi DEMO sintetis saja…',
+                hintText: 'Observasi sintetis saja…',
               ),
             )
           : Text(

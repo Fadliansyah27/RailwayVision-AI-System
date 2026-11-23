@@ -2,9 +2,45 @@
 
 All notable changes to RailwayVision AI are recorded here. Dates are UTC. This project is a decision-support prototype; nothing here implies production approval.
 
-## [Unreleased] — 0.8.0-dev — dashboard, reports, model lifecycle, checklists
+## [0.8.0] — 2026-11-23 — Fase D: operations console, honest ops status, synthetic reset
 
 ### Added
+- Operations console (`/operations`) backed by real endpoints:
+  - `GET /api/v1/ops/ai-jobs` — paginated AI job history with status/search filters,
+    scope-subtree filtering, and `detections:read`.
+  - `GET /api/v1/ops/logs` — bounded in-process log buffer with level/search filters and
+    redaction of passwords, bearer tokens, and signed URLs; `audit:read` required.
+  - `GET/POST /api/v1/ops/deployments` — manual deployment records validated against
+    `APP_ENV`, stamped with the authenticated operator and `deployment.recorded` audit.
+  - `GET /api/v1/ops/backup` — status reported verbatim from `BACKUP_STATUS_FILE`
+    (`ok`, `stale`, `unavailable`, `invalid`, `not_configured`); never infers health.
+  - `GET /api/v1/ops/synthetic-reset/preview` and `POST /api/v1/ops/synthetic-reset` —
+    phrase-confirmed (`HAPUS DATA SINTETIS`), `ops:manage`, local/test only, limited to
+    `SINTETIS-*` transaction rows, audited as `synthetic_data.reset`; storage cleanup is
+    best-effort and reported separately.
+- Web tabs for AI jobs, logs, deployments, backup, and synthetic reset with loading, empty,
+  and error states; operations navigation entry for supervisor, auditor, and administrator.
+- New permission `ops:manage` (administrator) and `audit:read` use for the console.
+- Alembic `d1e2f3a4b5c6` relabels existing rows from `DEMO` to `SINTETIS` and renames worker
+  model identifiers (`synthetic-image-quality`, `0.1.0-sintetis`, `synthetic_only`).
+- Regression test ensuring `seed_rbac` grants newly introduced permissions to existing roles.
+
+### Changed
+- All user-facing `DEMO` wording replaced with `SINTETIS` across API, web, worker, Flutter,
+  tests, seed data, and environment variable names (`SEED_SYNTHETIC_DATA`, `SEED_PASSWORD`,
+  `SYNTHETIC_AI_ENABLED`). Internal `is_demo` columns keep their names.
+- Worker modules renamed to `worker/synthetic_ai.py` and `worker/synthetic_jobs.py`.
+- Release version bumped to `0.8.0` in API settings, `/api/v1/meta`, `package.json`, and the
+  lockfile.
+- Navigation: "Konsol Operasi" visible to supervisor, auditor, and administrator.
+
+### Security
+- Log redaction runs before serialization; reset is refused outside local/test, without
+  `ops:manage`, or without the exact confirmation phrase.
+- Removed the literal seed password from the login page and both `.env.example` files; the
+  password now comes only from `SEED_PASSWORD` at runtime.
+
+### Previously delivered in the 0.8.0 cycle
 - Configurable inspection checklists: `checklist_templates`, `checklist_template_items`,
   and `inspection_checklist_results` (Alembic `c4d5e6f7a8b9`). Master API
   `GET/POST/PATCH /master/checklist-templates` requires `inspections:manage` for writes and
@@ -59,25 +95,27 @@ All notable changes to RailwayVision AI are recorded here. Dates are UTC. This p
   mandatory notes, and per-model history.
 - Alembic `8f1c2d3e4a50`: `datasets` table and AI lifecycle columns on `ai_models`
   (family, approval status/notes/by, dataset version, checksum, class mapping, training
-  config, evaluation, deploy/retire timestamps); backfills `family` and `demo_only` for
-  existing demo models. Reversible downgrade included.
+  config, evaluation, deploy/retire timestamps); backfills `family` and `synthetic_only` for
+  existing seeded models. Reversible downgrade included.
 - Dependencies: `openpyxl==3.1.5`, `reportlab==4.2.5`.
 
 ### Changed
 - Navigation: "Pengelolaan Model AI" now routes to `/models` (AI engineer, administrator,
   auditor); reports item marked delivered.
-- Demo registry seed records family, `demo_only` approval, and known limitations.
+- Synthetic registry seed records family, `synthetic_only` approval, and known limitations.
 - Print stylesheet hides navigation and chrome for report printing.
 
 ### Security
-- Removed the literal demo password from the login page and both `.env.example`
-  files; the password now comes only from `DEMO_SEED_PASSWORD` at runtime.
+- Removed the literal seed password from the login page and both `.env.example`
+  files; the password now comes only from `SEED_PASSWORD` at runtime.
 
 ### Tests
-- API suite: 77 passed (checklist snapshot, submit guard, RBAC, and template activation coverage added).
-- Web: 38 passed; TypeScript and ESLint clean. Worker: 8 passed.
-- Live checks: dashboard counts, `/models` rendering, PDF/XLSX export, migration applied
-  to PostgreSQL (`8f1c2d3e4a50`).
+- API suite: 83 passed (console permissions, log redaction, scope-filtered jobs, deployment
+  audit, backup status transitions, reset guards, RBAC reconciliation).
+- Web: 39 passed; TypeScript and ESLint clean. Worker: 8 passed. Flutter: 11 passed.
+- Live checks: dashboard counts, `/models` rendering, PDF/XLSX export, `/operations` tabs in
+  the browser with screenshots; migration `d1e2f3a4b5c6` applied to PostgreSQL; containers
+  rebuilt; all services healthy.
 
 
 ## [0.7.0] — 2026-11-23 — Phase 7: findings, work orders, notifications

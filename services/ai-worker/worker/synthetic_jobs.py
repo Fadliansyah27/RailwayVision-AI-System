@@ -8,9 +8,9 @@ from minio import Minio
 from minio.error import S3Error
 
 from worker.config import get_settings
-from worker.demo_ai import analyze_image_bytes
+from worker.synthetic_ai import analyze_image_bytes
 
-logger = logging.getLogger("railwayvision.demo_ai")
+logger = logging.getLogger("railwayvision.synthetic_ai")
 
 _ACTOR_LABEL = "system:ai-worker"
 
@@ -102,11 +102,13 @@ async def _fail(conn: asyncpg.Connection, job_id: uuid.UUID, scope_id, code: str
         job_id,
         code,
     )
-    await _audit(conn, job_id, scope_id, "ai.demo_job_failed", "failure", {"error": code})
+    await _audit(
+        conn, job_id, scope_id, "ai.synthetic_job_failed", "failure", {"error": code}
+    )
     await _sync_inspection(conn, job_id, scope_id, "ai_failed")
 
 
-async def process_demo_job(job_id: uuid.UUID) -> None:
+async def process_synthetic_job(job_id: uuid.UUID) -> None:
     settings = get_settings()
     conn = await asyncpg.connect(_dsn(settings.database_url))
     scope_id = None
@@ -118,7 +120,9 @@ async def process_demo_job(job_id: uuid.UUID) -> None:
             job_id,
         )
         if job is None:
-            logger.info("demo_ai_job_skipped", extra={"event": "demo_ai_job_skipped"})
+            logger.info(
+                "synthetic_ai_job_skipped", extra={"event": "synthetic_ai_job_skipped"}
+            )
             return
         scope_id = job["scope_id"]
         await conn.execute(
@@ -144,8 +148,8 @@ async def process_demo_job(job_id: uuid.UUID) -> None:
                 response.release_conn()
         except (S3Error, OSError, RuntimeError):
             logger.warning(
-                "demo_ai_storage_failed",
-                extra={"event": "demo_ai_storage_failed", "outcome": "error"},
+                "synthetic_ai_storage_failed",
+                extra={"event": "synthetic_ai_storage_failed", "outcome": "error"},
             )
             await _fail(conn, job_id, scope_id, "storage_unavailable")
             return
@@ -154,8 +158,8 @@ async def process_demo_job(job_id: uuid.UUID) -> None:
             result = analyze_image_bytes(data)
         except Exception:
             logger.warning(
-                "demo_ai_decode_failed",
-                extra={"event": "demo_ai_decode_failed", "outcome": "error"},
+                "synthetic_ai_decode_failed",
+                extra={"event": "synthetic_ai_decode_failed", "outcome": "error"},
             )
             await _fail(conn, job_id, scope_id, "unsupported_image")
             return
@@ -170,28 +174,30 @@ async def process_demo_job(job_id: uuid.UUID) -> None:
             conn,
             job_id,
             scope_id,
-            "ai.demo_job_completed",
+            "ai.synthetic_job_completed",
             "success",
             {"kind": result["kind"], "quality_flags": result["quality_flags"]},
         )
         await _sync_inspection(conn, job_id, scope_id, "ai_processed")
         logger.info(
-            "demo_ai_job_succeeded",
-            extra={"event": "demo_ai_job_succeeded", "media_id": str(job["media_id"])},
+            "synthetic_ai_job_succeeded",
+            extra={"event": "synthetic_ai_job_succeeded", "media_id": str(job["media_id"])},
         )
     except Exception:
-        logger.exception("demo_ai_job_crashed", extra={"event": "demo_ai_job_crashed"})
+        logger.exception(
+            "synthetic_ai_job_crashed", extra={"event": "synthetic_ai_job_crashed"}
+        )
         if scope_id is not None:
             try:
                 await _fail(conn, job_id, scope_id, "analysis_failed")
             except Exception:
                 logger.exception(
-                    "demo_ai_failure_record_failed",
-                    extra={"event": "demo_ai_failure_record_failed"},
+                    "synthetic_ai_failure_record_failed",
+                    extra={"event": "synthetic_ai_failure_record_failed"},
                 )
     finally:
         await conn.close()
 
 
-def run_demo_job(job_id: str) -> None:
-    asyncio.run(process_demo_job(uuid.UUID(job_id)))
+def run_synthetic_job(job_id: str) -> None:
+    asyncio.run(process_synthetic_job(uuid.UUID(job_id)))

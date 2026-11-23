@@ -494,7 +494,7 @@ export interface DatasetCreatePayload {
   split_test?: number;
 }
 
-export interface DemoQualityMetrics {
+export interface SyntheticQualityMetrics {
   width: number;
   height: number;
   mean_luminance: number;
@@ -502,11 +502,11 @@ export interface DemoQualityMetrics {
   edge_variance: number;
 }
 
-export interface DemoQualityResult {
+export interface SyntheticQualityResult {
   kind: string;
   advisory: boolean;
   disclaimer: string;
-  metrics: DemoQualityMetrics;
+  metrics: SyntheticQualityMetrics;
   quality_flags: string[];
   thresholds?: Record<string, number>;
   note?: string;
@@ -518,12 +518,101 @@ export interface AIJob {
   media_id: string;
   status: string;
   error_code: string | null;
-  result: DemoQualityResult | null;
+  result: SyntheticQualityResult | null;
   model: AIModelBrief;
   requested_by: UserBrief;
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
+}
+
+export interface OpsAIJob {
+  id: string;
+  inspection_id: string;
+  inspection_reference: string;
+  inspection_status: string;
+  media_id: string;
+  media_filename: string;
+  status: string;
+  error_code: string | null;
+  model: AIModelBrief;
+  requested_by: UserBrief;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+export interface OpsLogEntry {
+  ts: string;
+  level: string;
+  logger: string;
+  message: string;
+  request_id: string | null;
+  event: string | null;
+  method: string | null;
+  path: string | null;
+  status_code: number | null;
+  duration_ms: number | null;
+  outcome: string | null;
+  error_code: string | null;
+  exception: string | null;
+}
+
+export interface OpsLogPage {
+  items: OpsLogEntry[];
+  retained: number;
+  capacity: number;
+  generated_at: string;
+  note: string;
+}
+
+export interface DeploymentRecord {
+  id: string;
+  version: string;
+  environment: string;
+  commit_sha: string | null;
+  notes: string;
+  recorded_by: string;
+  recorded_at: string;
+}
+
+export interface DeploymentPayload {
+  version: string;
+  environment: "local" | "test" | "staging" | "production";
+  commit_sha?: string | null;
+  notes?: string;
+}
+
+export interface BackupStatus {
+  status: string;
+  configured: boolean;
+  checked_at: string;
+  last_backup_at: string | null;
+  age_hours: number | null;
+  size_bytes: number | null;
+  checksum_sha256: string | null;
+  last_restore_test_at: string | null;
+  max_age_hours: number;
+  detail: string;
+}
+
+export interface SyntheticResetPreview {
+  enabled: boolean;
+  environment: string;
+  confirmation_phrase: string;
+  scope_codes: string[];
+  counts: Record<string, number>;
+  total: number;
+  reason: string | null;
+}
+
+export interface SyntheticResetResult {
+  deleted: Record<string, number>;
+  total: number;
+  storage_cleanup: string;
+  storage_objects_deleted: number;
+  storage_failures: number;
+  completed_at: string;
 }
 
 export class ApiError extends Error {

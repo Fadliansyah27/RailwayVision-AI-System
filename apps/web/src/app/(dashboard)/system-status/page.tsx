@@ -92,8 +92,8 @@ export default function SystemStatusPage() {
                 Pemberitahuan data
               </dt>
               <dd className="mt-1 text-xs leading-5 text-secondary">
-                Prototipe ini tidak memuat data operasional KCIC. Catatan demonstrasi bersifat
-                sintetis dan berlabel DEMO.
+                Prototipe ini tidak memuat data operasional KCIC. Catatan bersifat sintetis
+                dan berlabel SINTETIS.
               </dd>
             </div>
           </dl>

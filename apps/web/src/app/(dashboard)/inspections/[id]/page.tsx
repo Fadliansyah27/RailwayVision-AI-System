@@ -25,7 +25,7 @@ import {
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
 import { ChecklistPanel } from "@/components/checklist-panel";
-import { DemoBadge, InspectionStatusChip } from "@/components/records";
+import { SyntheticBadge, InspectionStatusChip } from "@/components/records";
 import { FindingsPanel } from "@/components/findings-panel";
 import { MediaPanel } from "@/components/media-panel";
 import { ReviewPanel } from "@/components/review-panel";
@@ -390,7 +390,7 @@ export default function InspectionDetailPage() {
         title={
           <span className="inline-flex flex-wrap items-center gap-3">
             <span className="font-mono text-2xl">{inspection.reference}</span>
-            <DemoBadge reference={inspection.reference} />
+            <SyntheticBadge reference={inspection.reference} />
             <InspectionStatusChip status={inspection.status} />
           </span>
         }
@@ -615,7 +615,7 @@ export default function InspectionDetailPage() {
                   </div>
                 </div>
                 <p className="text-[11px] leading-5 text-secondary">
-                  Taksonomi DEMO sementara sampai KCIC menyetujui jenis inspeksi. Jangan memasukkan
+                  Taksonomi sintetis sementara sampai KCIC menyetujui jenis inspeksi. Jangan memasukkan
                   koordinat KCIC yang belum disetujui.
                 </p>
                 <div>
@@ -762,7 +762,7 @@ export default function InspectionDetailPage() {
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Bukti" description="Media dan status pipeline AI demo." />
+            <CardHeader title="Bukti" description="Media dan status pipeline AI sintetis." />
             <div className="space-y-4 p-5">
               <div className="flex items-start gap-3">
                 <ImageOff className="mt-0.5 size-4 shrink-0 text-secondary" aria-hidden="true" />
@@ -783,7 +783,7 @@ export default function InspectionDetailPage() {
                     {inspection.pending_detections} pekerjaan AI tertunda
                   </p>
                   <p className="mt-1 text-xs leading-5 text-secondary">
-                    Heuristik kualitas gambar DEMO yang diberi label jelas menguji antrean. Ini
+                    Heuristik kualitas gambar sintetis yang diberi label jelas menguji antrean. Ini
                     bukan deteksi kerusakan dan tidak mengklaim akurasi apa pun.
                   </p>
                 </div>
@@ -811,7 +811,7 @@ export default function InspectionDetailPage() {
               ) : null}
               {inspection.status === "ai_processing" ? (
                 <p>
-                  <span className="font-semibold text-ink">Pemrosesan AI.</span> Pekerjaan AI demo
+                  <span className="font-semibold text-ink">Pemrosesan AI.</span> Pekerjaan AI sintetis
                   diantrekan terhadap bukti. Pekerjaan ini hanya menguji pipeline dan tidak
                   mengklaim deteksi kerusakan.
                 </p>
@@ -819,14 +819,14 @@ export default function InspectionDetailPage() {
               {inspection.status === "ai_processed" ? (
                 <p>
                   <span className="font-semibold text-ink">AI selesai memproses.</span> Pekerjaan
-                  demo selesai dengan keluaran bersifat saran. Peninjau manusia harus memutuskan
+                  sintetis selesai dengan keluaran bersifat saran. Peninjau manusia harus memutuskan
                   catatan ini.
                 </p>
               ) : null}
               {inspection.status === "ai_failed" ? (
                 <p>
                   <span className="font-semibold text-ink">Pemrosesan AI gagal.</span> Pekerjaan
-                  demo tidak selesai. Supervisor dapat membuka kembali atau membatalkan catatan;
+                  sintetis tidak selesai. Supervisor dapat membuka kembali atau membatalkan catatan;
                   bukti dapat dicoba ulang.
                 </p>
               ) : null}

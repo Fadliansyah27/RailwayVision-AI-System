@@ -9,13 +9,13 @@ import { Chip } from "@/components/ui";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
-const DEMO_ACCOUNTS = [
-  "admin@demo.railwayvision.example",
-  "inspector@demo.railwayvision.example",
-  "reviewer@demo.railwayvision.example",
-  "supervisor@demo.railwayvision.example",
-  "ai@demo.railwayvision.example",
-  "auditor@demo.railwayvision.example",
+const SINTETIS_ACCOUNTS = [
+  "admin@sintetis.railwayvision.example",
+  "inspector@sintetis.railwayvision.example",
+  "reviewer@sintetis.railwayvision.example",
+  "supervisor@sintetis.railwayvision.example",
+  "ai@sintetis.railwayvision.example",
+  "auditor@sintetis.railwayvision.example",
 ];
 
 export default function LoginPage() {
@@ -146,10 +146,10 @@ export default function LoginPage() {
                 Akses ruang kerja Anda
               </h2>
             </div>
-            <Chip tone="warning">DEMO</Chip>
+            <Chip tone="warning">SINTETIS</Chip>
           </div>
           <p className="mt-2 text-sm leading-6 text-secondary">
-            Gunakan akun DEMO yang berwenang. Sesi berakhir otomatis dan diperbarui
+            Gunakan akun sintetis yang berwenang. Sesi berakhir otomatis dan diperbarui
             secara aman di latar belakang.
           </p>
 
@@ -190,7 +190,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  placeholder="name@demo.railwayvision.example"
+                  placeholder="name@sintetis.railwayvision.example"
                   className="w-full rounded-lg border border-border bg-surface py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-secondary/70"
                 />
               </div>
@@ -244,15 +244,15 @@ export default function LoginPage() {
 
           <div className="mt-8 rounded-xl border border-border bg-surface p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
-              Akun DEMO
+              Akun Sintetis
             </p>
             <p className="mt-1 text-xs leading-5 text-secondary">
-              Kata sandi akun demo ditentukan oleh{" "}
-              <code className="font-mono text-ink">DEMO_SEED_PASSWORD</code> pada konfigurasi
+              Kata sandi akun sintetis ditentukan oleh{" "}
+              <code className="font-mono text-ink">SEED_PASSWORD</code> pada konfigurasi
               server lokal. Nilai contoh tidak disimpan di aplikasi.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {DEMO_ACCOUNTS.map((account) => (
+              {SINTETIS_ACCOUNTS.map((account) => (
                 <button
                   key={account}
                   type="button"

@@ -5,13 +5,13 @@ import '../services/api_client.dart';
 import '../services/session_controller.dart';
 import '../widgets/section_card.dart';
 
-const _demoAccounts = [
-  'admin@demo.railwayvision.example',
-  'inspector@demo.railwayvision.example',
-  'reviewer@demo.railwayvision.example',
-  'supervisor@demo.railwayvision.example',
-  'ai@demo.railwayvision.example',
-  'auditor@demo.railwayvision.example',
+const _syntheticAccounts = [
+  'admin@sintetis.railwayvision.example',
+  'inspector@sintetis.railwayvision.example',
+  'reviewer@sintetis.railwayvision.example',
+  'supervisor@sintetis.railwayvision.example',
+  'ai@sintetis.railwayvision.example',
+  'auditor@sintetis.railwayvision.example',
 ];
 
 class LoginScreen extends StatefulWidget {
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 18),
                   _form(context),
                   const SizedBox(height: 14),
-                  _DemoAccounts(
+                  _SyntheticAccounts(
                     onSelected: (email) {
                       _emailController.text = email;
                       _passwordController.clear();
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return SectionCard(
       title: 'Masuk ke ruang kerja',
       description:
-          'Gunakan akun DEMO yang diberikan administrator proyek. Peran dan '
+          'Gunakan akun sintetis yang diberikan administrator proyek. Peran dan '
           'cakupan ditegakkan oleh server.',
       child: Form(
         key: _formKey,
@@ -281,7 +281,7 @@ class _HeroPanel extends StatelessWidget {
                   ],
                 ),
               ),
-              const DemoBadge(onBrand: true),
+              const SyntheticBadge(onBrand: true),
             ],
           ),
           const SizedBox(height: 18),
@@ -335,23 +335,23 @@ class _ErrorBox extends StatelessWidget {
   }
 }
 
-class _DemoAccounts extends StatelessWidget {
-  const _DemoAccounts({required this.onSelected});
+class _SyntheticAccounts extends StatelessWidget {
+  const _SyntheticAccounts({required this.onSelected});
 
   final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
     return SectionCard(
-      title: 'Akun DEMO',
+      title: 'Akun Sintetis',
       description:
-          'Kata sandi diambil dari DEMO_SEED_PASSWORD pada konfigurasi lokal. '
-          'Jangan aktifkan seed demo di lingkungan yang dapat diakses publik.',
+          'Kata sandi diambil dari SEED_PASSWORD pada konfigurasi lokal. '
+          'Jangan aktifkan seed sintetis di lingkungan yang dapat diakses publik.',
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
         children: [
-          for (final email in _demoAccounts)
+          for (final email in _syntheticAccounts)
             ActionChip(
               avatar: const Icon(Icons.person_outline, size: 16),
               label: Text(

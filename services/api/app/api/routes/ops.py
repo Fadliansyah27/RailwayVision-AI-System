@@ -23,14 +23,14 @@ from app.schemas.common import Page, UserBrief
 from app.schemas.media import AIModelBrief
 from app.schemas.ops import (
     BackupStatusOut,
-    DemoResetPreviewOut,
-    DemoResetRequest,
-    DemoResetResult,
     DeploymentCreate,
     DeploymentRecordOut,
     OpsAIJobOut,
     OpsLogEntry,
     OpsLogPage,
+    SyntheticResetPreviewOut,
+    SyntheticResetRequest,
+    SyntheticResetResult,
 )
 from app.services.access import accessible_scope_condition
 from app.services.audit import record_audit
@@ -38,8 +38,8 @@ from app.services.storage import StorageUnavailable, get_storage
 
 router = APIRouter(prefix="/ops", tags=["operations"])
 
-DEMO_SCOPE_CODES = ("DEMO-KCIC", "DEMO-NORTH", "DEMO-SOUTH")
-DEMO_RESET_CONFIRMATION = "RESET DATA DEMO"
+SYNTHETIC_SCOPE_CODES = ("SINTETIS-KCIC", "SINTETIS-NORTH", "SINTETIS-SOUTH")
+SYNTHETIC_RESET_CONFIRMATION = "HAPUS DATA SINTETIS"
 _DEPLOYMENT_ACTION = "deployment.recorded"
 
 
@@ -59,12 +59,12 @@ def _parse_timestamp(value: object) -> datetime | None:
     return parsed
 
 
-def _demo_reset_enabled() -> bool:
+def _synthetic_reset_enabled() -> bool:
     return get_settings().app_env in {"local", "test"}
 
 
 @dataclass(slots=True)
-class _DemoResetPlan:
+class _SyntheticResetPlan:
     scope_codes: list[str]
     inspections: list[uuid.UUID]
     reviews: list[uuid.UUID]
@@ -99,26 +99,26 @@ async def _ids(db: AsyncSession, stmt) -> list[uuid.UUID]:
     return list((await db.execute(stmt)).scalars().all())
 
 
-async def _collect_demo_reset_plan(db: AsyncSession) -> _DemoResetPlan:
+async def _collect_synthetic_reset_plan(db: AsyncSession) -> _SyntheticResetPlan:
     scopes = (
-        await db.execute(select(Scope).where(Scope.code.in_(DEMO_SCOPE_CODES)))
+        await db.execute(select(Scope).where(Scope.code.in_(SYNTHETIC_SCOPE_CODES)))
     ).scalars().all()
     scope_ids = [scope.id for scope in scopes]
     scope_codes = [scope.code for scope in scopes]
     if not scope_ids:
-        return _DemoResetPlan(scope_codes, *([[] for _ in range(10)]))
+        return _SyntheticResetPlan(scope_codes, *([[] for _ in range(10)]))
 
-    demo_user_ids = await _ids(
+    synthetic_user_ids = await _ids(
         db,
-        select(User.id).where(User.email.like("%@demo.railwayvision.example")),
+        select(User.id).where(User.email.like("%@sintetis.railwayvision.example")),
     )
-    demo_inspection = [Inspection.scope_id.in_(scope_ids)]
-    demo_owner = [Inspection.reference.ilike("DEMO-%")]
-    if demo_user_ids:
-        demo_owner.append(Inspection.inspector_id.in_(demo_user_ids))
+    synthetic_inspection = [Inspection.scope_id.in_(scope_ids)]
+    synthetic_owner = [Inspection.reference.ilike("SINTETIS-%")]
+    if synthetic_user_ids:
+        synthetic_owner.append(Inspection.inspector_id.in_(synthetic_user_ids))
     inspection_ids = await _ids(
         db,
-        select(Inspection.id).where(*demo_inspection, or_(*demo_owner)),
+        select(Inspection.id).where(*synthetic_inspection, or_(*synthetic_owner)),
     )
     review_ids = (
         await _ids(
@@ -190,7 +190,7 @@ async def _collect_demo_reset_plan(db: AsyncSession) -> _DemoResetPlan:
         db,
         select(Asset.id).where(
             Asset.scope_id.in_(scope_ids),
-            Asset.code.ilike("DEMO-%"),
+            Asset.code.ilike("SINTETIS-%"),
             ~exists(remaining_inspection),
         ),
     )
@@ -202,12 +202,12 @@ async def _collect_demo_reset_plan(db: AsyncSession) -> _DemoResetPlan:
         db,
         select(Location.id).where(
             Location.scope_id.in_(scope_ids),
-            Location.code.ilike("DEMO-%"),
+            Location.code.ilike("SINTETIS-%"),
             ~exists(remaining_asset),
         ),
     )
 
-    return _DemoResetPlan(
+    return _SyntheticResetPlan(
         scope_codes=scope_codes,
         inspections=list(inspection_ids),
         reviews=list(review_ids),
@@ -222,7 +222,7 @@ async def _collect_demo_reset_plan(db: AsyncSession) -> _DemoResetPlan:
     )
 
 
-async def _cleanup_media(plan: _DemoResetPlan) -> tuple[str, int, int]:
+async def _cleanup_media(plan: _SyntheticResetPlan) -> tuple[str, int, int]:
     if not plan.media:
         return "not_needed", 0, 0
     try:
@@ -523,13 +523,13 @@ async def backup_status(
     )
 
 
-def _preview(plan: _DemoResetPlan) -> DemoResetPreviewOut:
+def _preview(plan: _SyntheticResetPlan) -> SyntheticResetPreviewOut:
     counts = plan.counts()
-    enabled = _demo_reset_enabled()
-    return DemoResetPreviewOut(
+    enabled = _synthetic_reset_enabled()
+    return SyntheticResetPreviewOut(
         enabled=enabled,
         environment=get_settings().app_env,
-        confirmation_phrase=DEMO_RESET_CONFIRMATION,
+        confirmation_phrase=SYNTHETIC_RESET_CONFIRMATION,
         scope_codes=plan.scope_codes,
         counts=counts,
         total=sum(counts.values()),
@@ -541,34 +541,34 @@ def _preview(plan: _DemoResetPlan) -> DemoResetPreviewOut:
     )
 
 
-@router.get("/demo-reset/preview", response_model=DemoResetPreviewOut)
-async def demo_reset_preview(
+@router.get("/synthetic-reset/preview", response_model=SyntheticResetPreviewOut)
+async def synthetic_reset_preview(
     ctx: AuthContext = Depends(require_permission("ops:manage")),
     db: AsyncSession = Depends(get_db),
-) -> DemoResetPreviewOut:
-    return _preview(await _collect_demo_reset_plan(db))
+) -> SyntheticResetPreviewOut:
+    return _preview(await _collect_synthetic_reset_plan(db))
 
 
-@router.post("/demo-reset", response_model=DemoResetResult)
-async def reset_demo_data(
-    payload: DemoResetRequest,
+@router.post("/synthetic-reset", response_model=SyntheticResetResult)
+async def reset_synthetic_data(
+    payload: SyntheticResetRequest,
     ctx: AuthContext = Depends(require_permission("ops:manage")),
     db: AsyncSession = Depends(get_db),
-) -> DemoResetResult:
-    if not _demo_reset_enabled():
+) -> SyntheticResetResult:
+    if not _synthetic_reset_enabled():
         raise AppError(
             409,
-            "demo_reset_disabled",
+            "synthetic_reset_disabled",
             "Reset data hanya tersedia pada lingkungan local atau test.",
         )
-    if payload.confirm.strip() != DEMO_RESET_CONFIRMATION:
+    if payload.confirm.strip() != SYNTHETIC_RESET_CONFIRMATION:
         raise AppError(
             422,
             "validation_error",
-            f"Frasa konfirmasi harus persis: {DEMO_RESET_CONFIRMATION}",
+            f"Frasa konfirmasi harus persis: {SYNTHETIC_RESET_CONFIRMATION}",
         )
 
-    plan = await _collect_demo_reset_plan(db)
+    plan = await _collect_synthetic_reset_plan(db)
     counts = plan.counts()
 
     deletions = (
@@ -591,16 +591,16 @@ async def reset_demo_data(
     if total:
         await record_audit(
             db,
-            action="demo_data.reset",
+            action="synthetic_data.reset",
             actor=ctx.user,
-            target_type="demo_data",
+            target_type="synthetic_data",
             scope_id=ctx.user.scope_id,
             metadata={"deleted": counts, "total": total},
         )
     await db.commit()
 
     storage_cleanup, storage_deleted, storage_failures = await _cleanup_media(plan)
-    return DemoResetResult(
+    return SyntheticResetResult(
         deleted=counts,
         total=total,
         storage_cleanup=storage_cleanup,

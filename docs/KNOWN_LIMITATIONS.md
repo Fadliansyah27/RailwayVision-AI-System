@@ -1,4 +1,4 @@
-# Known Limitations — RailwayVision AI (0.7.0)
+# Known Limitations — RailwayVision AI (0.8.0)
 
 This file is updated every phase. It reflects the working tree on 2026-11-23.
 
@@ -28,14 +28,14 @@ This file is updated every phase. It reflects the working tree on 2026-11-23.
   audit-backed history. Findings and corrective-action work orders now exist (below), but
   per-media or per-AI-result review, reviewer assignment/queue, and multi-stage approval do not.
 - Inspection types (`routine`, `detailed`, `follow_up`, `emergency`) and the status model are
-  provisional DEMO taxonomy pending KCIC approval. No defect taxonomy or severity model exists.
+  provisional synthetic taxonomy pending KCIC approval. No defect taxonomy or severity model exists.
 - Review decisions cover record completeness only. They are not safety clearances, do not
   approve AI output, and do not verify infrastructure condition. Reviewer notes are visible to
   any reader with `inspections:read` in the same scope. Reopening is a single-step action by
   an `inspections:manage` holder with no dual control.
 - Findings: recorded only by `findings:write` holders on `reviewed` or `inconclusive`
   inspections; categories, severity, priorities, and the derived status model are provisional
-  DEMO rules, not KCIC maintenance procedures. No finding photos, defect taxonomy, or
+  workflow rules, not KCIC maintenance procedures. No finding photos, defect taxonomy, or
   automated severity. A finding is scoped to its inspection/asset scope.
 - Work orders: one assignee per work order, subtree-limited candidate list, and server-validated
   transitions (`open` → `in_progress` → `awaiting_verification` → `completed`, plus `cancel`).
@@ -53,41 +53,46 @@ This file is updated every phase. It reflects the working tree on 2026-11-23.
   media deletion, captions, per-inspection media limit, or quarantine list/release/purge
   workflow. Quarantine retention is undefined.
 - The web app calls the API through a same-origin Next.js proxy; deployments must keep the
-  proxy and refresh-cookie path consistent. The overview still shows delivery status and audit
-  activity rather than operational KPIs.
-- Asset and inspection pages show status counts, not time-series KPIs, trends, or charts.
-  Operational dashboards and PDF/Excel exports arrive in Phase 8.
-- Mobile app remains a status shell; no login, camera, upload, drafts, offline sync, or
-  notifications.
-- AI worker runs a clearly labelled demo image-quality heuristic (`ai.demo_quality_check`) plus
-  heartbeat. It produces no detections, severity, confidence, accuracy, or safety verdict; no
-  real model, dataset, evaluation, or registry console exists. Jobs have `max_retries=0` and
-  require an explicit re-run after failure; demo endpoints are disabled in production.
+  proxy and refresh-cookie path consistent.
+- The operational dashboard aggregates live counts and a six-month trend, and PDF/Excel exports
+  exist, but there are no configurable date-range presets beyond the report page, no scheduled
+  reports, and no warehouse/BI layer.
+- Mobile app covers Fase B–C (login/session, inspections, checklist, capture, upload queue,
+  work orders). There is no on-screen E2E automation, no physical-device verification, and the
+  offline queue is memory-only on Flutter web.
+- AI worker runs a clearly labelled synthetic image-quality heuristic
+  (`synthetic-image-quality`) plus heartbeat. It produces no detections, severity, confidence,
+  accuracy, or safety verdict; no real model, dataset, evaluation, or deployed artifact exists.
+  Jobs have `max_retries=0` and require an explicit re-run after failure; synthetic endpoints are
+  disabled in production.
+- Operations console logs are a bounded in-process ring buffer lost on API restart; the console
+  does not aggregate infrastructure logs. Deployment records are manual and do not read CI.
+  Backup status is read from a configured status file and never runs a backup or restore. The
+  synthetic reset is limited to `SINTETIS-*` scopes, local/test only, and there is no schedule
+  or dry-run restore.
 - MinIO stores media and quarantine objects with API-generated keys; there is no key rotation
   policy, object lifecycle/retention, versioning, or encryption-at-rest configuration
   documented for this build.
 - No video processing pipeline.
-- No PDF/Excel exports.
 - Audit trail is queryable but has no export, retention policy, tamper-evidence (hash
   chain/append-only sink), or read-access logging.
 
 ## Data and AI governance
 
-- No authorized KCIC dataset or model exists; nothing is trained or evaluated. The demo AI
-  output is synthetic image-quality statistics with fixed demo thresholds, not KCIC-approved
-  values.
+- No authorized KCIC dataset or model exists; nothing is trained or evaluated. The synthetic AI
+  output is image-quality statistics with fixed thresholds, not KCIC-approved values.
 - No defect taxonomy, severity thresholds, inspection-type taxonomy, or safety rules are
-  approved. All current taxonomies are provisional DEMO placeholders.
+  approved. All current taxonomies are provisional placeholders.
 - AI confidence, when introduced, will be labeled as model confidence only — never as danger
   or safety.
-- Demo data is synthetic and labeled DEMO in names/descriptions. Demo accounts use
-  `@demo.railwayvision.example` and a shared password from `.env`; seeding is blocked outside
-  `local`.
-- Assets and inspections created through the UI by a user are not forcibly prefixed DEMO;
+- Seed data is synthetic and labeled SINTETIS in names/descriptions. Seed accounts use
+  `@sintetis.railwayvision.example` and a shared password from `.env` (`SEED_PASSWORD`);
+  seeding is blocked outside `local`.
+- Assets and inspections created through the UI by a user are not forcibly prefixed SINTETIS;
   operators must not enter real KCIC records until governance approval. The UI warns against
   entering unapproved codes or coordinates.
 - Three `integration.inspector.*` users and one integration inspection remain in the local
-  database as test artifacts; they are synthetic DEMO data.
+  database as test artifacts; they are synthetic data.
 
 ## Security and operations
 
@@ -107,20 +112,17 @@ This file is updated every phase. It reflects the working tree on 2026-11-23.
   scanning, upload rate limiting, storage quota, or EXIF stripping. Quarantine objects have no
   operator workflow.
 - No dependency update automation, container image scanning, SBOM, or secret-history scan.
-  Images are pinned by tag; MinIO comes from a legacy community mirror. The dependency set did
-  not change in 0.7.0.
+  Images are pinned by tag; MinIO comes from a legacy community mirror.
 - No backup/restore drill, RPO/RTO agreement, monitoring stack (Prometheus/Grafana), or log
   aggregation.
-- CI workflow exists but has not run on a hosted runner. No remote repository is configured.
-- No git commit has been created; the working tree is the source of truth until the owner
-  approves a commit.
+- The CI workflow exists but has not run on a hosted runner. The repository is public on GitHub
+  and pushes are manual.
 - OpenAPI docs are disabled only in `production`; staging still exposes `/docs`.
 
 ## Verification gaps
 
-- Report, export, and real-model evaluation tests from `TEST_PLAN.md` are not executed because
-  the features do not exist. Malware-scanning, EXIF, upload-abuse, and quarantine-lifecycle
-  tests are also absent.
+- Report export is covered by API tests; the PDF/XLSX files were downloaded and inspected once
+  in the browser. There are no automated assertions on PDF layout.
 - Findings/work orders/notifications are covered by API tests and live/browser checks, but the
   work-order `409` version-conflict path was not exercised with two simultaneous browser
   sessions, and there is no load test for notification fan-out.
@@ -131,9 +133,9 @@ This file is updated every phase. It reflects the working tree on 2026-11-23.
   under volume.
 - No end-to-end test on a mobile device or emulator; Flutter is verified by widget tests and
   analysis only.
-- Browser verification used accessibility snapshots; screenshots were not captured because the
-  in-app browser reported `NATIVE_BROWSER_VIEWPORT_UNAVAILABLE`. Responsive layout at
-  mobile/tablet widths and cross-browser rendering were not visually verified.
+- Browser verification used accessibility snapshots plus screenshots for the operations console
+  and overview. Responsive layout at mobile/tablet widths and cross-browser rendering were not
+  visually verified.
 - The quarantine path is verified by API tests but was not exercised through the browser UI.
   The `409` upload-completion conflict and simultaneous cancel/upload race were not exercised
   with two sessions.
@@ -141,7 +143,7 @@ This file is updated every phase. It reflects the working tree on 2026-11-23.
   by API tests and code review, not with two simultaneous browser sessions.
 - Review queue/assignment, return/accept notifications, dual-control, review SLAs, and
   multi-stage approval are not implemented.
-- CSV/Excel/PDF exports, print views, and bulk actions are absent.
+- Bulk actions and scheduled report delivery are absent.
 - PostGIS is provisioned but unused; location precision requirements remain unapproved.
 
 ## External blockers (require stakeholder decisions)

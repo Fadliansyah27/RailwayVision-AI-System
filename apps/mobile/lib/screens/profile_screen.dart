@@ -94,7 +94,7 @@ class ProfileScreen extends StatelessWidget {
             children: const [
               _Bullet(
                 'Build ini tidak memuat data operasional KCIC. Semua catatan '
-                'bertanda DEMO merupakan data sintetis.',
+                'bertanda SINTETIS merupakan data sintetis.',
               ),
               _Bullet(
                 'Bukti disimpan privat dan hanya dapat dibaca melalui API yang '

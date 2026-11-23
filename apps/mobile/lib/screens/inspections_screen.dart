@@ -158,7 +158,7 @@ class _InspectionsScreenState extends State<InspectionsScreen> {
           ],
           const SizedBox(height: 8),
           Text(
-            'Data DEMO sintetis. Tidak ada data operasional KCIC pada build ini.',
+            'Data sintetis. Tidak ada data operasional KCIC pada build ini.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: RvColors.secondary,

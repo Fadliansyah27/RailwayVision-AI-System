@@ -13,7 +13,7 @@ import {
   findingPriorityTone,
   findingStatusTone,
   inspectionStatusTone,
-  isDemoRecord,
+  isSyntheticRecord,
   notificationTargetHref,
   reviewDecisionTone,
   toDatetimeLocalValue,
@@ -74,11 +74,11 @@ describe("buildQuery", () => {
   });
 });
 
-describe("demo labelling", () => {
-  it("detects demo codes and references case-insensitively", () => {
-    expect(isDemoRecord({ code: "DEMO-AST-0001" })).toBe(true);
-    expect(isDemoRecord({ reference: "demo-ins-0001" })).toBe(true);
-    expect(isDemoRecord({ code: "KCIC-AST-0001" })).toBe(false);
+describe("sintetis labelling", () => {
+  it("detects sintetis codes and references case-insensitively", () => {
+    expect(isSyntheticRecord({ code: "SINTETIS-AST-0001" })).toBe(true);
+    expect(isSyntheticRecord({ reference: "sintetis-ins-0001" })).toBe(true);
+    expect(isSyntheticRecord({ code: "KCIC-AST-0001" })).toBe(false);
   });
 });
 

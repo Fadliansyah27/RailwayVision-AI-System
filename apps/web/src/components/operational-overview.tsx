@@ -253,7 +253,7 @@ export function OperationalOverview() {
           <EmptyState
             icon={<ClipboardList className="size-5" aria-hidden="true" />}
             title="Data operasional belum tersedia"
-            description="Dasbor akan terisi otomatis dari PostgreSQL setelah inspeksi pertama dicatat. Akun dan catatan demonstrasi bersifat sintetis dan diberi label DEMO."
+            description="Dasbor akan terisi otomatis dari PostgreSQL setelah inspeksi pertama dicatat. Akun dan catatan bersifat sintetis dan diberi label SINTETIS."
           />
         </Card>
       ) : null}

@@ -214,13 +214,13 @@ export default function AssetReferencePage() {
       <PageHeader
         eyebrow="Register · Fase 3"
         title="Kategori & lokasi"
-        description="Data referensi di balik register aset. Semua entri adalah data DEMO sintetis; jangan memasukkan kode aset atau koordinat KCIC asli tanpa persetujuan."
+        description="Data referensi di balik register aset. Semua entri adalah data sintetis; jangan memasukkan kode aset atau koordinat KCIC asli tanpa persetujuan."
       />
 
       <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-soft px-4 py-3">
         <Info className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
         <p className="text-sm leading-6 text-ink">
-          <span className="font-semibold">Hanya data referensi DEMO.</span> Kategori berlaku
+          <span className="font-semibold">Hanya data referensi sintetis.</span> Kategori berlaku
           global; lokasi terikat pada cakupan organisasi dan hanya dapat dipakai di dalamnya.
           Setiap perubahan dicatat pada riwayat aktivitas.
         </p>
@@ -281,7 +281,7 @@ export default function AssetReferencePage() {
                       onChange={(event) => setCategoryCode(event.target.value)}
                       maxLength={32}
                       required
-                      placeholder="DEMO-BRIDGE"
+                      placeholder="SINTETIS-BRIDGE"
                     />
                   </div>
                   <div>
@@ -314,7 +314,7 @@ export default function AssetReferencePage() {
                 <EmptyState
                   icon={<Tag className="size-5" aria-hidden="true" />}
                   title="Belum ada kategori"
-                  description="Tambahkan kategori DEMO pertama untuk mengklasifikasikan aset."
+                  description="Tambahkan kategori sintetis pertama untuk mengklasifikasikan aset."
                 />
               ) : (
                 <ul className="divide-y divide-border rounded-xl border border-border">
@@ -371,7 +371,7 @@ export default function AssetReferencePage() {
                           onChange={(event) => setLocationCode(event.target.value)}
                           maxLength={32}
                           required
-                          placeholder="DEMO-LOC-01"
+                          placeholder="SINTETIS-LOC-01"
                         />
                       </div>
                       <div>
@@ -453,7 +453,7 @@ export default function AssetReferencePage() {
                 <EmptyState
                   icon={<MapPin className="size-5" aria-hidden="true" />}
                   title="Belum ada lokasi"
-                  description="Tambahkan lokasi DEMO untuk mengikat aset ke suatu tempat."
+                  description="Tambahkan lokasi sintetis untuk mengikat aset ke suatu tempat."
                 />
               ) : (
                 <ul className="divide-y divide-border rounded-xl border border-border">

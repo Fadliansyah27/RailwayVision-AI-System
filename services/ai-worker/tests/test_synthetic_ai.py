@@ -3,7 +3,7 @@ import io
 import pytest
 from PIL import Image
 
-from worker.demo_ai import UnsupportedImage, analyze_image_bytes
+from worker.synthetic_ai import UnsupportedImage, analyze_image_bytes
 
 
 def _image_bytes(size: tuple[int, int], color: tuple[int, int, int]) -> bytes:
@@ -12,10 +12,10 @@ def _image_bytes(size: tuple[int, int], color: tuple[int, int, int]) -> bytes:
     return buffer.getvalue()
 
 
-def test_dark_small_image_reports_demo_quality_flags():
+def test_dark_small_image_reports_synthetic_quality_flags():
     result = analyze_image_bytes(_image_bytes((320, 200), (8, 8, 8)))
 
-    assert result["kind"] == "demo_image_quality"
+    assert result["kind"] == "synthetic_image_quality"
     assert result["advisory"] is True
     assert "bukan deteksi kerusakan" in result["disclaimer"]
     assert "low_light" in result["quality_flags"]

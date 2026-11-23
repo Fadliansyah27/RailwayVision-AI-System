@@ -11,7 +11,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
-import { AssetStatusChip, DemoBadge, Pagination } from "@/components/records";
+import { AssetStatusChip, SyntheticBadge, Pagination } from "@/components/records";
 import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import {
   apiRequest,
@@ -174,7 +174,7 @@ export default function AssetsPage() {
       <PageHeader
         eyebrow="Register · Fase 3"
         title="Aset & lokasi"
-        description="Register aset sesuai cakupan yang mendasari setiap inspeksi. Catatan berupa data DEMO sintetis sampai KCIC menyetujui master aset dan hierarki lokasi."
+        description="Register aset sesuai cakupan yang mendasari setiap inspeksi. Catatan berupa data sintetis sampai KCIC menyetujui master aset dan hierarki lokasi."
         actions={
           <>
             <Link href="/assets/reference" className={secondaryButtonClass}>
@@ -258,7 +258,7 @@ export default function AssetsPage() {
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               maxLength={120}
-              placeholder="DEMO-AST or bridge"
+              placeholder="SINTETIS-AST atau jembatan"
             />
           </div>
           <div>
@@ -383,7 +383,7 @@ export default function AssetsPage() {
             description={
               query.search || query.status || query.categoryId || query.locationId
                 ? "Hapus atau ubah filter untuk melihat catatan lain dalam cakupan Anda."
-                : "Belum ada aset dalam cakupan Anda. Supervisor dan administrator dapat mendaftarkan aset DEMO pertama."
+                : "Belum ada aset dalam cakupan Anda. Supervisor dan administrator dapat mendaftarkan aset sintetis pertama."
             }
           />
         ) : (
@@ -400,7 +400,7 @@ export default function AssetsPage() {
                         <span className="font-mono text-[11px] font-semibold text-secondary">
                           {asset.code}
                         </span>
-                        <DemoBadge code={asset.code} />
+                        <SyntheticBadge code={asset.code} />
                       </div>
                       <Link
                         href={`/assets/${asset.id}`}

@@ -126,7 +126,7 @@ function UserEditor({
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-ink">
-            {editor.mode === "create" ? "Buat pengguna DEMO" : `Ubah ${editing?.full_name}`}
+            {editor.mode === "create" ? "Buat pengguna sintetis" : `Ubah ${editing?.full_name}`}
           </h3>
           <p className="mt-1 text-xs leading-5 text-secondary">
             Peran ditegakkan oleh API. Cakupan membatasi catatan yang dapat dijangkau akun ini.
@@ -416,7 +416,7 @@ export function UserManagement({
       <Card>
         <CardHeader
           title="Daftar pengguna"
-          description="Akun DEMO untuk prototipe ini. Buat akun, ubah peran dan cakupan, atau nonaktifkan akses."
+          description="Akun sintetis untuk prototipe ini. Buat akun, ubah peran dan cakupan, atau nonaktifkan akses."
           actions={
             <button
               type="button"
@@ -657,7 +657,7 @@ export function UserManagement({
           {!loading && users && users.items.length === 0 ? (
             <EmptyState
               title="Tidak ada pengguna yang cocok"
-              description="Sesuaikan filter atau buat akun DEMO baru."
+              description="Sesuaikan filter atau buat akun sintetis baru."
             />
           ) : null}
 

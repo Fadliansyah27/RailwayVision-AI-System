@@ -311,7 +311,9 @@ def _build_pdf(summary: ReportSummaryOut) -> bytes:
     body = ParagraphStyle("Body", parent=styles["BodyText"], fontSize=8.5, leading=11)
     cell = ParagraphStyle("Cell", parent=body, fontSize=8, leading=10)
     elements: list[Any] = [
-        Paragraph("<b>RailwayVision AI - Laporan Inspeksi (DEMO)</b>", styles["Title"]),
+        Paragraph(
+            "<b>RailwayVision AI - Laporan Inspeksi (SINTETIS)</b>", styles["Title"]
+        ),
         Paragraph(f"Periode: {_period_label(summary)}", body),
         Paragraph(f"Dibuat: {_local_time(summary.generated_at)} WIB", body),
         Spacer(1, 4 * mm),
@@ -393,7 +395,7 @@ def _build_pdf(summary: ReportSummaryOut) -> bytes:
     elements.append(
         Paragraph(
             "Seluruh angka berasal dari basis data operasional sesuai cakupan akun. "
-            "Catatan demonstrasi bersifat sintetis dan diberi label DEMO.",
+            "Catatan sintetis diberi label SINTETIS dan bukan data operasional KCIC.",
             body,
         )
     )

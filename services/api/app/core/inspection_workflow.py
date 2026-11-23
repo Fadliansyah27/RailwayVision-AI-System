@@ -2,7 +2,7 @@
 
 Statuses and inspection types are provisional until KCIC approves its own
 procedure. The transition sets below are the single source of truth for the
-API; the demo worker mirrors the AI transitions with SQL.
+API; the synthetic worker mirrors the AI transitions with SQL.
 """
 
 INSPECTION_STATUSES: tuple[str, ...] = (

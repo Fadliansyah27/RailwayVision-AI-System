@@ -83,7 +83,7 @@ export function AssetEditor({
           <p className="mt-1 text-xs leading-5 text-secondary">
             {editing
               ? "Perubahan diperiksa cakupannya dan dicatat pada riwayat aktivitas."
-              : "Gunakan identitas DEMO sintetis sampai KCIC menyetujui master aset."}
+              : "Gunakan identitas sintetis sampai KCIC menyetujui master aset."}
           </p>
         </div>
         <button
@@ -121,7 +121,7 @@ export function AssetEditor({
               minLength={3}
               maxLength={48}
               pattern="[A-Za-z0-9][A-Za-z0-9_-]*"
-              placeholder="DEMO-AST-0004"
+              placeholder="SINTETIS-AST-0004"
             />
             <p className="mt-1 text-[11px] text-secondary">
               Huruf besar oleh API. Huruf, angka, tanda hubung, garis bawah.
@@ -156,7 +156,7 @@ export function AssetEditor({
               required
               minLength={2}
               maxLength={200}
-              placeholder="DEMO north track section B"
+              placeholder="Segmen jalur sintetis B"
             />
           </div>
 
@@ -209,7 +209,7 @@ export function AssetEditor({
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               maxLength={2000}
-              placeholder="Catatan demonstrasi sintetis."
+              placeholder="Catatan sintetis untuk pengujian prototipe."
             />
           </div>
         </div>

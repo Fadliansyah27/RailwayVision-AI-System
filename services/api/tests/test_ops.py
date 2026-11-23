@@ -13,13 +13,13 @@ from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import get_db
 from app.models.assets import Asset, Location
-from app.models.identity import AuditEvent, Scope, User
+from app.models.identity import AuditEvent, Permission, Role, Scope, User
 from app.models.inspections import Inspection
 from app.models.media import AIJob, AIModel, MediaObject
-from app.seed import seed_ai_registry, seed_demo_content, seed_rbac
+from app.seed import seed_ai_registry, seed_rbac, seed_synthetic_content
 from tests.conftest import FakeRedis, auth_headers
 
-PASSWORD = "Test-Demo-Password-2026"
+PASSWORD = "Test-Sintetis-Password-2026"
 OPS = "/api/v1/ops"
 
 
@@ -41,7 +41,7 @@ async def ops_env(api_app):
     async with session_factory() as session:
         scopes = await seed_rbac(session)
         await seed_ai_registry(session)
-        await seed_demo_content(session, scopes)
+        await seed_synthetic_content(session, scopes)
         await session.commit()
 
     api_app.dependency_overrides[get_db] = override_get_db
@@ -64,7 +64,7 @@ async def _add_ai_job(session_factory, scope_code: str, reference: str) -> uuid.
         ).scalars().first()
         requester = (
             await session.execute(
-                select(User).where(User.email == "admin@demo.railwayvision.example")
+                select(User).where(User.email == "admin@sintetis.railwayvision.example")
             )
         ).scalar_one()
         inspection = Inspection(
@@ -79,7 +79,7 @@ async def _add_ai_job(session_factory, scope_code: str, reference: str) -> uuid.
         await session.flush()
         model = (
             await session.execute(
-                select(AIModel).where(AIModel.code == "demo-image-quality")
+                select(AIModel).where(AIModel.code == "synthetic-image-quality")
             )
         ).scalar_one()
         media = MediaObject(
@@ -109,11 +109,11 @@ async def _add_ai_job(session_factory, scope_code: str, reference: str) -> uuid.
 
 async def test_ops_permissions_and_log_redaction(ops_env):
     client, _ = ops_env
-    admin = await auth_headers(client, "admin@demo.railwayvision.example")
-    auditor = await auth_headers(client, "auditor@demo.railwayvision.example")
-    inspector = await auth_headers(client, "inspector@demo.railwayvision.example")
+    admin = await auth_headers(client, "admin@sintetis.railwayvision.example")
+    auditor = await auth_headers(client, "auditor@sintetis.railwayvision.example")
+    inspector = await auth_headers(client, "inspector@sintetis.railwayvision.example")
 
-    for path in ("/logs", "/deployments", "/backup", "/demo-reset/preview"):
+    for path in ("/logs", "/deployments", "/backup", "/synthetic-reset/preview"):
         assert (await client.get(f"{OPS}{path}", headers=inspector)).status_code == 403
     assert (await client.get(f"{OPS}/ai-jobs", headers=inspector)).status_code == 200
     assert (await client.get(f"{OPS}/logs", headers=auditor)).status_code == 200
@@ -141,11 +141,11 @@ async def test_ops_permissions_and_log_redaction(ops_env):
 
 async def test_ai_job_history_is_scope_filtered(ops_env):
     client, session_factory = ops_env
-    north_job = await _add_ai_job(session_factory, "DEMO-NORTH", "PROBE-NORTH-1")
-    await _add_ai_job(session_factory, "DEMO-SOUTH", "PROBE-SOUTH-1")
+    north_job = await _add_ai_job(session_factory, "SINTETIS-NORTH", "PROBE-NORTH-1")
+    await _add_ai_job(session_factory, "SINTETIS-SOUTH", "PROBE-SOUTH-1")
 
-    admin = await auth_headers(client, "admin@demo.railwayvision.example")
-    inspector = await auth_headers(client, "inspector@demo.railwayvision.example")
+    admin = await auth_headers(client, "admin@sintetis.railwayvision.example")
+    inspector = await auth_headers(client, "inspector@sintetis.railwayvision.example")
 
     all_jobs = await client.get(f"{OPS}/ai-jobs?page_size=50", headers=admin)
     assert all_jobs.status_code == 200, all_jobs.text
@@ -162,8 +162,8 @@ async def test_ai_job_history_is_scope_filtered(ops_env):
 
 async def test_deployment_history_records_real_operator(ops_env):
     client, session_factory = ops_env
-    admin = await auth_headers(client, "admin@demo.railwayvision.example")
-    inspector = await auth_headers(client, "inspector@demo.railwayvision.example")
+    admin = await auth_headers(client, "admin@sintetis.railwayvision.example")
+    inspector = await auth_headers(client, "inspector@sintetis.railwayvision.example")
 
     denied = await client.post(
         f"{OPS}/deployments",
@@ -184,7 +184,7 @@ async def test_deployment_history_records_real_operator(ops_env):
     )
     assert created.status_code == 201, created.text
     record = created.json()
-    assert record["recorded_by"] == "admin@demo.railwayvision.example"
+    assert record["recorded_by"] == "admin@sintetis.railwayvision.example"
     assert record["commit_sha"] == "abcdef1234567"
 
     wrong_env = await client.post(
@@ -209,7 +209,7 @@ async def test_deployment_history_records_real_operator(ops_env):
 
 async def test_backup_status_never_infers_health(ops_env, tmp_path, monkeypatch):
     client, _ = ops_env
-    admin = await auth_headers(client, "admin@demo.railwayvision.example")
+    admin = await auth_headers(client, "admin@sintetis.railwayvision.example")
     settings = get_settings()
     original = settings.backup_status_file
     monkeypatch.setattr(settings, "backup_status_file", None)
@@ -266,33 +266,33 @@ async def test_backup_status_never_infers_health(ops_env, tmp_path, monkeypatch)
     monkeypatch.setattr(settings, "backup_status_file", original)
 
 
-async def test_demo_reset_requires_phrase_and_deletes_only_synthetic_rows(ops_env):
+async def test_sintetis_reset_requires_phrase_and_deletes_only_synthetic_rows(ops_env):
     client, session_factory = ops_env
-    admin = await auth_headers(client, "admin@demo.railwayvision.example")
-    inspector = await auth_headers(client, "inspector@demo.railwayvision.example")
+    admin = await auth_headers(client, "admin@sintetis.railwayvision.example")
+    inspector = await auth_headers(client, "inspector@sintetis.railwayvision.example")
 
-    preview = await client.get(f"{OPS}/demo-reset/preview", headers=admin)
+    preview = await client.get(f"{OPS}/synthetic-reset/preview", headers=admin)
     assert preview.status_code == 200
     plan = preview.json()
     assert plan["enabled"] is True
-    assert plan["scope_codes"] == ["DEMO-KCIC", "DEMO-NORTH", "DEMO-SOUTH"]
+    assert plan["scope_codes"] == ["SINTETIS-KCIC", "SINTETIS-NORTH", "SINTETIS-SOUTH"]
     assert plan["counts"]["inspections"] == 1
     assert plan["counts"]["assets"] == 3
     assert plan["counts"]["locations"] == 2
     assert plan["total"] > 0
 
     denied = await client.post(
-        f"{OPS}/demo-reset", headers=inspector, json={"confirm": "RESET DATA DEMO"}
+        f"{OPS}/synthetic-reset", headers=inspector, json={"confirm": "HAPUS DATA SINTETIS"}
     )
     assert denied.status_code == 403
 
     wrong = await client.post(
-        f"{OPS}/demo-reset", headers=admin, json={"confirm": "hapus"}
+        f"{OPS}/synthetic-reset", headers=admin, json={"confirm": "hapus"}
     )
     assert wrong.status_code == 422
 
     reset = await client.post(
-        f"{OPS}/demo-reset", headers=admin, json={"confirm": "RESET DATA DEMO"}
+        f"{OPS}/synthetic-reset", headers=admin, json={"confirm": "HAPUS DATA SINTETIS"}
     )
     assert reset.status_code == 200, reset.text
     result = reset.json()
@@ -309,10 +309,37 @@ async def test_demo_reset_requires_phrase_and_deletes_only_synthetic_rows(ops_en
             await session.execute(
                 select(func.count())
                 .select_from(AuditEvent)
-                .where(AuditEvent.action == "demo_data.reset")
+                .where(AuditEvent.action == "synthetic_data.reset")
             )
         ).scalar_one()
         assert audit == 1
 
-    again = await client.get(f"{OPS}/demo-reset/preview", headers=admin)
+    again = await client.get(f"{OPS}/synthetic-reset/preview", headers=admin)
     assert again.json()["total"] == 0
+
+
+async def test_seed_rbac_restores_missing_role_permissions(ops_env):
+    _, session_factory = ops_env
+    async with session_factory() as session:
+        role = (
+            await session.execute(select(Role).where(Role.code == "administrator"))
+        ).scalar_one()
+        role.permissions = [
+            permission for permission in role.permissions if permission.code != "ops:manage"
+        ]
+        await session.commit()
+
+    async with session_factory() as session:
+        await seed_rbac(session)
+        await session.commit()
+
+    async with session_factory() as session:
+        role = (
+            await session.execute(select(Role).where(Role.code == "administrator"))
+        ).scalar_one()
+        permission = (
+            await session.execute(
+                select(Permission).where(Permission.code == "ops:manage")
+            )
+        ).scalar_one()
+        assert permission in role.permissions

@@ -11,7 +11,7 @@ import {
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
 import {
-  DemoBadge,
+  SyntheticBadge,
   FindingPriorityChip,
   FindingStatusChip,
   Pagination,
@@ -343,7 +343,7 @@ export default function FindingsPage() {
                           >
                             {finding.reference}
                           </Link>
-                          <DemoBadge reference={finding.reference} />
+                          <SyntheticBadge reference={finding.reference} />
                         </div>
                       </td>
                       <td className="max-w-72 px-5 py-3 text-ink">{finding.title}</td>

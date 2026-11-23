@@ -11,15 +11,15 @@ import {
   findingPriorityTone,
   findingStatusTone,
   inspectionStatusTone,
-  isDemoRecord,
+  isSyntheticRecord,
   workOrderStatusTone,
 } from "@/lib/domain";
 
-export function DemoBadge({ code, reference }: { code?: string; reference?: string }) {
-  if (!isDemoRecord({ code, reference })) {
+export function SyntheticBadge({ code, reference }: { code?: string; reference?: string }) {
+  if (!isSyntheticRecord({ code, reference })) {
     return null;
   }
-  return <Chip tone="neutral">DEMO</Chip>;
+  return <Chip tone="neutral">SINTETIS</Chip>;
 }
 
 export function AssetStatusChip({ status }: { status: string }) {

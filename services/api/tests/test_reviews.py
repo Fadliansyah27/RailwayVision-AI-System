@@ -1,9 +1,9 @@
 from tests.conftest import auth_headers
 
-REVIEWER = "reviewer@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
-SUPERVISOR = "supervisor@demo.railwayvision.example"
-ADMIN = "admin@demo.railwayvision.example"
+REVIEWER = "reviewer@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
+SUPERVISOR = "supervisor@sintetis.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
 
 
 async def _submitted_inspection(client, headers, notes="Review fixture"):
@@ -40,7 +40,7 @@ async def test_reviewer_accepts_submitted_inspection(auth_client):
     assert body["status"] == "reviewed"
     assert body["version"] == inspection["version"] + 1
     assert body["reviews"][0]["decision"] == "accepted"
-    assert body["reviews"][0]["reviewer"]["full_name"] == "DEMO Reviewer"
+    assert body["reviews"][0]["reviewer"]["full_name"] == "Peninjau Sintetis"
     assert body["reviews"][0]["notes"] == "Record and evidence reviewed; complete."
 
     admin_headers = await auth_headers(auth_client, ADMIN)
@@ -184,7 +184,7 @@ async def test_cross_scope_review_returns_404(auth_client):
     admin_headers = await auth_headers(auth_client, ADMIN)
     assets = await auth_client.get("/api/v1/assets?page_size=50", headers=admin_headers)
     south_asset = next(
-        item for item in assets.json()["items"] if item["code"] == "DEMO-AST-0003"
+        item for item in assets.json()["items"] if item["code"] == "SINTETIS-AST-0003"
     )
     created = await auth_client.post(
         "/api/v1/inspections",

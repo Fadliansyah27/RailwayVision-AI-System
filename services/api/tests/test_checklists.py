@@ -1,7 +1,7 @@
 from tests.conftest import auth_headers
 
-ADMIN = "admin@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
 
 
 async def _asset_id(client, headers) -> str:
@@ -16,25 +16,25 @@ async def _create_template(client, headers, *, active: bool = True, code: str = 
         headers=headers,
         json={
             "code": code,
-            "name": "DEMO Checklist Jalur Rutin",
+            "name": "SINTETIS Checklist Jalur Rutin",
             "inspection_type": "routine",
             "is_active": active,
             "items": [
                 {
                     "code": "SURFACE",
-                    "label": "Permukaan jalur bebas dari retak terbuka (DEMO)",
+                    "label": "Permukaan jalur bebas dari retak terbuka (SINTETIS)",
                     "position": 1,
                     "is_required": True,
                 },
                 {
                     "code": "FASTENER",
-                    "label": "Pengencang terpasang pada posisi (DEMO)",
+                    "label": "Pengencang terpasang pada posisi (SINTETIS)",
                     "position": 2,
                     "is_required": True,
                 },
                 {
                     "code": "DRAINAGE",
-                    "label": "Drainase sekitar segmen teramati (DEMO)",
+                    "label": "Drainase sekitar segmen teramati (SINTETIS)",
                     "position": 3,
                     "is_required": False,
                 },
@@ -64,7 +64,7 @@ async def test_template_management_requires_manage_permission(auth_client):
             "code": "DENIED-V1",
             "name": "Tidak boleh dibuat",
             "inspection_type": "routine",
-            "items": [{"code": "A1", "label": "Item demo", "position": 1}],
+            "items": [{"code": "A1", "label": "Item sintetis", "position": 1}],
         },
     )
     assert denied.status_code == 403
@@ -121,8 +121,8 @@ async def test_active_template_is_snapshotted_and_submit_is_guarded(auth_client)
         json={
             "version": inspection["version"],
             "entries": [
-                {"item_code": "SURFACE", "result": "pass", "notes": "Terlihat bersih (DEMO)."},
-                {"item_code": "FASTENER", "result": "fail", "notes": "Perlu tinjauan (DEMO)."},
+                {"item_code": "SURFACE", "result": "pass", "notes": "Terlihat bersih (SINTETIS)."},
+                {"item_code": "FASTENER", "result": "fail", "notes": "Perlu tinjauan (SINTETIS)."},
             ],
         },
     )

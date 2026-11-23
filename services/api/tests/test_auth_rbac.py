@@ -2,11 +2,11 @@ from tests.conftest import auth_headers, login
 
 
 async def test_login_success_and_me(auth_client):
-    response = await login(auth_client, "inspector@demo.railwayvision.example")
+    response = await login(auth_client, "inspector@sintetis.railwayvision.example")
     assert response.status_code == 200
     body = response.json()
-    assert body["user"]["email"] == "inspector@demo.railwayvision.example"
-    assert body["user"]["scope"]["code"] == "DEMO-NORTH"
+    assert body["user"]["email"] == "inspector@sintetis.railwayvision.example"
+    assert body["user"]["scope"]["code"] == "SINTETIS-NORTH"
     assert not body.get("refresh_token")
 
     me = await auth_client.get(
@@ -18,22 +18,24 @@ async def test_login_success_and_me(auth_client):
 
 
 async def test_login_rejects_wrong_password(auth_client):
-    response = await login(auth_client, "inspector@demo.railwayvision.example", "wrong-password")
+    response = await login(
+        auth_client, "inspector@sintetis.railwayvision.example", "wrong-password"
+    )
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "unauthorized"
 
 
 async def test_login_rate_limit_after_repeated_failures(auth_client):
     for _ in range(5):
-        await login(auth_client, "auditor@demo.railwayvision.example", "bad-password")
-    response = await login(auth_client, "auditor@demo.railwayvision.example", "bad-password")
+        await login(auth_client, "auditor@sintetis.railwayvision.example", "bad-password")
+    response = await login(auth_client, "auditor@sintetis.railwayvision.example", "bad-password")
     assert response.status_code == 429
     assert response.json()["error"]["code"] == "rate_limited"
 
 
 async def test_refresh_rotation_and_logout_revokes_access(auth_client):
     login_response = await login(
-        auth_client, "inspector@demo.railwayvision.example", body=True
+        auth_client, "inspector@sintetis.railwayvision.example", body=True
     )
     body = login_response.json()
     refresh_token = body["refresh_token"]
@@ -65,15 +67,15 @@ async def test_refresh_rotation_and_logout_revokes_access(auth_client):
 
 
 async def test_scope_isolation_hides_other_corridor(auth_client):
-    admin_headers = await auth_headers(auth_client, "admin@demo.railwayvision.example")
+    admin_headers = await auth_headers(auth_client, "admin@sintetis.railwayvision.example")
     all_assets = await auth_client.get("/api/v1/assets?page_size=50", headers=admin_headers)
     assert all_assets.json()["total"] == 3
     south_asset = next(
-        item for item in all_assets.json()["items"] if item["code"] == "DEMO-AST-0003"
+        item for item in all_assets.json()["items"] if item["code"] == "SINTETIS-AST-0003"
     )
 
     inspector_headers = await auth_headers(
-        auth_client, "inspector@demo.railwayvision.example"
+        auth_client, "inspector@sintetis.railwayvision.example"
     )
     listing = await auth_client.get("/api/v1/assets?page_size=50", headers=inspector_headers)
     assert listing.json()["total"] == 2
@@ -85,12 +87,12 @@ async def test_scope_isolation_hides_other_corridor(auth_client):
 
 
 async def test_rbac_blocks_inspector_asset_creation(auth_client):
-    headers = await auth_headers(auth_client, "inspector@demo.railwayvision.example")
+    headers = await auth_headers(auth_client, "inspector@sintetis.railwayvision.example")
     response = await auth_client.post(
         "/api/v1/assets",
         headers=headers,
         json={
-            "code": "DEMO-AST-9999",
+            "code": "SINTETIS-AST-9999",
             "name": "Should fail",
             "category_id": "00000000-0000-0000-0000-000000000000",
         },
@@ -100,7 +102,7 @@ async def test_rbac_blocks_inspector_asset_creation(auth_client):
 
 
 async def test_inspector_can_create_and_submit_inspection(auth_client):
-    headers = await auth_headers(auth_client, "inspector@demo.railwayvision.example")
+    headers = await auth_headers(auth_client, "inspector@sintetis.railwayvision.example")
     assets = await auth_client.get("/api/v1/assets", headers=headers)
     asset_id = assets.json()["items"][0]["id"]
 
@@ -128,7 +130,7 @@ async def test_inspector_can_create_and_submit_inspection(auth_client):
 
 
 async def test_auditor_is_read_only_and_admin_manages_users(auth_client):
-    auditor_headers = await auth_headers(auth_client, "auditor@demo.railwayvision.example")
+    auditor_headers = await auth_headers(auth_client, "auditor@sintetis.railwayvision.example")
     assets = await auth_client.get("/api/v1/assets", headers=auditor_headers)
     assert assets.status_code == 200
 
@@ -139,7 +141,7 @@ async def test_auditor_is_read_only_and_admin_manages_users(auth_client):
     )
     assert denied.status_code == 403
 
-    admin_headers = await auth_headers(auth_client, "admin@demo.railwayvision.example")
+    admin_headers = await auth_headers(auth_client, "admin@sintetis.railwayvision.example")
     users = await auth_client.get("/api/v1/users", headers=admin_headers)
     assert users.status_code == 200
     assert users.json()["total"] == 6
@@ -157,7 +159,7 @@ async def test_auditor_is_read_only_and_admin_manages_users(auth_client):
 
 
 async def test_audit_events_record_material_actions(auth_client):
-    headers = await auth_headers(auth_client, "inspector@demo.railwayvision.example")
+    headers = await auth_headers(auth_client, "inspector@sintetis.railwayvision.example")
     assets = await auth_client.get("/api/v1/assets", headers=headers)
     await auth_client.post(
         "/api/v1/inspections",
@@ -165,7 +167,7 @@ async def test_audit_events_record_material_actions(auth_client):
         json={"asset_id": assets.json()["items"][0]["id"]},
     )
 
-    admin_headers = await auth_headers(auth_client, "admin@demo.railwayvision.example")
+    admin_headers = await auth_headers(auth_client, "admin@sintetis.railwayvision.example")
     events = await auth_client.get("/api/v1/audit-events?page_size=50", headers=admin_headers)
     actions = {event["action"] for event in events.json()["items"]}
     assert "inspection.created" in actions

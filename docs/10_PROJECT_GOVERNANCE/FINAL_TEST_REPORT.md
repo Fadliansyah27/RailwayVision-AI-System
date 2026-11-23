@@ -16,16 +16,23 @@ the local Docker Compose stack (all six services healthy at the time of the run)
 
 | Area | Command | Result |
 |---|---|---|
-| API tests | `python -m pytest -q` in `services/api` | **77 passed** |
-| API lint | `ruff check app tests` | 0 findings |
+| API tests | `python -m pytest -q` in `services/api` | **83 passed** |
+| API lint | `ruff check app tests alembic` | 0 findings |
 | AI worker tests | `python -m pytest -c pyproject.toml -q` | **8 passed** |
 | Web typecheck | `npx tsc --noEmit` | Pass |
 | Web lint | `npm run lint` | Pass |
-| Web unit tests | `npm test` | **38 passed / 5 files** |
+| Web unit tests | `npm test` | **39 passed / 5 files** |
 | Flutter analysis | `flutter analyze` | 0 issues |
 | Flutter tests | `flutter test` | **11 passed / 4 files** (+1 live test skipped without credentials) |
-| Flutter live API smoke | `flutter test test/live_api_test.dart` with `.env` credentials against Compose | **1 passed** — login, readiness (database/redis), scoped inspections, detail, work orders, assets, logout |
+| Flutter live API smoke | `flutter test test/live_api_test.dart` with `.env` credentials against Compose | **1 passed on the previous run** — login, readiness (database/redis), scoped inspections, detail, work orders, assets, logout |
 | Flutter web build | `flutter build web --release` | Success (`build/web`) |
+| Browser checks | browser-use against Compose | `/operations` tabs rendered for administrator; header shows `Sintetis — Jaringan ilustratif`; screenshots in `docs/screenshots/` |
+
+Fase D additions covered by tests: operations-console RBAC (inspector denied logs/deployments/
+backup/reset but allowed scoped AI jobs), log redaction of passwords and bearer tokens,
+scope-filtered AI job history, deployment operator/audit recording and `APP_ENV` rejection,
+backup status transitions (`not_configured`, `unavailable`, `invalid`, `stale`, `ok`), reset
+phrase/environment guards and row-limited deletion, and `seed_rbac` permission reconciliation.
 
 Flutter tests cover: signed-out login gate, sign-in into the Indonesian shell with live
 readiness/workload text, unreachable-API retry state, readiness summarization/parsing, and

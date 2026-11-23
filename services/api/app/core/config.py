@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "RailwayVision AI API"
-    app_version: str = "0.7.0"
+    app_version: str = "0.8.0"
     app_env: Literal["local", "test", "staging", "production"] = "local"
     api_v1_prefix: str = "/api/v1"
     log_level: str = "INFO"
@@ -53,10 +53,10 @@ class Settings(BaseSettings):
     minio_media_bucket: str = "railwayvision-media"
     minio_quarantine_bucket: str = "railwayvision-quarantine"
     media_max_bytes: int = 10_485_760
-    demo_ai_enabled: bool = True
+    synthetic_ai_enabled: bool = True
 
-    seed_demo_data: bool = False
-    demo_seed_password: str | None = None
+    seed_synthetic_data: bool = False
+    seed_password: str | None = None
 
     # Operations console. The backup status is read from a status file written by an
     # external backup job; nothing is inferred or reported as healthy by default.
@@ -108,8 +108,10 @@ class Settings(BaseSettings):
                 raise ValueError("ENABLE_HSTS must be true for staging/production")
             if len(self.jwt_secret) < 32 or self.jwt_secret.startswith("local-development"):
                 raise ValueError("JWT_SECRET must be a strong secret for staging/production")
-            if self.seed_demo_data:
-                raise ValueError("SEED_DEMO_DATA must be false outside local development")
+            if self.seed_synthetic_data:
+                raise ValueError(
+                    "SEED_SYNTHETIC_DATA must be false outside local development"
+                )
             if not self.minio_access_key or not self.minio_secret_key:
                 raise ValueError("MINIO_ACCESS_KEY and MINIO_SECRET_KEY are required")
             if "localhost" in self.minio_endpoint or "127.0.0.1" in self.minio_endpoint:

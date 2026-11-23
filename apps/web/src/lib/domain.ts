@@ -187,8 +187,8 @@ export function defaultDatetimeLocalValue(): string {
   return toDatetimeLocalValue(new Date().toISOString());
 }
 
-export function isDemoRecord(record: { code?: string; reference?: string }): boolean {
-  return /demo/i.test(record.code ?? record.reference ?? "");
+export function isSyntheticRecord(record: { code?: string; reference?: string }): boolean {
+  return /sintetis/i.test(record.code ?? record.reference ?? "");
 }
 
 export function buildQuery(params: Record<string, string | number | boolean | null | undefined>): string {

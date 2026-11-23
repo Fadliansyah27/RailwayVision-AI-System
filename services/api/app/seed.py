@@ -16,40 +16,60 @@ from app.services.security import hash_password
 
 logger = logging.getLogger("railwayvision.seed")
 
-DEMO_PASSWORD_ENV = "DEMO_SEED_PASSWORD"
+SEED_PASSWORD_ENV = "SEED_PASSWORD"
 
-DEMO_USERS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
+SEED_USERS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     (
-        "admin@demo.railwayvision.example",
-        "DEMO Administrator",
-        "DEMO-KCIC",
+        "admin@sintetis.railwayvision.example",
+        "Administrator Sintetis",
+        "SINTETIS-KCIC",
         (RoleCode.ADMINISTRATOR,),
     ),
-    ("inspector@demo.railwayvision.example", "DEMO Inspector", "DEMO-NORTH", (RoleCode.INSPECTOR,)),
-    ("reviewer@demo.railwayvision.example", "DEMO Reviewer", "DEMO-NORTH", (RoleCode.REVIEWER,)),
     (
-        "supervisor@demo.railwayvision.example",
-        "DEMO Supervisor",
-        "DEMO-KCIC",
+        "inspector@sintetis.railwayvision.example",
+        "Inspektur Sintetis",
+        "SINTETIS-NORTH",
+        (RoleCode.INSPECTOR,),
+    ),
+    (
+        "reviewer@sintetis.railwayvision.example",
+        "Peninjau Sintetis",
+        "SINTETIS-NORTH",
+        (RoleCode.REVIEWER,),
+    ),
+    (
+        "supervisor@sintetis.railwayvision.example",
+        "Supervisor Sintetis",
+        "SINTETIS-KCIC",
         (RoleCode.SUPERVISOR,),
     ),
-    ("ai@demo.railwayvision.example", "DEMO AI Engineer", "DEMO-KCIC", (RoleCode.AI_ML_ENGINEER,)),
-    ("auditor@demo.railwayvision.example", "DEMO Auditor", "DEMO-KCIC", (RoleCode.AUDITOR,)),
+    (
+        "ai@sintetis.railwayvision.example",
+        "AI Engineer Sintetis",
+        "SINTETIS-KCIC",
+        (RoleCode.AI_ML_ENGINEER,),
+    ),
+    (
+        "auditor@sintetis.railwayvision.example",
+        "Auditor Sintetis",
+        "SINTETIS-KCIC",
+        (RoleCode.AUDITOR,),
+    ),
 )
 
 SCOPES: tuple[tuple[str, str, str | None], ...] = (
-    ("DEMO-KCIC", "DEMO — Jaringan ilustratif", None),
-    ("DEMO-NORTH", "DEMO — Koridor utara", "DEMO-KCIC"),
-    ("DEMO-SOUTH", "DEMO — Koridor selatan", "DEMO-KCIC"),
+    ("SINTETIS-KCIC", "Sintetis — Jaringan ilustratif", None),
+    ("SINTETIS-NORTH", "Sintetis — Koridor utara", "SINTETIS-KCIC"),
+    ("SINTETIS-SOUTH", "Sintetis — Koridor selatan", "SINTETIS-KCIC"),
 )
 
 CATEGORIES: tuple[tuple[str, str], ...] = (
-    ("TRACK", "Jalur (DEMO)"),
-    ("TURNOUT", "Wesel (DEMO)"),
-    ("BRIDGE", "Jembatan (DEMO)"),
-    ("TUNNEL", "Terowongan (DEMO)"),
-    ("STATION", "Struktur stasiun (DEMO)"),
-    ("DRAINAGE", "Drainase (DEMO)"),
+    ("TRACK", "Jalur"),
+    ("TURNOUT", "Wesel"),
+    ("BRIDGE", "Jembatan"),
+    ("TUNNEL", "Terowongan"),
+    ("STATION", "Struktur stasiun"),
+    ("DRAINAGE", "Drainase"),
 )
 
 
@@ -76,6 +96,8 @@ async def seed_rbac(db: AsyncSession) -> dict[str, Scope]:
             permission = Permission(code=code, name=name)
             db.add(permission)
             await db.flush()
+        elif permission.name != name:
+            permission.name = name
         permissions[code] = permission
 
     for code, (name, description, permission_codes) in ROLE_DEFINITIONS.items():
@@ -88,6 +110,15 @@ async def seed_rbac(db: AsyncSession) -> dict[str, Scope]:
                 permissions=[permissions[code] for code in permission_codes],
             )
             db.add(role)
+            continue
+        granted = {permission.code for permission in role.permissions}
+        missing = [
+            permissions[permission_code]
+            for permission_code in permission_codes
+            if permission_code not in granted
+        ]
+        if missing:
+            role.permissions.extend(missing)
 
     scopes: dict[str, Scope] = {}
     for code, name, parent_code in SCOPES:
@@ -98,17 +129,17 @@ async def seed_rbac(db: AsyncSession) -> dict[str, Scope]:
     return scopes
 
 
-async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
+async def seed_synthetic_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
     settings = get_settings()
-    password = settings.demo_seed_password
+    password = settings.seed_password
     if not password:
         logger.warning(
-            "demo_seed_skipped_users",
-            extra={"event": "demo_seed_skipped_users", "reason": DEMO_PASSWORD_ENV},
+            "synthetic_seed_skipped_users",
+            extra={"event": "synthetic_seed_skipped_users", "reason": SEED_PASSWORD_ENV},
         )
         return
 
-    for email, full_name, scope_code, role_codes in DEMO_USERS:
+    for email, full_name, scope_code, role_codes in SEED_USERS:
         user = (await db.execute(select(User).where(User.email == email))).scalar_one_or_none()
         if user is not None:
             continue
@@ -143,8 +174,8 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
             await db.flush()
         categories[code] = category
 
-    north = scopes["DEMO-NORTH"]
-    south = scopes["DEMO-SOUTH"]
+    north = scopes["SINTETIS-NORTH"]
+    south = scopes["SINTETIS-SOUTH"]
 
     async def get_or_create_location(code: str, name: str, scope: Scope) -> Location:
         location = (
@@ -155,14 +186,18 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
                 code=code,
                 name=name,
                 scope_id=scope.id,
-                description="Lokasi demonstrasi sintetis. Bukan lokasi resmi KCIC.",
+                description="Lokasi sintetis. Bukan lokasi resmi KCIC.",
             )
             db.add(location)
             await db.flush()
         return location
 
-    location_north = await get_or_create_location("DEMO-LOC-N1", "DEMO Halaman Utara 01", north)
-    location_south = await get_or_create_location("DEMO-LOC-S1", "DEMO Halaman Selatan 01", south)
+    location_north = await get_or_create_location(
+        "SINTETIS-LOC-N1", "Halaman Sintetis Utara 01", north
+    )
+    location_south = await get_or_create_location(
+        "SINTETIS-LOC-S1", "Halaman Sintetis Selatan 01", south
+    )
 
     async def get_or_create_asset(
         code: str,
@@ -176,7 +211,7 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
             asset = Asset(
                 code=code,
                 name=name,
-                description="Catatan aset DEMO hanya untuk demonstrasi prototipe.",
+                description="Catatan aset sintetis untuk pengujian prototipe.",
                 status="active",
                 category_id=categories[category].id,
                 location_id=location.id,
@@ -187,28 +222,32 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
         return asset
 
     asset_one = await get_or_create_asset(
-        "DEMO-AST-0001", "DEMO segmen jalur utara A", "TRACK", location_north, north
+        "SINTETIS-AST-0001", "Segmen jalur sintetis utara A", "TRACK", location_north, north
     )
     await get_or_create_asset(
-        "DEMO-AST-0002", "DEMO jembatan utara B-01", "BRIDGE", location_north, north
+        "SINTETIS-AST-0002", "Jembatan sintetis utara B-01", "BRIDGE", location_north, north
     )
     await get_or_create_asset(
-        "DEMO-AST-0003", "DEMO wesel selatan T-01", "TURNOUT", location_south, south
+        "SINTETIS-AST-0003", "Wesel sintetis selatan T-01", "TURNOUT", location_south, south
     )
 
     inspector = (
-        await db.execute(select(User).where(User.email == "inspector@demo.railwayvision.example"))
+        await db.execute(
+            select(User).where(User.email == "inspector@sintetis.railwayvision.example")
+        )
     ).scalar_one_or_none()
     if inspector is not None:
         existing = (
-            await db.execute(select(Inspection).where(Inspection.reference == "DEMO-INS-0001"))
+            await db.execute(
+                select(Inspection).where(Inspection.reference == "SINTETIS-INS-0001")
+            )
         ).scalar_one_or_none()
         if existing is None:
             db.add(
                 Inspection(
-                    reference="DEMO-INS-0001",
+                    reference="SINTETIS-INS-0001",
                     status="submitted",
-                    notes="[DEMO] Catatan inspeksi sintetis. Bukan data operasional KCIC.",
+                    notes="[SINTETIS] Catatan inspeksi sintetis. Bukan data operasional KCIC.",
                     inspected_at=datetime.now(UTC),
                     asset_id=asset_one.id,
                     inspector_id=inspector.id,
@@ -220,25 +259,27 @@ async def seed_demo_content(db: AsyncSession, scopes: dict[str, Scope]) -> None:
 
 async def seed_ai_registry(db: AsyncSession) -> None:
     model = (
-        await db.execute(select(AIModel).where(AIModel.code == "demo-image-quality"))
+        await db.execute(
+            select(AIModel).where(AIModel.code == "synthetic-image-quality")
+        )
     ).scalar_one_or_none()
     if model is not None:
         return
     db.add(
         AIModel(
-            code="demo-image-quality",
-            name="DEMO heuristik kualitas gambar",
-            version="0.1.0-demo",
+            code="synthetic-image-quality",
+            name="Heuristik kualitas gambar sintetis",
+            version="0.1.0-sintetis",
             modality="image",
             description=(
-                "Metrik kualitas gambar deterministik yang hanya dipakai untuk mendemonstrasikan "
-                "alur unggah dan antrean. Ini bukan pendeteksi kerusakan, tidak mengklaim akurasi, "
-                "dan tidak boleh digunakan untuk keputusan keselamatan."
+                "Metrik kualitas gambar deterministik yang dipakai untuk menguji alur unggah "
+                "dan antrean. Ini bukan pendeteksi kerusakan, tidak mengklaim akurasi, dan "
+                "tidak boleh digunakan untuk keputusan keselamatan."
             ),
             is_demo=True,
             status="active",
-            family="demo-image-quality",
-            approval_status="demo_only",
+            family="synthetic-image-quality",
+            approval_status="synthetic_only",
             known_limitations=(
                 "Heuristik kualitas gambar; bukan pendeteksi kerusakan dan tidak dievaluasi "
                 "terhadap dataset inspeksi."
@@ -251,7 +292,7 @@ async def seed_ai_registry(db: AsyncSession) -> None:
 async def seed_all(db: AsyncSession) -> None:
     scopes = await seed_rbac(db)
     await seed_ai_registry(db)
-    await seed_demo_content(db, scopes)
+    await seed_synthetic_content(db, scopes)
     await db.commit()
 
 
@@ -262,15 +303,17 @@ async def run_seed() -> None:
 
 async def seed_on_startup() -> None:
     settings = get_settings()
-    if settings.app_env != "local" or not settings.seed_demo_data:
+    if settings.app_env != "local" or not settings.seed_synthetic_data:
         return
     try:
         await run_seed()
-        logger.info("demo_seed_completed", extra={"event": "demo_seed_completed"})
+        logger.info(
+            "synthetic_seed_completed", extra={"event": "synthetic_seed_completed"}
+        )
     except Exception:
         logger.exception(
-            "demo_seed_failed",
-            extra={"event": "demo_seed_failed", "outcome": "error"},
+            "synthetic_seed_failed",
+            extra={"event": "synthetic_seed_failed", "outcome": "error"},
         )
 
 

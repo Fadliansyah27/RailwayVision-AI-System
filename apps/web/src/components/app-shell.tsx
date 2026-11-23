@@ -13,6 +13,7 @@ import {
   Map,
   Menu,
   ScrollText,
+  ServerCog,
   ShieldCheck,
   UserRound,
   Users,
@@ -45,6 +46,7 @@ const ICONS: Record<NavIconKey, typeof LayoutDashboard> = {
   administration: Users,
   audit: ScrollText,
   status: Activity,
+  operations: ServerCog,
 };
 
 function initials(name: string): string {

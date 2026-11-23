@@ -61,7 +61,7 @@ ALL_PERMISSIONS: tuple[tuple[str, str], ...] = (
     (PermissionCode.NOTIFICATIONS_READ, "Lihat notifikasi"),
     (
         PermissionCode.OPS_MANAGE,
-        "Kelola konsol operasi, deployment, dan reset data demo",
+        "Kelola konsol operasi, deployment, dan reset data sintetis",
     ),
 )
 

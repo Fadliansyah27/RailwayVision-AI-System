@@ -362,8 +362,10 @@ async def create_ai_job(
     queue: TaskQueue = Depends(task_queue_dependency),
 ) -> AIJobOut:
     settings = get_settings()
-    if not settings.demo_ai_enabled or settings.app_env == "production":
-        raise AppError(409, "conflict", "Pipeline AI demo dinonaktifkan pada versi ini.")
+    if not settings.synthetic_ai_enabled or settings.app_env == "production":
+        raise AppError(
+            409, "conflict", "Pipeline AI sintetis dinonaktifkan pada versi ini."
+        )
     inspection = await _get_accessible_inspection(db, ctx, inspection_id)
     media = (
         await db.execute(
@@ -395,7 +397,7 @@ async def create_ai_job(
         )
     ).scalar_one_or_none()
     if model is None:
-        raise AppError(409, "conflict", "Belum ada model AI demo yang terdaftar.")
+        raise AppError(409, "conflict", "Belum ada model AI sintetis yang terdaftar.")
 
     existing = (
         await db.execute(
@@ -407,7 +409,9 @@ async def create_ai_job(
         )
     ).scalar_one_or_none()
     if existing is not None:
-        raise AppError(409, "conflict", "Analisis demo untuk media ini sudah dalam antrean.")
+        raise AppError(
+            409, "conflict", "Analisis sintetis untuk media ini sudah dalam antrean."
+        )
 
     inspection.status = "ai_processing"
     inspection.version += 1
@@ -422,7 +426,7 @@ async def create_ai_job(
     await db.flush()
     await record_audit(
         db,
-        action="ai.demo_job_queued",
+        action="ai.synthetic_job_queued",
         actor=ctx.user,
         target_type="ai_job",
         target_id=job.id,
@@ -438,7 +442,7 @@ async def create_ai_job(
     job_id = job.id
 
     try:
-        await queue.enqueue_demo_quality_check(str(job_id))
+        await queue.enqueue_synthetic_quality_check(str(job_id))
     except AppError:
         failed = (await db.execute(select(AIJob).where(AIJob.id == job_id))).scalar_one()
         failed.status = "failed"
@@ -447,7 +451,7 @@ async def create_ai_job(
         inspection.status = previous_status
         await record_audit(
             db,
-            action="ai.demo_job_failed",
+            action="ai.synthetic_job_failed",
             actor=ctx.user,
             target_type="ai_job",
             target_id=job_id,
@@ -546,7 +550,7 @@ async def register_model(
         description=payload.description.strip(),
         is_demo=payload.is_demo,
         status="active" if payload.is_demo else "candidate",
-        approval_status="demo_only" if payload.is_demo else "draft",
+        approval_status="synthetic_only" if payload.is_demo else "draft",
         dataset_version=payload.dataset_version,
         checksum_sha256=payload.checksum_sha256,
         class_names=payload.class_names,

@@ -33,7 +33,7 @@ export const JOB_ERROR_LABELS: Record<string, string> = {
   media_unavailable: "Media tidak lagi tersedia",
   storage_unavailable: "Penyimpanan objek tidak tersedia",
   unsupported_image: "Gambar tidak dapat didekode",
-  analysis_failed: "Analisis demo gagal",
+  analysis_failed: "Analisis sintetis gagal",
 };
 
 export function mediaStatusTone(status: string): Tone {

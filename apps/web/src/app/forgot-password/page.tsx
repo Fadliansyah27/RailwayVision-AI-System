@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="name@demo.railwayvision.example"
+                    placeholder="name@sintetis.railwayvision.example"
                     className={`${inputClass} pl-9`}
                   />
                 </div>

@@ -67,8 +67,8 @@ class SectionCard extends StatelessWidget {
   }
 }
 
-class DemoBadge extends StatelessWidget {
-  const DemoBadge({super.key, this.label = 'DEMO', this.onBrand = false});
+class SyntheticBadge extends StatelessWidget {
+  const SyntheticBadge({super.key, this.label = 'SINTETIS', this.onBrand = false});
 
   final String label;
   final bool onBrand;

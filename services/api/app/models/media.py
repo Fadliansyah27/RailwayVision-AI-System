@@ -12,7 +12,13 @@ from app.models.identity import User
 MEDIA_STATUSES = ("pending_upload", "ready", "quarantined")
 AI_JOB_STATUSES = ("queued", "running", "succeeded", "failed")
 AI_MODEL_STATUSES = ("candidate", "active", "retired")
-AI_MODEL_APPROVAL_STATUSES = ("draft", "pending_approval", "approved", "rejected", "demo_only")
+AI_MODEL_APPROVAL_STATUSES = (
+    "draft",
+    "pending_approval",
+    "approved",
+    "rejected",
+    "synthetic_only",
+)
 DATASET_STATUSES = ("draft", "pending_approval", "approved", "rejected")
 
 

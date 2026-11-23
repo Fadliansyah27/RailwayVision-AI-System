@@ -63,16 +63,16 @@ class _FakeApiClient extends ApiClient {
     return InspectionPage(items: const [], total: inspectionTotal);
   }
 
-  SessionUser _user({String email = 'inspector@demo.railwayvision.example'}) {
+  SessionUser _user({String email = 'inspector@sintetis.railwayvision.example'}) {
     return SessionUser(
       id: '00000000-0000-0000-0000-000000000001',
       email: email,
       fullName: 'Budi Santoso',
       scope: const SessionScope(
         id: '00000000-0000-0000-0000-000000000002',
-        code: 'DEMO-HSR',
-        name: 'Koridor DEMO Halim–Tegalluar',
-        path: '/DEMO-HSR',
+        code: 'SINTETIS-HSR',
+        name: 'Koridor SINTETIS Halim–Tegalluar',
+        path: '/SINTETIS-HSR',
       ),
       roles: const [SessionRole(code: 'inspector', name: 'Inspektur Lapangan')],
       permissions: const {'inspections:read', 'inspections:write'},
@@ -115,7 +115,7 @@ void main() {
 
     expect(find.text('Masuk ke ruang kerja'), findsOneWidget);
     expect(find.text('Masuk'), findsOneWidget);
-    expect(find.text('DEMO'), findsOneWidget);
+    expect(find.text('SINTETIS'), findsOneWidget);
     expect(find.text('Beranda'), findsNothing);
   });
 
@@ -135,7 +135,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-        find.byType(TextField).at(0), 'inspector@demo.railwayvision.example');
+        find.byType(TextField).at(0), 'inspector@sintetis.railwayvision.example');
     await tester.enterText(find.byType(TextField).at(1), 'Secret123!');
     await tester.tap(find.widgetWithText(FilledButton, 'Masuk'));
     await tester.pumpAndSettle();

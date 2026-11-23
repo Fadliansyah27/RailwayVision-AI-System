@@ -56,7 +56,7 @@ const APPROVAL_LABELS: Record<string, string> = {
   pending_approval: "Menunggu persetujuan",
   approved: "Disetujui",
   rejected: "Ditolak",
-  demo_only: "Demo saja",
+  synthetic_only: "Sintetis saja",
 };
 
 const DATASET_STATUS_LABELS: Record<string, string> = {
@@ -512,7 +512,7 @@ function ModelsTab({
       <Card>
         <CardHeader
           title="Model terdaftar"
-          description={`${models.length} entri. Model demonstrasi ditandai DEMO dan tidak mengikuti alur persetujuan operasional.`}
+          description={`${models.length} entri. Model sintetis ditandai label SINTETIS dan tidak mengikuti alur persetujuan operasional.`}
         />
         {models.length === 0 ? (
           <EmptyState
@@ -534,7 +534,7 @@ function ModelsTab({
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-ink">{model.name}</p>
-                        {model.is_demo ? <Chip tone="neutral">DEMO</Chip> : null}
+                        {model.is_demo ? <Chip tone="neutral">SINTETIS</Chip> : null}
                         <Chip tone={modelStatusTone(model.status)}>
                           {MODEL_STATUS_LABELS[model.status] ?? model.status}
                         </Chip>
@@ -788,7 +788,7 @@ function RegisterModelForm({
     description: "",
     limitations: "",
     metrics: "",
-    isDemo: false,
+    isSynthetic: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -832,7 +832,7 @@ function RegisterModelForm({
       version: form.version.trim(),
       family: form.family.trim(),
       description: form.description.trim(),
-      is_demo: form.isDemo,
+      is_demo: form.isSynthetic,
       dataset_version: form.datasetVersion.trim() || null,
       checksum_sha256: checksum || null,
       class_names: splitCsv(form.classNames),
@@ -848,8 +848,8 @@ function RegisterModelForm({
         body: payload,
       });
       setSuccess(
-        form.isDemo
-          ? "Model demonstrasi terdaftar."
+        form.isSynthetic
+          ? "Model sintetis terdaftar."
           : "Model terdaftar sebagai kandidat. Ajukan persetujuan setelah kelengkapan terpenuhi.",
       );
       setForm({
@@ -863,7 +863,7 @@ function RegisterModelForm({
         description: "",
         limitations: "",
         metrics: "",
-        isDemo: false,
+        isSynthetic: false,
       });
       await onRegistered();
     } catch (caught) {
@@ -1025,11 +1025,11 @@ function RegisterModelForm({
         <label className="flex items-center gap-2 text-xs text-ink">
           <input
             type="checkbox"
-            checked={form.isDemo}
-            onChange={(event) => update("isDemo", event.target.checked)}
+            checked={form.isSynthetic}
+            onChange={(event) => update("isSynthetic", event.target.checked)}
             className="size-3.5 accent-primary"
           />
-          Tandai sebagai model demonstrasi (tidak untuk keputusan keselamatan)
+          Tandai sebagai model sintetis (tidak untuk keputusan keselamatan)
         </label>
 
         {formError ? (

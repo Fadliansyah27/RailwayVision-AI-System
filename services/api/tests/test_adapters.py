@@ -27,8 +27,8 @@ class RecordingClient:
 async def test_queue_adapter_forwards_task_arguments():
     adapter = CeleryTaskQueue.__new__(CeleryTaskQueue)
     adapter._client = RecordingClient()
-    await adapter.enqueue_demo_quality_check("job-123")
-    assert adapter._client.calls == [("ai.demo_quality_check",)]
+    await adapter.enqueue_synthetic_quality_check("job-123")
+    assert adapter._client.calls == [("ai.synthetic_quality_check",)]
     assert adapter._client.kwargs == [{"args": ["job-123"]}]
 
 
@@ -42,7 +42,7 @@ async def test_queue_adapter_reports_outage(monkeypatch):
     client.send_task = explode
     adapter._client = client
     with pytest.raises(AppError) as excinfo:
-        await adapter.enqueue_demo_quality_check("job-123")
+        await adapter.enqueue_synthetic_quality_check("job-123")
     assert excinfo.value.status_code == 503
 
 

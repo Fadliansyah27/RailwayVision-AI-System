@@ -159,7 +159,7 @@ export function MediaPanel({
       })
       .catch((caught) => {
         if (!cancelled) {
-          setJobsError(readError(caught, "Tidak dapat memuat pekerjaan analisis demo."));
+          setJobsError(readError(caught, "Tidak dapat memuat pekerjaan analisis sintetis."));
         }
       })
       .finally(() => {
@@ -283,7 +283,7 @@ export function MediaPanel({
     }
   }
 
-  async function runDemoJob(item: MediaObject) {
+  async function runSyntheticJob(item: MediaObject) {
     setBusyMedia(item.id);
     setJobsError(null);
     try {
@@ -295,7 +295,7 @@ export function MediaPanel({
       setJobsKey((value) => value + 1);
       onActivity?.();
     } catch (caught) {
-      setJobsError(readError(caught, "Tidak dapat mengantrekan analisis demo."));
+      setJobsError(readError(caught, "Tidak dapat mengantrekan analisis sintetis."));
     } finally {
       setBusyMedia(null);
     }
@@ -306,7 +306,7 @@ export function MediaPanel({
   return (
     <Card>
       <CardHeader
-        title="Bukti dan pipeline AI demo"
+        title="Bukti dan pipeline AI sintetis"
         description="Gambar berada di penyimpanan objek privat dan hanya dapat diakses melalui pembacaan API yang berwenang. Setiap pembacaan diaudit."
         actions={
           <Chip tone="neutral">
@@ -505,16 +505,16 @@ export function MediaPanel({
                         <button
                           type="button"
                           className={secondaryButtonClass}
-                          onClick={() => runDemoJob(item)}
+                          onClick={() => runSyntheticJob(item)}
                           disabled={busyMedia === item.id || !canQueueJob}
                           title={
                             canQueueJob
-                              ? "Antrekan pekerjaan kualitas gambar demo untuk gambar ini."
-                              : "Analisis demo hanya dapat diantrekan selama inspeksi berstatus Dikirim, AI selesai memproses, atau Pemrosesan AI gagal."
+                              ? "Antrekan pekerjaan kualitas gambar sintetis untuk gambar ini."
+                              : "Analisis sintetis hanya dapat diantrekan selama inspeksi berstatus Dikirim, AI selesai memproses, atau Pemrosesan AI gagal."
                           }
                         >
                           <Bot className="size-3.5" aria-hidden="true" />
-                          Jalankan pemeriksaan demo
+                          Jalankan pemeriksaan sintetis
                         </button>
                       ) : null}
                     </div>
@@ -538,9 +538,9 @@ export function MediaPanel({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="inline-flex items-center gap-2 text-sm font-semibold text-ink">
                 <Bot className="size-4 text-ai" aria-hidden="true" />
-                Pekerjaan analisis demo
+                Pekerjaan analisis sintetis
               </h3>
-              <Chip tone="ai">DEMO · saran saja</Chip>
+              <Chip tone="ai">SINTETIS · saran saja</Chip>
             </div>
             <p className="mt-1 text-xs leading-5 text-secondary">
               Versi ini menjalankan heuristik kualitas gambar deterministik untuk menguji antrean
@@ -554,11 +554,11 @@ export function MediaPanel({
             {loadingJobs ? (
               <p className="mt-3 flex items-center gap-2 text-sm text-secondary">
                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                Memuat pekerjaan demo…
+                Memuat pekerjaan sintetis…
               </p>
             ) : jobs.length === 0 ? (
               <p className="mt-3 rounded-lg border border-border bg-canvas px-3 py-2 text-xs text-secondary">
-                Belum ada analisis demo yang diminta untuk inspeksi ini.
+                Belum ada analisis sintetis yang diminta untuk inspeksi ini.
               </p>
             ) : (
               <ul className="mt-3 space-y-3">

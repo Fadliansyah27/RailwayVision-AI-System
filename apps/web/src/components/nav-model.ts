@@ -17,7 +17,8 @@ export type NavIconKey =
   | "reports"
   | "administration"
   | "audit"
-  | "status";
+  | "status"
+  | "operations";
 
 export interface NavItem {
   label: string;
@@ -164,6 +165,15 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Sistem",
     items: [
+      {
+        label: "Konsol Operasi",
+        icon: "operations",
+        href: "/operations",
+        available: true,
+        phase: 9,
+        roles: ["supervisor", "administrator", "auditor"],
+        description: "Riwayat job AI, log, deployment, backup, dan reset data sintetis",
+      },
       {
         label: "Status Sistem",
         icon: "status",

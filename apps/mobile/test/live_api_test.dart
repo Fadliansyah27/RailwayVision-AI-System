@@ -6,9 +6,9 @@ import 'package:railwayvision_mobile/services/api_client.dart';
 import 'package:railwayvision_mobile/services/token_store.dart';
 
 // Live check of the networking layer used by the field app.
-// Runs only when DEMO_SEED_PASSWORD is set; never prints tokens or passwords.
+// Runs only when SEED_PASSWORD is set; never prints tokens or passwords.
 void main() {
-  final password = Platform.environment['DEMO_SEED_PASSWORD'] ?? '';
+  final password = Platform.environment['SEED_PASSWORD'] ?? '';
   final baseUrl =
       Platform.environment['API_BASE_URL'] ?? 'http://localhost:8000';
 
@@ -21,7 +21,7 @@ void main() {
       );
 
       final user = await api.login(
-        'inspector@demo.railwayvision.example',
+        'inspector@sintetis.railwayvision.example',
         password,
       );
       expect(user.email, contains('inspector@'));
@@ -63,7 +63,7 @@ void main() {
       expect(api.hasSession, isFalse);
     },
     skip: password.isEmpty
-        ? 'DEMO_SEED_PASSWORD not set; live smoke skipped.'
+        ? 'SEED_PASSWORD not set; live smoke skipped.'
         : false,
   );
 }

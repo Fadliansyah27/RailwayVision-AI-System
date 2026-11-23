@@ -1,9 +1,9 @@
 from tests.conftest import auth_headers, login
 
-ADMIN = "admin@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
-REVIEWER = "reviewer@demo.railwayvision.example"
-SUPERVISOR = "supervisor@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
+REVIEWER = "reviewer@sintetis.railwayvision.example"
+SUPERVISOR = "supervisor@sintetis.railwayvision.example"
 
 
 async def _asset_id(client, headers) -> str:
@@ -27,7 +27,7 @@ async def test_password_reset_requires_an_admin_issued_token(auth_client):
 
     unknown = await auth_client.post(
         "/api/v1/auth/password-reset/request",
-        json={"email": "nobody@demo.railwayvision.example"},
+        json={"email": "nobody@sintetis.railwayvision.example"},
     )
     assert unknown.status_code == 202
     assert unknown.json() == {"status": "accepted"}
@@ -104,7 +104,7 @@ async def test_user_filters_and_admin_detail_fields(auth_client):
     assert paged.json()["total"] == 6
 
     searched = await auth_client.get(
-        "/api/v1/users?search=DEMO&is_active=true", headers=admin_headers
+        "/api/v1/users?search=SINTETIS&is_active=true", headers=admin_headers
     )
     assert searched.json()["total"] == 6
 
@@ -115,7 +115,7 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
     category = await auth_client.post(
         "/api/v1/asset-categories",
         headers=admin_headers,
-        json={"code": "SIGNAL", "name": "Signalling (DEMO)"},
+        json={"code": "SIGNAL", "name": "Signalling (SINTETIS)"},
     )
     assert category.status_code == 201, category.text
     category_id = category.json()["id"]
@@ -130,21 +130,21 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
     renamed = await auth_client.patch(
         f"/api/v1/asset-categories/{category_id}",
         headers=admin_headers,
-        json={"name": "Signalling equipment (DEMO)"},
+        json={"name": "Signalling equipment (SINTETIS)"},
     )
     assert renamed.status_code == 200
-    assert renamed.json()["name"] == "Signalling equipment (DEMO)"
+    assert renamed.json()["name"] == "Signalling equipment (SINTETIS)"
 
     scopes = await auth_client.get("/api/v1/scopes", headers=admin_headers)
-    north = next(scope for scope in scopes.json() if scope["code"] == "DEMO-NORTH")
+    north = next(scope for scope in scopes.json() if scope["code"] == "SINTETIS-NORTH")
 
     location = await auth_client.post(
         "/api/v1/locations",
         headers=admin_headers,
         json={
-            "code": "DEMO-LOC-N2",
-            "name": "DEMO North Yard 02",
-            "description": "Synthetic demonstration location.",
+            "code": "SINTETIS-LOC-N2",
+            "name": "SINTETIS North Yard 02",
+            "description": "Synthetic example location.",
             "scope_id": north["id"],
         },
     )
@@ -154,7 +154,7 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
     updated_location = await auth_client.patch(
         f"/api/v1/locations/{location_id}",
         headers=admin_headers,
-        json={"name": "DEMO North Yard 02 (renamed)"},
+        json={"name": "SINTETIS North Yard 02 (renamed)"},
     )
     assert updated_location.status_code == 200
 
@@ -162,8 +162,8 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
         "/api/v1/assets",
         headers=admin_headers,
         json={
-            "code": "DEMO-AST-0100",
-            "name": "DEMO signal cabinet S-01",
+            "code": "SINTETIS-AST-0100",
+            "name": "SINTETIS signal cabinet S-01",
             "category_id": category_id,
             "location_id": location_id,
         },
@@ -175,7 +175,7 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
     )
     assert filtered.status_code == 200
     assert filtered.json()["total"] == 1
-    assert filtered.json()["items"][0]["code"] == "DEMO-AST-0100"
+    assert filtered.json()["items"][0]["code"] == "SINTETIS-AST-0100"
 
     summary = await auth_client.get("/api/v1/assets/summary", headers=admin_headers)
     assert summary.status_code == 200, summary.text
@@ -194,12 +194,12 @@ async def test_asset_reference_management_location_filter_and_summary(auth_clien
     assert {"asset_category.created", "asset_category.updated"} <= actions
 
     auditor_headers = await auth_headers(
-        auth_client, "auditor@demo.railwayvision.example"
+        auth_client, "auditor@sintetis.railwayvision.example"
     )
     denied = await auth_client.post(
         "/api/v1/locations",
         headers=auditor_headers,
-        json={"code": "DEMO-LOC-X", "name": "Denied", "scope_id": north["id"]},
+        json={"code": "SINTETIS-LOC-X", "name": "Denied", "scope_id": north["id"]},
     )
     assert denied.status_code == 403
 
@@ -214,14 +214,14 @@ async def test_inspection_fields_and_nine_status_workflow(auth_client):
         json={
             "asset_id": asset_id,
             "inspection_type": "detailed",
-            "location_reference": "DEMO chainage marker 12",
+            "location_reference": "SINTETIS chainage marker 12",
             "notes": "Workflow coverage draft.",
         },
     )
     assert created.status_code == 201, created.text
     inspection = created.json()
     assert inspection["inspection_type"] == "detailed"
-    assert inspection["location_reference"] == "DEMO chainage marker 12"
+    assert inspection["location_reference"] == "SINTETIS chainage marker 12"
 
     updated = await auth_client.patch(
         f"/api/v1/inspections/{inspection['id']}",
@@ -265,7 +265,7 @@ async def test_inspection_fields_and_nine_status_workflow(auth_client):
     assert cancel_under_review.status_code == 409
 
     auditor_headers = await auth_headers(
-        auth_client, "auditor@demo.railwayvision.example"
+        auth_client, "auditor@sintetis.railwayvision.example"
     )
     undecidable = await auth_client.post(
         f"/api/v1/inspections/{inspection['id']}/review",

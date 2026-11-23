@@ -102,11 +102,11 @@ async def submit_model(
     db: AsyncSession = Depends(get_db),
 ) -> AIModelOut:
     model = await _get_model(db, model_id)
-    if model.is_demo or model.approval_status == "demo_only":
+    if model.is_demo or model.approval_status == "synthetic_only":
         raise AppError(
             409,
             "conflict",
-            "Model demonstrasi tidak mengikuti alur persetujuan penggunaan.",
+            "Model sintetis tidak mengikuti alur persetujuan penggunaan.",
         )
     if model.approval_status not in ("draft", "rejected"):
         raise AppError(
@@ -212,7 +212,9 @@ async def deploy_model(
     model = await _get_model(db, model_id)
     if model.is_demo:
         raise AppError(
-            409, "conflict", "Model demonstrasi tidak dapat diterapkan sebagai model operasional."
+            409,
+            "conflict",
+            "Model sintetis tidak dapat diterapkan sebagai model operasional.",
         )
     if model.approval_status != "approved":
         raise AppError(409, "conflict", "Model harus disetujui sebelum dapat diterapkan.")
@@ -266,7 +268,9 @@ async def retire_model(
     model = await _get_model(db, model_id)
     if model.is_demo:
         raise AppError(
-            409, "conflict", "Model demonstrasi dikelola otomatis dan tidak dapat dipensiunkan."
+            409,
+            "conflict",
+            "Model sintetis dikelola otomatis dan tidak dapat dipensiunkan.",
         )
     if model.status != "active":
         raise AppError(409, "conflict", "Hanya model aktif yang dapat dipensiunkan.")

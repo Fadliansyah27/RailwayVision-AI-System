@@ -1,8 +1,8 @@
 from tests.conftest import auth_headers
 
-ADMIN = "admin@demo.railwayvision.example"
-REVIEWER = "reviewer@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+REVIEWER = "reviewer@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
 
 
 async def test_report_summary_uses_scope_and_period(auth_client):
@@ -18,7 +18,7 @@ async def test_report_summary_uses_scope_and_period(auth_client):
     if payload["inspections"]:
         row = payload["inspections"][0]
         assert "INS-" in row["reference"]
-        assert row["asset"]["code"].startswith("DEMO-")
+        assert row["asset"]["code"].startswith("SINTETIS-")
 
 
 async def test_report_exports_return_files(auth_client):

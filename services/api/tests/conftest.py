@@ -3,8 +3,8 @@ import os
 os.environ["APP_ENV"] = "test"
 os.environ["LOG_LEVEL"] = "WARNING"
 os.environ["JWT_SECRET"] = "test-only-jwt-secret-0123456789abcdef01234567"
-os.environ["DEMO_SEED_PASSWORD"] = "Test-Demo-Password-2026"
-os.environ["SEED_DEMO_DATA"] = "false"
+os.environ["SEED_PASSWORD"] = "Test-Sintetis-Password-2026"
+os.environ["SEED_SYNTHETIC_DATA"] = "false"
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -14,9 +14,9 @@ from sqlalchemy.pool import StaticPool
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
-from app.seed import seed_demo_content, seed_rbac
+from app.seed import seed_rbac, seed_synthetic_content
 
-PASSWORD = "Test-Demo-Password-2026"
+PASSWORD = "Test-Sintetis-Password-2026"
 
 
 class FakeRedis:
@@ -73,7 +73,7 @@ async def auth_client(api_app):
 
     async with session_factory() as session:
         scopes = await seed_rbac(session)
-        await seed_demo_content(session, scopes)
+        await seed_synthetic_content(session, scopes)
         await session.commit()
 
     api_app.dependency_overrides[get_db] = override_get_db

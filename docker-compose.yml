@@ -72,8 +72,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-local-development-only-jwt-secret-change-me}
       ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
       REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-7}
-      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
-      DEMO_SEED_PASSWORD: ${DEMO_SEED_PASSWORD:-}
+      SEED_SYNTHETIC_DATA: ${SEED_SYNTHETIC_DATA:-false}
+      SEED_PASSWORD: ${SEED_PASSWORD:-}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/1}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
       MINIO_ENDPOINT: minio:9000
@@ -82,7 +82,7 @@ services:
       MINIO_MEDIA_BUCKET: ${MINIO_MEDIA_BUCKET:-railwayvision-media}
       MINIO_QUARANTINE_BUCKET: ${MINIO_QUARANTINE_BUCKET:-railwayvision-quarantine}
       MEDIA_MAX_BYTES: ${MEDIA_MAX_BYTES:-10485760}
-      DEMO_AI_ENABLED: ${DEMO_AI_ENABLED:-true}
+      SYNTHETIC_AI_ENABLED: ${SYNTHETIC_AI_ENABLED:-true}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

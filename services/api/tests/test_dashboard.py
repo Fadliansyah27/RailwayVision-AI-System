@@ -1,7 +1,7 @@
 from tests.conftest import auth_headers
 
-ADMIN = "admin@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
 
 
 async def test_dashboard_overview_reports_live_counts(auth_client):
@@ -38,7 +38,7 @@ async def test_dashboard_overview_reports_live_counts(auth_client):
 
     recent = payload["recent_inspections"]
     assert 1 <= len(recent) <= 5
-    assert recent[0]["asset"]["code"].startswith("DEMO-")
+    assert recent[0]["asset"]["code"].startswith("SINTETIS-")
 
 
 async def test_dashboard_requires_permission_and_authentication(auth_client):

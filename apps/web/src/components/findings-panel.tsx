@@ -10,7 +10,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
-import { DemoBadge, FindingPriorityChip, FindingStatusChip } from "@/components/records";
+import { SyntheticBadge, FindingPriorityChip, FindingStatusChip } from "@/components/records";
 import { Card, CardHeader, EmptyState } from "@/components/ui";
 import { apiRequest, ApiError, type Finding, type InspectionDetail, type Page } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -173,7 +173,7 @@ export function FindingsPanel({ inspection }: { inspection: InspectionDetail }) 
           </div>
           <div>
             <label className={labelClass} htmlFor="finding-create-priority">
-              Prioritas (nilai DEMO sementara)
+              Prioritas (nilai sintetis sementara)
             </label>
             <select
               id="finding-create-priority"
@@ -244,7 +244,7 @@ export function FindingsPanel({ inspection }: { inspection: InspectionDetail }) 
                   >
                     {finding.reference}
                   </Link>
-                  <DemoBadge reference={finding.reference} />
+                  <SyntheticBadge reference={finding.reference} />
                   <FindingStatusChip status={finding.status} />
                   <FindingPriorityChip priority={finding.priority} />
                 </div>

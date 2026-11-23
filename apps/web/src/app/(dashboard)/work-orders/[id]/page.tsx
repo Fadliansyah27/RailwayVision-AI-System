@@ -21,7 +21,7 @@ import {
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
 import {
-  DemoBadge,
+  SyntheticBadge,
   FindingPriorityChip,
   WorkOrderStatusChip,
 } from "@/components/records";
@@ -241,7 +241,7 @@ export default function WorkOrderDetailPage() {
         title={
           <span className="inline-flex flex-wrap items-center gap-3">
             <span className="font-mono text-2xl">{workOrder.reference}</span>
-            <DemoBadge reference={workOrder.reference} />
+            <SyntheticBadge reference={workOrder.reference} />
             <WorkOrderStatusChip status={workOrder.status} />
           </span>
         }

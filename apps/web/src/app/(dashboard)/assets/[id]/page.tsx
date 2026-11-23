@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 import { AssetEditor } from "@/components/asset-editor";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/admin/form-styles";
-import { AssetStatusChip, DemoBadge, InspectionStatusChip } from "@/components/records";
+import { AssetStatusChip, SyntheticBadge, InspectionStatusChip } from "@/components/records";
 import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import {
   apiRequest,
@@ -211,7 +211,7 @@ export default function AssetDetailPage() {
               <dt className="text-xs font-medium text-secondary">Kode aset</dt>
               <dd className="mt-1 flex flex-wrap items-center gap-2">
                 <span className="font-mono text-sm font-semibold text-ink">{asset.code}</span>
-                <DemoBadge code={asset.code} />
+                <SyntheticBadge code={asset.code} />
               </dd>
             </div>
             <div>
@@ -292,7 +292,7 @@ export default function AssetDetailPage() {
             title="Belum ada inspeksi"
             description={
               canInspect
-                ? "Mulai inspeksi draf untuk membuat catatan DEMO pertama bagi aset ini."
+                ? "Mulai inspeksi draf untuk membuat catatan sintetis pertama bagi aset ini."
                 : "Inspeksi yang dicatat petugas lapangan akan tampil di sini."
             }
           />

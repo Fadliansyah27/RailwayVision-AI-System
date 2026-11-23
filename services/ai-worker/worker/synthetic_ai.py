@@ -8,7 +8,7 @@ POSSIBLE_BLUR_EDGE_VARIANCE = 120.0
 LOW_RESOLUTION_WIDTH = 640
 
 DISCLAIMER = (
-    "Hanya heuristik kualitas gambar demo. Ini bukan deteksi kerusakan, tidak mengklaim "
+    "Hanya heuristik kualitas gambar sintetis. Ini bukan deteksi kerusakan, tidak mengklaim "
     "akurasi, dan tidak boleh digunakan untuk keputusan keselamatan atau pemeliharaan."
 )
 
@@ -43,7 +43,7 @@ def analyze_image_bytes(data: bytes) -> dict:
         flags.append("low_resolution")
 
     return {
-        "kind": "demo_image_quality",
+        "kind": "synthetic_image_quality",
         "advisory": True,
         "disclaimer": DISCLAIMER,
         "metrics": {
@@ -60,5 +60,7 @@ def analyze_image_bytes(data: bytes) -> dict:
             "possible_blur_edge_variance": POSSIBLE_BLUR_EDGE_VARIANCE,
             "low_resolution_width": LOW_RESOLUTION_WIDTH,
         },
-        "note": "Ambang batas adalah konstanta demo tetap, bukan nilai yang disetujui KCIC.",
+        "note": (
+            "Ambang batas adalah konstanta sintetis tetap, bukan nilai yang disetujui KCIC."
+        ),
     }

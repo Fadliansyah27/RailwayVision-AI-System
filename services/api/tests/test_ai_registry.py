@@ -1,9 +1,9 @@
 from tests.conftest import auth_headers
 
-ADMIN = "admin@demo.railwayvision.example"
-AI_ENGINEER = "ai@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
-AUDITOR = "auditor@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+AI_ENGINEER = "ai@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
+AUDITOR = "auditor@sintetis.railwayvision.example"
 
 CHECKSUM = "a" * 64
 
@@ -11,11 +11,11 @@ CHECKSUM = "a" * 64
 async def _register(client, headers, code: str, version: str, **extra):
     payload = {
         "code": code,
-        "name": f"DEMO {code}",
+        "name": f"SINTETIS {code}",
         "version": version,
-        "family": "demo-yolo-family",
+        "family": "test-yolo-family",
         "checksum_sha256": CHECKSUM,
-        "dataset_version": "demo-dataset-1.0",
+        "dataset_version": "sintetis-dataset-1.0",
         "class_names": ["retak", "korosi"],
         "known_limitations": "Hanya untuk unit test.",
         "is_demo": False,
@@ -41,7 +41,7 @@ async def _approve(client, headers, model_id: str) -> None:
 
 async def test_model_requires_evaluation_before_approval(auth_client):
     headers = await auth_headers(auth_client, ADMIN)
-    model = await _register(auth_client, headers, "demo-yolo-a", "1.0.0")
+    model = await _register(auth_client, headers, "test-yolo-a", "1.0.0")
 
     missing_metrics = await auth_client.post(
         f"/api/v1/models/{model['id']}/submit", headers=headers
@@ -59,7 +59,7 @@ async def test_model_requires_evaluation_before_approval(auth_client):
     incomplete = await _register(
         auth_client,
         headers,
-        "demo-yolo-b",
+        "test-yolo-b",
         "1.0.0",
         checksum_sha256=None,
         dataset_version=None,
@@ -75,7 +75,7 @@ async def test_model_deployment_and_rollback(auth_client):
     headers = await auth_headers(auth_client, ADMIN)
     metrics = {"precision": 0.5, "recall": 0.4, "source": "synthetic unit test"}
     first = await _register(
-        auth_client, headers, "demo-yolo-v1", "1.0.0", evaluation_metrics=metrics
+        auth_client, headers, "test-yolo-v1", "1.0.0", evaluation_metrics=metrics
     )
     await _approve(auth_client, headers, first["id"])
     deployed_first = await auth_client.post(
@@ -85,7 +85,7 @@ async def test_model_deployment_and_rollback(auth_client):
     assert deployed_first.json()["status"] == "active"
 
     second = await _register(
-        auth_client, headers, "demo-yolo-v2", "2.0.0", evaluation_metrics=metrics
+        auth_client, headers, "test-yolo-v2", "2.0.0", evaluation_metrics=metrics
     )
     await _approve(auth_client, headers, second["id"])
     deployed_second = await auth_client.post(
@@ -96,8 +96,8 @@ async def test_model_deployment_and_rollback(auth_client):
 
     listed = await auth_client.get("/api/v1/models", headers=headers)
     by_code = {item["code"]: item for item in listed.json()["items"]}
-    assert by_code["demo-yolo-v1"]["status"] == "retired"
-    assert by_code["demo-yolo-v2"]["status"] == "active"
+    assert by_code["test-yolo-v1"]["status"] == "retired"
+    assert by_code["test-yolo-v2"]["status"] == "active"
 
     rollback = await auth_client.post(
         f"/api/v1/models/{first['id']}/deploy", headers=headers
@@ -105,8 +105,8 @@ async def test_model_deployment_and_rollback(auth_client):
     assert rollback.status_code == 200, rollback.text
     listed = await auth_client.get("/api/v1/models", headers=headers)
     by_code = {item["code"]: item for item in listed.json()["items"]}
-    assert by_code["demo-yolo-v1"]["status"] == "active"
-    assert by_code["demo-yolo-v2"]["status"] == "retired"
+    assert by_code["test-yolo-v1"]["status"] == "active"
+    assert by_code["test-yolo-v2"]["status"] == "retired"
 
     history = await auth_client.get(
         f"/api/v1/models/{first['id']}/history", headers=headers
@@ -116,12 +116,12 @@ async def test_model_deployment_and_rollback(auth_client):
     assert {"model.registered", "model.submitted", "model.approved", "model.deployed"} <= actions
 
 
-async def test_demo_model_bypasses_approval_flow(auth_client):
+async def test_sintetis_model_bypasses_approval_flow(auth_client):
     headers = await auth_headers(auth_client, ADMIN)
-    demo = await _register(
+    sintetis = await _register(
         auth_client,
         headers,
-        "demo-only-heuristic",
+        "synthetic-only-heuristic",
         "0.1.0",
         is_demo=True,
         dataset_version=None,
@@ -129,13 +129,13 @@ async def test_demo_model_bypasses_approval_flow(auth_client):
         class_names=[],
     )
     response = await auth_client.post(
-        f"/api/v1/models/{demo['id']}/submit", headers=headers
+        f"/api/v1/models/{sintetis['id']}/submit", headers=headers
     )
     assert response.status_code == 409
-    assert "demonstrasi" in response.json()["error"]["message"]
+    assert "sintetis" in response.json()["error"]["message"]
 
     deploy = await auth_client.post(
-        f"/api/v1/models/{demo['id']}/deploy", headers=headers
+        f"/api/v1/models/{sintetis['id']}/deploy", headers=headers
     )
     assert deploy.status_code == 409
 
@@ -146,8 +146,8 @@ async def test_registry_permissions_and_dataset_lifecycle(auth_client):
         "/api/v1/datasets",
         headers=inspector_headers,
         json={
-            "code": "demo-ds",
-            "name": "Dataset demo",
+            "code": "test-ds",
+            "name": "Dataset sintetis",
             "version": "1.0",
             "source": "unit test",
             "license_note": "synthetic only",
@@ -160,8 +160,8 @@ async def test_registry_permissions_and_dataset_lifecycle(auth_client):
         "/api/v1/datasets",
         headers=engineer_headers,
         json={
-            "code": "demo-ds",
-            "name": "Dataset demonstrasi sintetis",
+            "code": "test-ds",
+            "name": "Dataset sintetis sintetis",
             "version": "1.0.0",
             "source": "Pembuatan sintetis untuk pengujian",
             "license_note": "Hanya pengujian; bukan data KCIC",
@@ -179,7 +179,7 @@ async def test_registry_permissions_and_dataset_lifecycle(auth_client):
         "/api/v1/datasets",
         headers=engineer_headers,
         json={
-            "code": "demo-ds",
+            "code": "test-ds",
             "name": "Duplikat",
             "version": "1.0.1",
             "source": "unit test",
@@ -192,7 +192,7 @@ async def test_registry_permissions_and_dataset_lifecycle(auth_client):
         "/api/v1/datasets",
         headers=engineer_headers,
         json={
-            "code": "demo-ds-overflow",
+            "code": "test-ds-overflow",
             "name": "Pembagian tidak valid",
             "version": "1.0.0",
             "source": "unit test",
@@ -221,7 +221,7 @@ async def test_registry_permissions_and_dataset_lifecycle(auth_client):
     auditor_headers = await auth_headers(auth_client, AUDITOR)
     listed = await auth_client.get("/api/v1/datasets", headers=auditor_headers)
     assert listed.status_code == 200
-    assert listed.json()[0]["code"] == "demo-ds"
+    assert listed.json()[0]["code"] == "test-ds"
 
     auditor_write = await auth_client.post(
         f"/api/v1/datasets/{dataset_id}/approve",

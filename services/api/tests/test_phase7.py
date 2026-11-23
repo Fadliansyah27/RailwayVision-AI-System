@@ -1,14 +1,14 @@
 from tests.conftest import auth_headers
 
-ADMIN = "admin@demo.railwayvision.example"
-INSPECTOR = "inspector@demo.railwayvision.example"
-REVIEWER = "reviewer@demo.railwayvision.example"
-SUPERVISOR = "supervisor@demo.railwayvision.example"
-AUDITOR = "auditor@demo.railwayvision.example"
+ADMIN = "admin@sintetis.railwayvision.example"
+INSPECTOR = "inspector@sintetis.railwayvision.example"
+REVIEWER = "reviewer@sintetis.railwayvision.example"
+SUPERVISOR = "supervisor@sintetis.railwayvision.example"
+AUDITOR = "auditor@sintetis.railwayvision.example"
 
 FINDING = {
-    "title": "DEMO surface observation",
-    "description": "DEMO synthetic observation recorded for workflow testing only.",
+    "title": "SINTETIS surface observation",
+    "description": "SINTETIS synthetic observation recorded for workflow testing only.",
     "priority": "high",
 }
 
@@ -58,8 +58,8 @@ async def _create_work_order(client, headers, finding_id: str, assignee_id: str)
         headers=headers,
         json={
             "finding_id": finding_id,
-            "title": "DEMO corrective action",
-            "instructions": "DEMO instruction text. Not a KCIC procedure.",
+            "title": "SINTETIS corrective action",
+            "instructions": "SINTETIS instruction text. Not a KCIC procedure.",
             "assignee_id": assignee_id,
         },
     )
@@ -161,7 +161,7 @@ async def test_work_order_lifecycle_closes_finding(auth_client):
     completed = await auth_client.post(
         f"/api/v1/work-orders/{work_order['id']}/complete",
         headers=inspector_headers,
-        json={"notes": "DEMO corrective action completed; verification requested."},
+        json={"notes": "SINTETIS corrective action completed; verification requested."},
     )
     assert completed.status_code == 200, completed.text
     assert completed.json()["status"] == "awaiting_verification"
@@ -176,7 +176,7 @@ async def test_work_order_lifecycle_closes_finding(auth_client):
     verified = await auth_client.post(
         f"/api/v1/work-orders/{work_order['id']}/verify",
         headers=supervisor_headers,
-        json={"notes": "Completion independently verified for the demo record."},
+        json={"notes": "Completion independently verified for the sintetis record."},
     )
     assert verified.status_code == 200, verified.text
     assert verified.json()["status"] == "completed"
@@ -234,21 +234,21 @@ async def test_invalid_transitions_and_stale_versions(auth_client):
     stale_order = await auth_client.patch(
         f"/api/v1/work-orders/{work_order['id']}",
         headers=supervisor_headers,
-        json={"title": "DEMO stale edit", "version": work_order["version"]},
+        json={"title": "SINTETIS stale edit", "version": work_order["version"]},
     )
     assert stale_order.status_code == 409
 
     stale_finding = await auth_client.patch(
         f"/api/v1/findings/{finding['id']}",
         headers=reviewer_headers,
-        json={"title": "DEMO stale finding edit", "version": finding["version"]},
+        json={"title": "SINTETIS stale finding edit", "version": finding["version"]},
     )
     assert stale_finding.status_code == 409
 
     late_edit = await auth_client.patch(
         f"/api/v1/findings/{finding['id']}",
         headers=reviewer_headers,
-        json={"title": "DEMO late edit"},
+        json={"title": "SINTETIS late edit"},
     )
     assert late_edit.status_code == 409
 
@@ -274,7 +274,7 @@ async def test_work_order_cancel_reverts_finding(auth_client):
     cancelled = await auth_client.post(
         f"/api/v1/work-orders/{work_order['id']}/cancel",
         headers=supervisor_headers,
-        json={"notes": "DEMO cancellation; instruction withdrawn."},
+        json={"notes": "SINTETIS cancellation; instruction withdrawn."},
     )
     assert cancelled.status_code == 200, cancelled.text
     assert cancelled.json()["status"] == "cancelled"
@@ -302,11 +302,11 @@ async def test_finding_reject_and_reopen(auth_client):
     rejected = await auth_client.post(
         f"/api/v1/findings/{finding['id']}/reject",
         headers=reviewer_headers,
-        json={"notes": "Duplicate of an existing demo record."},
+        json={"notes": "Duplicate of an existing sintetis record."},
     )
     assert rejected.status_code == 200, rejected.text
     assert rejected.json()["status"] == "rejected"
-    assert rejected.json()["resolution_notes"] == "Duplicate of an existing demo record."
+    assert rejected.json()["resolution_notes"] == "Duplicate of an existing sintetis record."
 
     assignee_id = await _inspector_id(auth_client)
     blocked = await auth_client.post(
@@ -314,7 +314,7 @@ async def test_finding_reject_and_reopen(auth_client):
         headers=supervisor_headers,
         json={
             "finding_id": finding["id"],
-            "title": "DEMO blocked work order",
+            "title": "SINTETIS blocked work order",
             "assignee_id": assignee_id,
         },
     )
@@ -323,7 +323,7 @@ async def test_finding_reject_and_reopen(auth_client):
     reopened = await auth_client.post(
         f"/api/v1/findings/{finding['id']}/reopen",
         headers=reviewer_headers,
-        json={"notes": "Reopened after reassessing the demo evidence."},
+        json={"notes": "Reopened after reassessing the sintetis evidence."},
     )
     assert reopened.status_code == 200, reopened.text
     assert reopened.json()["status"] == "confirmed"
@@ -340,7 +340,7 @@ async def test_cross_scope_findings_are_hidden(auth_client):
     admin_headers = await auth_headers(auth_client, ADMIN)
     assets = await auth_client.get("/api/v1/assets?page_size=50", headers=admin_headers)
     south_asset = next(
-        item for item in assets.json()["items"] if item["code"] == "DEMO-AST-0003"
+        item for item in assets.json()["items"] if item["code"] == "SINTETIS-AST-0003"
     )
     created = await auth_client.post(
         "/api/v1/inspections",
@@ -359,7 +359,7 @@ async def test_cross_scope_findings_are_hidden(auth_client):
     )
     assert reviewed.status_code == 200, reviewed.text
     finding = await _create_finding(auth_client, supervisor_headers, created.json()["id"])
-    assert finding["scope"]["code"] == "DEMO-SOUTH"
+    assert finding["scope"]["code"] == "SINTETIS-SOUTH"
 
     reviewer_headers = await auth_headers(auth_client, REVIEWER)
     hidden = await auth_client.get(
@@ -373,7 +373,7 @@ async def test_cross_scope_findings_are_hidden(auth_client):
         headers=reviewer_headers,
         json={
             "finding_id": finding["id"],
-            "title": "DEMO cross-scope attempt",
+            "title": "SINTETIS cross-scope attempt",
             "assignee_id": assignee_id,
         },
     )
@@ -384,7 +384,7 @@ async def test_cross_scope_findings_are_hidden(auth_client):
         headers=supervisor_headers,
         json={
             "finding_id": finding["id"],
-            "title": "DEMO out-of-scope assignee",
+            "title": "SINTETIS out-of-scope assignee",
             "assignee_id": assignee_id,
         },
     )
@@ -397,7 +397,7 @@ async def test_assignee_candidates_follow_the_scope_subtree(auth_client):
         "/api/v1/work-orders/assignees", headers=supervisor_headers
     )
     assert candidates.status_code == 200, candidates.text
-    assert "DEMO-NORTH" in {item["scope"]["code"] for item in candidates.json()}
+    assert "SINTETIS-NORTH" in {item["scope"]["code"] for item in candidates.json()}
 
     admin_headers = await auth_headers(auth_client, ADMIN)
     users = await auth_client.get("/api/v1/users?page_size=50", headers=admin_headers)
@@ -405,7 +405,7 @@ async def test_assignee_candidates_follow_the_scope_subtree(auth_client):
     candidate_ids = {item["id"] for item in candidates.json()}
     assert by_email[INSPECTOR] in candidate_ids
     assert by_email[REVIEWER] in candidate_ids
-    assert by_email["ai@demo.railwayvision.example"] not in candidate_ids
+    assert by_email["ai@sintetis.railwayvision.example"] not in candidate_ids
 
     reviewer_headers = await auth_headers(auth_client, REVIEWER)
     denied = await auth_client.get(

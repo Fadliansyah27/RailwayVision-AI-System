@@ -334,7 +334,7 @@ class _GreetingCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              const DemoBadge(onBrand: true),
+              const SyntheticBadge(onBrand: true),
             ],
           ),
           const SizedBox(height: 6),

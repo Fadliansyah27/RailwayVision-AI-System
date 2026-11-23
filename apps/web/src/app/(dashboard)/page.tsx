@@ -23,7 +23,7 @@ const DELIVERY_STATUS = [
     status: "Selesai" as const,
   },
   {
-    module: "Bukti media dan pipeline AI demo",
+    module: "Bukti media dan pipeline AI sintetis",
     phase: "Fase 4",
     status: "Selesai" as const,
   },
@@ -65,7 +65,7 @@ export default function OverviewPage() {
       <PageHeader
         eyebrow="Ringkasan operasional"
         title="Ringkasan program inspeksi"
-        description="Satu ruang kerja untuk bukti inspeksi, penyaringan berbantuan AI, verifikasi manusia yang berwenang, dan pemantauan tindakan perbaikan. Antarmuka terhubung ke API langsung; catatan demonstrasi bersifat sintetis dan diberi label DEMO."
+        description="Satu ruang kerja untuk bukti inspeksi, penyaringan berbantuan AI, verifikasi manusia yang berwenang, dan pemantauan tindakan perbaikan. Antarmuka terhubung ke API langsung; catatan bersifat sintetis dan diberi label SINTETIS."
         actions={
           <>
             <Link
@@ -93,9 +93,9 @@ export default function OverviewPage() {
           melihat catatan pada cakupannya. Pemeriksa teknis mencatat temuan pada inspeksi yang telah
           ditinjau, supervisor menugaskan perintah kerja dengan transisi tervalidasi server, dan
           penerima tugas mendapat notifikasi dalam aplikasi. Setiap tindakan diaudit; bukti tetap
-          privat dengan verifikasi SHA-256, dan pipeline AI demo tetap diberi label jelas, tanpa
-          klaim deteksi kerusakan atau akurasi. Akun dan catatan demonstrasi bersifat sintetis dan
-          diberi label DEMO.
+          privat dengan verifikasi SHA-256, dan pipeline AI sintetis tetap diberi label jelas, tanpa
+          klaim deteksi kerusakan atau akurasi. Akun dan catatan yang ditampilkan di sini adalah
+          data sintetis berlabel SINTETIS, bukan data operasional KCIC.
         </p>
       </div>
 

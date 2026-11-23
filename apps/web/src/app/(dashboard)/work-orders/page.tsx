@@ -10,7 +10,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
-import { DemoBadge, Pagination, WorkOrderStatusChip } from "@/components/records";
+import { SyntheticBadge, Pagination, WorkOrderStatusChip } from "@/components/records";
 import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import {
   apiRequest,
@@ -306,7 +306,7 @@ export default function WorkOrdersPage() {
                           >
                             {workOrder.reference}
                           </Link>
-                          <DemoBadge reference={workOrder.reference} />
+                          <SyntheticBadge reference={workOrder.reference} />
                         </div>
                       </td>
                       <td className="max-w-72 px-5 py-3 text-ink">{workOrder.title}</td>

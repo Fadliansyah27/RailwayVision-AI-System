@@ -22,7 +22,7 @@ import {
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
 import {
-  DemoBadge,
+  SyntheticBadge,
   FindingPriorityChip,
   FindingStatusChip,
   WorkOrderStatusChip,
@@ -283,7 +283,7 @@ export default function FindingDetailPage() {
         title={
           <span className="inline-flex flex-wrap items-center gap-3">
             <span className="font-mono text-2xl">{finding.reference}</span>
-            <DemoBadge reference={finding.reference} />
+            <SyntheticBadge reference={finding.reference} />
             <FindingStatusChip status={finding.status} />
             <FindingPriorityChip priority={finding.priority} />
           </span>
@@ -464,7 +464,7 @@ export default function FindingDetailPage() {
                 </div>
                 <div>
                   <label className={labelClass} htmlFor="finding-priority">
-                    Prioritas (nilai DEMO sementara)
+                    Prioritas (nilai sintetis sementara)
                   </label>
                   <select
                     id="finding-priority"

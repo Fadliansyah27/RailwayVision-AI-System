@@ -78,13 +78,13 @@ WorkOrder _order({String status = 'open'}) {
     ),
     asset: const AssetOption(
       id: 'asset-1',
-      code: 'DEMO-TRK-001',
-      name: 'Jalur DEMO KM 12',
+      code: 'SINTETIS-TRK-001',
+      name: 'Jalur SINTETIS KM 12',
     ),
-    scopeName: 'Koridor DEMO Halim–Tegalluar',
+    scopeName: 'Koridor SINTETIS Halim–Tegalluar',
     assigneeId: 'user-1',
     assigneeName: 'Rina Pratiwi',
-    createdByName: 'Supervisor Demo',
+    createdByName: 'Supervisor Sintetis',
     completedAt: null,
     verifiedAt: null,
     createdAt: DateTime.utc(2026, 11, 23, 2, 0),
@@ -118,13 +118,13 @@ WorkOrder _copy(WorkOrder order, {required String status}) {
 SessionUser _supervisor() {
   return const SessionUser(
     id: 'user-1',
-    email: 'supervisor@demo.railwayvision.example',
+    email: 'supervisor@sintetis.railwayvision.example',
     fullName: 'Rina Pratiwi',
     scope: SessionScope(
       id: 'scope-1',
-      code: 'DEMO-HSR',
-      name: 'Koridor DEMO Halim–Tegalluar',
-      path: '/DEMO-HSR',
+      code: 'SINTETIS-HSR',
+      name: 'Koridor SINTETIS Halim–Tegalluar',
+      path: '/SINTETIS-HSR',
     ),
     roles: [SessionRole(code: 'supervisor', name: 'Supervisor')],
     permissions: {
@@ -162,7 +162,7 @@ void main() {
     expect(api.listCalls, 1);
     expect(find.text('WO-20261123-ABC123'), findsOneWidget);
     expect(find.text('Terbuka'), findsWidgets);
-    expect(find.textContaining('Jalur DEMO KM 12'), findsOneWidget);
+    expect(find.textContaining('Jalur SINTETIS KM 12'), findsOneWidget);
     expect(find.text('Ditugaskan ke saya'), findsOneWidget);
   });
 
@@ -192,13 +192,13 @@ void main() {
     final api = _FakeApi(items: [_order()]);
     const limitedUser = SessionUser(
       id: 'user-9',
-      email: 'auditor@demo.railwayvision.example',
-      fullName: 'Auditor Demo',
+      email: 'auditor@sintetis.railwayvision.example',
+      fullName: 'Auditor Sintetis',
       scope: SessionScope(
         id: 'scope-1',
-        code: 'DEMO-HSR',
-        name: 'Koridor DEMO Halim–Tegalluar',
-        path: '/DEMO-HSR',
+        code: 'SINTETIS-HSR',
+        name: 'Koridor SINTETIS Halim–Tegalluar',
+        path: '/SINTETIS-HSR',
       ),
       roles: [SessionRole(code: 'guest', name: 'Tamu')],
       permissions: {'inspections:read'},

@@ -8,12 +8,12 @@ from sqlalchemy.pool import StaticPool
 
 from app.db.base import Base
 from app.db.session import get_db
-from app.seed import seed_ai_registry, seed_demo_content, seed_rbac
+from app.seed import seed_ai_registry, seed_rbac, seed_synthetic_content
 from app.services.queue import task_queue_dependency
 from app.services.storage import storage_dependency
 from tests.conftest import FakeRedis
 
-PASSWORD = "Test-Demo-Password-2026"
+PASSWORD = "Test-Sintetis-Password-2026"
 
 PNG_1X1 = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
@@ -51,7 +51,7 @@ class FakeQueue:
     def __init__(self) -> None:
         self.jobs: list[str] = []
 
-    async def enqueue_demo_quality_check(self, job_id: str) -> None:
+    async def enqueue_synthetic_quality_check(self, job_id: str) -> None:
         self.jobs.append(job_id)
 
 
@@ -73,7 +73,7 @@ async def media_env(api_app):
     async with session_factory() as session:
         scopes = await seed_rbac(session)
         await seed_ai_registry(session)
-        await seed_demo_content(session, scopes)
+        await seed_synthetic_content(session, scopes)
         await session.commit()
 
     storage = FakeStorage()
@@ -124,7 +124,7 @@ async def _intent(
 
 async def test_media_upload_flow_and_download(media_env):
     client, storage, _, _ = media_env
-    headers = await _headers(client, "inspector@demo.railwayvision.example")
+    headers = await _headers(client, "inspector@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, headers)
 
     intent = await _intent(client, headers, inspection_id)
@@ -161,14 +161,14 @@ async def test_media_upload_flow_and_download(media_env):
     )
     assert "attachment" in downloaded.headers["content-disposition"]
 
-    reviewer = await _headers(client, "reviewer@demo.railwayvision.example")
+    reviewer = await _headers(client, "reviewer@sintetis.railwayvision.example")
     reviewer_read = await client.get(f"{MEDIA}/{media['id']}/content", headers=reviewer)
     assert reviewer_read.status_code == 200
 
 
 async def test_media_upload_rejects_checksum_mismatch_and_quarantines(media_env):
     client, storage, _, _ = media_env
-    headers = await _headers(client, "inspector@demo.railwayvision.example")
+    headers = await _headers(client, "inspector@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, headers)
 
     intent = await _intent(client, headers, inspection_id, sha="0" * 64)
@@ -191,7 +191,7 @@ async def test_media_upload_rejects_checksum_mismatch_and_quarantines(media_env)
     blocked = await client.get(f"{MEDIA}/{media['id']}/content", headers=headers)
     assert blocked.status_code == 409
 
-    admin = await _headers(client, "admin@demo.railwayvision.example")
+    admin = await _headers(client, "admin@sintetis.railwayvision.example")
     audit = await client.get(
         "/api/v1/audit-events?action=media.quarantined", headers=admin
     )
@@ -201,7 +201,7 @@ async def test_media_upload_rejects_checksum_mismatch_and_quarantines(media_env)
 
 async def test_upload_rejects_wrong_signature_and_size(media_env):
     client, storage, _, _ = media_env
-    headers = await _headers(client, "inspector@demo.railwayvision.example")
+    headers = await _headers(client, "inspector@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, headers)
 
     first = (await _intent(client, headers, inspection_id)).json()
@@ -234,7 +234,7 @@ async def test_upload_rejects_wrong_signature_and_size(media_env):
 
 async def test_upload_intent_validation(media_env):
     client, _, _, _ = media_env
-    headers = await _headers(client, "inspector@demo.railwayvision.example")
+    headers = await _headers(client, "inspector@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, headers)
 
     too_large = await _intent(client, headers, inspection_id, size=10_485_761)
@@ -249,9 +249,9 @@ async def test_upload_intent_validation(media_env):
 
 async def test_media_permissions_and_scope(media_env):
     client, _, _, _ = media_env
-    inspector = await _headers(client, "inspector@demo.railwayvision.example")
-    auditor = await _headers(client, "auditor@demo.railwayvision.example")
-    admin = await _headers(client, "admin@demo.railwayvision.example")
+    inspector = await _headers(client, "inspector@sintetis.railwayvision.example")
+    auditor = await _headers(client, "auditor@sintetis.railwayvision.example")
+    admin = await _headers(client, "admin@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, inspector)
 
     denied = await _intent(client, auditor, inspection_id)
@@ -261,7 +261,7 @@ async def test_media_permissions_and_scope(media_env):
         "/api/v1/assets?status=active", headers=admin
     )
     south_asset = next(
-        item for item in south_assets.json()["items"] if item["code"] == "DEMO-AST-0003"
+        item for item in south_assets.json()["items"] if item["code"] == "SINTETIS-AST-0003"
     )
     created = await client.post(
         INS,
@@ -285,9 +285,9 @@ async def test_media_permissions_and_scope(media_env):
 
 async def test_ai_job_requires_ready_media_and_dedupes(media_env):
     client, _, queue, _ = media_env
-    headers = await _headers(client, "inspector@demo.railwayvision.example")
-    reviewer = await _headers(client, "reviewer@demo.railwayvision.example")
-    auditor = await _headers(client, "auditor@demo.railwayvision.example")
+    headers = await _headers(client, "inspector@sintetis.railwayvision.example")
+    reviewer = await _headers(client, "reviewer@sintetis.railwayvision.example")
+    auditor = await _headers(client, "auditor@sintetis.railwayvision.example")
     inspection_id = await _seed_inspection_id(client, headers)
     media = (await _intent(client, headers, inspection_id)).json()
 
@@ -313,7 +313,7 @@ async def test_ai_job_requires_ready_media_and_dedupes(media_env):
     assert created.status_code == 201, created.text
     job = created.json()
     assert job["status"] == "queued"
-    assert job["model"]["code"] == "demo-image-quality"
+    assert job["model"]["code"] == "synthetic-image-quality"
     assert queue.jobs == [job["id"]]
 
     duplicate = await client.post(
@@ -331,9 +331,9 @@ async def test_ai_job_requires_ready_media_and_dedupes(media_env):
 
 async def test_model_registry_permissions(media_env):
     client, _, _, _ = media_env
-    inspector = await _headers(client, "inspector@demo.railwayvision.example")
-    reviewer = await _headers(client, "reviewer@demo.railwayvision.example")
-    admin = await _headers(client, "admin@demo.railwayvision.example")
+    inspector = await _headers(client, "inspector@sintetis.railwayvision.example")
+    reviewer = await _headers(client, "reviewer@sintetis.railwayvision.example")
+    admin = await _headers(client, "admin@sintetis.railwayvision.example")
 
     listed = await client.get("/api/v1/models", headers=reviewer)
     assert listed.status_code == 200
@@ -343,7 +343,7 @@ async def test_model_registry_permissions(media_env):
     denied = await client.post(
         "/api/v1/models",
         headers=inspector,
-        json={"code": "demo-extra", "name": "Demo extra", "version": "0.1"},
+        json={"code": "sintetis-extra", "name": "Sintetis extra", "version": "0.1"},
     )
     assert denied.status_code == 403
 
@@ -351,8 +351,8 @@ async def test_model_registry_permissions(media_env):
         "/api/v1/models",
         headers=admin,
         json={
-            "code": "demo-extra",
-            "name": "Demo extra",
+            "code": "sintetis-extra",
+            "name": "Sintetis extra",
             "version": "0.1",
             "description": "Registry test entry",
         },
@@ -362,6 +362,6 @@ async def test_model_registry_permissions(media_env):
     duplicate = await client.post(
         "/api/v1/models",
         headers=admin,
-        json={"code": "demo-extra", "name": "Demo extra", "version": "0.2"},
+        json={"code": "sintetis-extra", "name": "Sintetis extra", "version": "0.2"},
     )
     assert duplicate.status_code == 409

@@ -5,7 +5,7 @@ penyaringan visual berbantuan AI dan validasi manusia.**
 
 > RailwayVision AI merupakan proyek sistem pendukung inspeksi infrastruktur perkeretaapian. Repository ini bukan representasi kebijakan, SOP, atau sistem resmi PT Kereta Cepat Indonesia China (KCIC), dan publikasinya tidak menyatakan adanya persetujuan atau afiliasi resmi KCIC. Seluruh penggunaan pada lingkungan operasional memerlukan validasi, otorisasi, pengujian, dan persetujuan pihak yang berwenang.
 
-Status repository: **prototipe pengembangan lokal (0.7.0 + pekerjaan pasca-rilis)**.
+Status repository: **prototipe pengembangan lokal (0.8.0)**.
 Tidak ada klaim kesiapan produksi, akurasi AI, maupun persetujuan KCIC.
 
 ---
@@ -37,7 +37,7 @@ keputusan keselamatan otomatis.
   atau sistem operasi kritis perkeretaapian.
 - Kategori kerusakan, severity, toleransi, checklist, dan interval inspeksi menunggu
   validasi KCIC (`PENDING_KCIC_VALIDATION`).
-- Seluruh data contoh bersifat sintetis dan diberi label `DEMO`.
+- Seluruh data contoh bersifat sintetis dan diberi label `SINTETIS`.
 
 ## 3. Tujuan sistem
 
@@ -75,11 +75,15 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
   template checklist inspeksi.
 - Register model AI dan dataset: pengajuan, persetujuan/penolakan bercatatan,
   penerapan (deploy) dan pensiun model, riwayat siklus hidup.
+- Konsol operasi (`/operations`): riwayat job AI sesuai cakupan, penampil log terbatas
+  peran dengan redaksi rahasia, riwayat deployment manual, status backup yang dilaporkan
+  apa adanya, dan reset data sintetis dengan frasa konfirmasi. Hanya untuk peran dengan
+  `audit:read`/`ops:manage`.
 
 ### API (`services/api`)
 
 - FastAPI + SQLAlchemy 2.0 async + Pydantic v2 + Alembic.
-- RBAC 6 peran dan 22 izin; otorisasi tingkat objek dan cakupan hierarkis.
+- RBAC 6 peran dan 23 izin; otorisasi tingkat objek dan cakupan hierarkis.
 - Transisi status inspeksi, temuan, dan perintah kerja divalidasi di backend.
 - Audit trail hanya-tambah untuk peristiwa autentikasi dan alur kerja material.
 - Media privat melalui MinIO (S3-compatible) dengan validasi tipe, ukuran, signature,
@@ -89,8 +93,8 @@ Yang benar-benar tersedia dan telah diuji secara lokal:
 ### Worker AI (`services/ai-worker`)
 
 - Celery worker dengan heartbeat.
-- Pipeline **demo** bernama `demo-image-quality` yang menghitung metrik kualitas gambar
-  deterministik (luminansi, kontras, variansi tepi).
+- Pipeline **sintetis** bernama `synthetic-image-quality` yang menghitung metrik kualitas
+  gambar deterministik (luminansi, kontras, variansi tepi).
 - **Bukan** pendeteksi kerusakan, tidak mengklaim akurasi, dan tidak digunakan untuk
   keputusan keselamatan.
 
@@ -118,7 +122,7 @@ apps/web (Next.js) ───────┐
 apps/mobile (Flutter) ────┘             │
                                         ├──► Redis 7.4 (queue, cache, heartbeat)
                                         ├──► MinIO (media privat, karantina)
-                                        └──► services/ai-worker (Celery, demo)
+                                        └──► services/ai-worker (Celery, sintetis)
 ```
 
 - Komunikasi web → API melalui proxy same-origin Next.js (`/api/v1`, `/health`) agar
@@ -154,7 +158,7 @@ apps/mobile (Flutter) ────┘             │
 │   │   │                    # dashboard, reports, ai_registry, users, audit, ...
 │   │   ├── app/core/        # konfigurasi, RBAC, workflow, error handling
 │   │   └── alembic/versions/
-│   └── ai-worker/           # Celery worker + heuristik demo
+│   └── ai-worker/           # Celery worker + heuristik sintetis
 ├── docs/                    # dokumentasi fase, arsitektur, audit, test report
 ├── .github/workflows/ci.yml # pipeline CI
 ├── docker-compose.yml
@@ -187,17 +191,17 @@ Akses:
 - API: <http://127.0.0.1:8000>
 - Swagger/OpenAPI (lingkungan lokal): <http://127.0.0.1:8000/docs>
 
-Akun demo (hanya ada bila `SEED_DEMO_DATA=true` dan `DEMO_SEED_PASSWORD` diisi):
+Akun sintetis (hanya ada bila `SEED_SYNTHETIC_DATA=true` dan `SEED_PASSWORD` diisi):
 
-- `admin@demo.railwayvision.example`
-- `inspector@demo.railwayvision.example`
-- `reviewer@demo.railwayvision.example`
-- `supervisor@demo.railwayvision.example`
-- `ai@demo.railwayvision.example`
-- `auditor@demo.railwayvision.example`
+- `admin@sintetis.railwayvision.example`
+- `inspector@sintetis.railwayvision.example`
+- `reviewer@sintetis.railwayvision.example`
+- `supervisor@sintetis.railwayvision.example`
+- `ai@sintetis.railwayvision.example`
+- `auditor@sintetis.railwayvision.example`
 
-Kata sandi diambil dari `DEMO_SEED_PASSWORD` di `.env` Anda. Jangan pernah mengaktifkan
-seed demo di lingkungan yang dapat diakses publik.
+Kata sandi diambil dari `SEED_PASSWORD` di `.env` Anda. Jangan pernah mengaktifkan
+seed sintetis di lingkungan yang dapat diakses publik.
 
 ## 10. Konfigurasi environment
 
@@ -210,12 +214,12 @@ seed demo di lingkungan yang dapat diakses publik.
 | `REDIS_URL`, `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND` | Redis dan antrean |
 | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_*_BUCKET` | Penyimpanan objek privat |
 | `MEDIA_MAX_BYTES` | Batas ukuran unggahan media |
-| `DEMO_AI_ENABLED` | Mengaktifkan pipeline AI demo (lokal) |
+| `SYNTHETIC_AI_ENABLED` | Mengaktifkan pipeline AI sintetis (lokal) |
 | `NEXT_PUBLIC_API_BASE_URL` | Kosongkan untuk proxy same-origin |
 | `CORS_ALLOWED_ORIGINS` | Origin web yang diizinkan |
 | `JWT_SECRET`, `ACCESS_TOKEN_MINUTES`, `REFRESH_TOKEN_DAYS` | Token |
 | `ENABLE_HSTS`, `MAX_JSON_BODY_BYTES` | Pengerasan API |
-| `SEED_DEMO_DATA`, `DEMO_SEED_PASSWORD` | Seed akun/data demo lokal |
+| `SEED_SYNTHETIC_DATA`, `SEED_PASSWORD` | Seed akun/data sintetis lokal |
 
 Aturan: **jangan commit `.env`**, gunakan secret manager di lingkungan non-lokal, dan
 jangan menggunakan nilai contoh di luar local development.
@@ -229,7 +233,7 @@ make migrate                                  # atau:
 docker compose exec api alembic upgrade head
 ```
 
-Revisi terbaru: `8f1c2d3e4a50` (siklus hidup model AI + registri dataset).
+Revisi terbaru: `d1e2f3a4b5c6` (pelabelan ulang baris sintetis + izin konsol operasi).
 Membuat migrasi baru:
 
 ```bash
@@ -290,7 +294,7 @@ docker compose logs -f ai-worker
 ```
 
 Worker menulis heartbeat ke Redis (`rvai:worker:heartbeat`) dan memproses job dari
-antrean Celery. Pipeline yang terdaftar adalah **demo kualitas gambar**, bukan deteksi
+antrean Celery. Pipeline yang terdaftar adalah **heuristik kualitas gambar sintetis**, bukan deteksi
 kerusakan. Jangan menambahkan model yang belum disetujui ke lingkungan operasional.
 
 ## 16. Cara menjalankan testing
@@ -319,13 +323,13 @@ flutter test
 
 Hasil verifikasi lokal terakhir (2026-11-23):
 
-- API: **77 tes lulus**, ruff bersih.
+- API: **83 tes lulus**, ruff bersih.
 - AI worker: **8 tes lulus**.
-- Web: **38 tes lulus**, TypeScript dan ESLint bersih.
-- Seluler: `flutter analyze` bersih, **11 tes Flutter lulus**, `flutter build web` release
-  berhasil, dan **smoke test lapisan API live lulus** (login, kesiapan, inspeksi, detail,
-  perintah kerja, aset, logout) pada stack Compose lokal.
-- Build container `api` dan `web` berhasil; seluruh layanan Compose healthy.
+- Web: **39 tes lulus**, TypeScript dan ESLint bersih.
+- Seluler: `flutter analyze` bersih, **11 tes Flutter lulus**; smoke test lapisan API live
+  lulus pada eksekusi sebelumnya terhadap stack Compose lokal (pada eksekusi terakhir
+  dilewati karena `SEED_PASSWORD` tidak diekspor di shell pengujian).
+- Build container `api`, `ai-worker`, dan `web` berhasil; seluruh layanan Compose healthy.
 
 Angka di atas adalah hasil eksekusi lokal, bukan sertifikasi. Lihat
 `docs/TEST_REPORT.md` dan laporan fase untuk rincian historis.
@@ -345,7 +349,7 @@ akses ke objek di luar cakupan (respons `404` untuk objek lintas cakupan).
 - Kata sandi di-hash Argon2id; akses JWT berumur pendek (15 menit) dengan refresh token
   opaque yang dirotasi dan dapat dicabut.
 - Pembatasan laju login (5 kegagalan / 300 detik).
-- RBAC 6 peran / 22 izin dari PostgreSQL, ditambah pembatasan cakupan hierarkis.
+- RBAC 6 peran / 23 izin dari PostgreSQL, ditambah pembatasan cakupan hierarkis.
 - Bukti media disimpan privat; akses melalui API yang diaudit, dengan checksum dan
   karantina untuk berkas tidak valid.
 - Header keamanan, batas ukuran body JSON, CORS terbatas, dan audit trail hanya-tambah.
@@ -356,17 +360,14 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
 
 ## 19. Roadmap
 
-1. Konsol operasi sistem: riwayat job AI, log terbatas peran, riwayat deployment,
-   dan status backup.
-2. Reset data DEMO yang aman (hanya data demo, tidak pernah data operasional).
-3. Transport notifikasi tambahan (email/WhatsApp) sesuai kebijakan KCIC.
-4. Aplikasi lapangan Flutter: otomasi UI ujung-ke-ujung dan pengujian perangkat fisik,
+1. Transport notifikasi tambahan (email/WhatsApp) sesuai kebijakan KCIC.
+2. Aplikasi lapangan Flutter: otomasi UI ujung-ke-ujung dan pengujian perangkat fisik,
    lalu perluasan ke notifikasi dan perintah kerja lapangan.
-5. Alat anotasi dan manajemen dataset yang terhubung ke registri.
-6. Model AI terotorisasi dengan evaluasi terukur, setelah dataset dan protokol evaluasi
+3. Alat anotasi dan manajemen dataset yang terhubung ke registri.
+4. Model AI terotorisasi dengan evaluasi terukur, setelah dataset dan protokol evaluasi
    disetujui pemilik data.
-7. Pengujian integrasi, keamanan, dan beban yang lebih luas; UAT terdokumentasi.
-8. Gerbang kesiapan produksi (deployment, backup/DR, monitoring, persetujuan KCIC).
+5. Pengujian integrasi, keamanan, dan beban yang lebih luas; UAT terdokumentasi.
+6. Gerbang kesiapan produksi (deployment, backup/DR, monitoring, persetujuan KCIC).
 
 ## 20. Status implementasi
 
@@ -375,11 +376,11 @@ Cara melaporkan kerentanan: lihat [`SECURITY.md`](SECURITY.md) dan
 | 1 | Fondasi monorepo, Docker, CI | Selesai (lokal) |
 | 2 | Autentikasi, RBAC, cakupan, audit, pemulihan kata sandi | Selesai (lokal) |
 | 3 | Register aset dan workflow inspeksi 9 status | Selesai (lokal) |
-| 4 | Bukti media privat dan pipeline AI demo | Selesai (lokal) |
+| 4 | Bukti media privat dan pipeline AI sintetis | Selesai (lokal) |
 | 5 | Model AI terotorisasi dan evaluasi | Registri + konsol tersedia; model nyata **belum ada** |
 | 6 | Verifikasi manusia dan tinjauan bukti | Selesai (lokal) |
 | 7 | Temuan, perintah kerja, notifikasi | Selesai (lokal) |
-| 8 | Dasbor KPI, laporan PDF/Excel, registri model & dataset | Tersedia (lokal); operasi sistem lain dalam pengerjaan |
+| 8 | Dasbor KPI, laporan PDF/Excel, registri model & dataset, konsol operasi | Selesai (lokal, 0.8.0) |
 | 9 | Aplikasi lapangan Flutter (inspeksi, bukti, perintah kerja) | Fase B–C tersedia (lokal), teruji widget + lapisan API live; otomasi UI/perangkat **belum** |
 | 10 | Pengujian integrasi/keamanan menyeluruh dan UAT | Sebagian; UAT resmi **belum dilakukan** |
 
@@ -389,13 +390,13 @@ persetujuan KCIC, dan UAT resmi terpenuhi.
 ## 21. Batasan proyek
 
 - Tidak ada model AI terlatih, dataset resmi, taksonomi kerusakan resmi, bounding box,
-  severity, confidence, atau metrik akurasi. Pipeline demo hanya menghitung kualitas gambar.
+  severity, confidence, atau metrik akurasi. Pipeline sintetis hanya menghitung kualitas gambar.
 - Tidak ada integrasi SSO/OIDC resmi; adapter autentikasi lokal bersifat sementara.
 - Tidak ada pengiriman email/SMS; tautan reset kata sandi disalin manual dari UI admin.
 - Aplikasi seluler belum siap untuk lapangan.
 - Tidak ada fungsi kendali/persinyalan/keselamatan kritis, dan tidak akan ditambahkan
   tanpa kajian keselamatan serta persetujuan khusus.
-- Tidak ada data KCIC. Semua data contoh sintetis dan berlabel DEMO.
+- Tidak ada data KCIC. Semua data contoh sintetis dan berlabel SINTETIS.
 - Verifikasi dilakukan pada stack lokal, bukan infrastruktur KCIC.
 - Tidak ada klaim kepatuhan terhadap SOP, standar, atau regulasi tertentu.
 

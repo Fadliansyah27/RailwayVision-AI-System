@@ -17,7 +17,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/admin/form-styles";
-import { DemoBadge, InspectionStatusChip, Pagination } from "@/components/records";
+import { SyntheticBadge, InspectionStatusChip, Pagination } from "@/components/records";
 import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
 import {
   apiRequest,
@@ -136,7 +136,7 @@ export default function InspectionsPage() {
       <PageHeader
         eyebrow="Operasional · Fase 6"
         title="Inspeksi"
-        description="Buat draf, kirim, dan pantau catatan inspeksi dalam cakupan organisasi Anda. Unggahan bukti diverifikasi integritasnya; pipeline demo berlabel jelas menguji antrean pekerjaan AI tanpa melakukan deteksi kerusakan."
+        description="Buat draf, kirim, dan pantau catatan inspeksi dalam cakupan organisasi Anda. Unggahan bukti diverifikasi integritasnya; pipeline sintetis berlabel jelas menguji antrean pekerjaan AI tanpa melakukan deteksi kerusakan."
         actions={
           canWrite ? (
             <Link href="/inspections/new" className={primaryButtonClass}>
@@ -313,7 +313,7 @@ export default function InspectionsPage() {
                           >
                             {inspection.reference}
                           </Link>
-                          <DemoBadge reference={inspection.reference} />
+                          <SyntheticBadge reference={inspection.reference} />
                         </div>
                       </td>
                       <td className="px-5 py-3">

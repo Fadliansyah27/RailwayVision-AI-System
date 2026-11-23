@@ -80,6 +80,18 @@ describe("navigation visibility", () => {
     expect(canSeeItem(modelRegistry, ["supervisor"])).toBe(false);
   });
 
+  it("restricts the operations console to audit and administrator roles", () => {
+    const operations = findItem("Konsol Operasi");
+    expect(operations.available).toBe(true);
+    expect(operations.href).toBe("/operations");
+    expect(canSeeItem(operations, ["administrator"])).toBe(true);
+    expect(canSeeItem(operations, ["auditor"])).toBe(true);
+    expect(canSeeItem(operations, ["supervisor"])).toBe(true);
+    expect(canSeeItem(operations, ["inspector"])).toBe(false);
+    expect(canSeeItem(operations, ["reviewer"])).toBe(false);
+    expect(canSeeItem(operations, ["ai_ml_engineer"])).toBe(false);
+  });
+
   it("restricts administration to administrators", () => {
     const administration = findItem("Administrasi");
     expect(canSeeItem(administration, ["administrator"])).toBe(true);

@@ -244,7 +244,7 @@ export function ChecklistTemplates({ token }: { token: string }) {
       <Card>
         <CardHeader
           title="Buat template baru"
-          description="Item checklist ditulis sesuai SOP KCIC setelah disetujui; data DEMO ini bukan SOP resmi."
+          description="Item checklist ditulis sesuai SOP KCIC setelah disetujui; data sintetis ini bukan SOP resmi."
         />
         <form className="grid gap-4 p-5" onSubmit={createTemplate} noValidate>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -271,7 +271,7 @@ export function ChecklistTemplates({ token }: { token: string }) {
                 className={`${inputClass} mt-1.5`}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Checklist jalur rutin (DEMO)"
+                placeholder="Checklist jalur rutin (SINTETIS)"
                 maxLength={160}
                 required
               />
@@ -340,7 +340,7 @@ export function ChecklistTemplates({ token }: { token: string }) {
                   className={inputClass}
                   value={item.label}
                   onChange={(event) => updateItem(index, { label: event.target.value })}
-                  placeholder="Permukaan jalur bebas dari retak terbuka (DEMO)"
+                  placeholder="Permukaan jalur bebas dari retak terbuka (SINTETIS)"
                   maxLength={200}
                 />
                 <label className="flex items-center gap-1.5 text-[11px] text-secondary">
