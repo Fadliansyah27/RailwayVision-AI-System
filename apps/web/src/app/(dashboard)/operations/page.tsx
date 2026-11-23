@@ -8,7 +8,7 @@ import { BackupStatusPanel } from "@/components/operations/backup-status-panel";
 import { DeploymentHistory } from "@/components/operations/deployment-history";
 import { OpsLogViewer } from "@/components/operations/ops-log-viewer";
 import { SyntheticResetPanel } from "@/components/operations/synthetic-reset-panel";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, PageHeader, TabBar, TabButton } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 
 type Tab = "jobs" | "logs" | "deployments" | "backup" | "reset";
@@ -78,31 +78,17 @@ export default function OperationsPage() {
         description="Jejak pekerjaan AI, log terbatas per peran, riwayat deployment, status backup, dan reset data sintetis. Tidak ada status yang diklaim sehat tanpa bukti dari sumbernya."
       />
 
-      <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Bagian konsol operasi">
+      <TabBar label="Bagian konsol operasi">
         {tabs.map((item) => (
-          <button
+          <TabButton
             key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
+            active={tab === item.id}
             onClick={() => setTab(item.id)}
-            className={`rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
-              tab === item.id
-                ? "border-primary bg-primary text-white"
-                : "border-border bg-surface text-ink hover:bg-canvas"
-            }`}
-          >
-            <span className="block font-semibold">{item.label}</span>
-            <span
-              className={`block text-[10px] ${
-                tab === item.id ? "text-white/75" : "text-secondary"
-              }`}
-            >
-              {item.description}
-            </span>
-          </button>
+            title={item.label}
+            description={item.description}
+          />
         ))}
-      </div>
+      </TabBar>
 
       {tab === "jobs" ? <AIJobHistory token={token} /> : null}
       {tab === "logs" ? <OpsLogViewer token={token} /> : null}

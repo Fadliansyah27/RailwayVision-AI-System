@@ -147,7 +147,7 @@ export default function InspectionsPage() {
         }
       />
 
-      <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-soft px-4 py-3">
+      <div className="flex items-start gap-3 rounded-2xl border border-warning/25 bg-warning-soft/80 px-4 py-3.5 shadow-[var(--rv-shadow-xs)]">
         <Info className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
         <p className="text-sm leading-6 text-ink">
           <span className="font-semibold">Hanya catatan inspeksi.</span> Entri ini mendokumentasikan
@@ -167,9 +167,13 @@ export default function InspectionsPage() {
             },
             { label: "Telah Ditinjau", value: stats.counts.reviewed ?? 0 },
           ].map((item) => (
-            <Card key={item.label} className="p-4">
-              <p className="text-xs font-medium text-secondary">{item.label}</p>
-              <p className="mt-2 font-mono text-2xl font-semibold text-ink">{item.value}</p>
+            <Card key={item.label} className="rv-card-hover p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">
+                {item.label}
+              </p>
+              <p className="mt-2 font-mono text-[1.75rem] font-semibold leading-none tracking-tight text-ink">
+                {item.value}
+              </p>
             </Card>
           ))}
         </div>
@@ -279,9 +283,9 @@ export default function InspectionsPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px] text-left text-sm">
+              <table className="rv-table min-w-[820px]">
                 <thead>
-                  <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
+                  <tr>
                     <th scope="col" className="px-5 py-3 font-semibold">
                       Referensi
                     </th>
@@ -304,8 +308,8 @@ export default function InspectionsPage() {
                 </thead>
                 <tbody>
                   {data.items.map((inspection) => (
-                    <tr key={inspection.id} className="border-b border-border last:border-0">
-                      <td className="px-5 py-3">
+                    <tr key={inspection.id}>
+                      <td className="px-5 py-3.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <Link
                             href={`/inspections/${inspection.id}`}
@@ -316,7 +320,7 @@ export default function InspectionsPage() {
                           <SyntheticBadge reference={inspection.reference} />
                         </div>
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-5 py-3.5">
                         <Link
                           href={`/assets/${inspection.asset.id}`}
                           className="text-ink hover:text-primary"
@@ -335,7 +339,7 @@ export default function InspectionsPage() {
                       <td className="px-5 py-3 text-secondary">
                         {formatDateTime(inspection.inspected_at)}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-5 py-3.5">
                         <InspectionStatusChip status={inspection.status} />
                       </td>
                     </tr>

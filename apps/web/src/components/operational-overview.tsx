@@ -37,21 +37,32 @@ function KpiCard({
   href: string;
 }) {
   return (
-    <Card className="p-5">
+    <Card className="rv-card-hover group relative overflow-hidden p-5">
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary/50 via-primary/10 to-transparent"
+      />
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-secondary">{label}</p>
-        <Icon className="size-4 text-primary/70" aria-hidden="true" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">
+          {label}
+        </p>
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary ring-1 ring-primary/10">
+          <Icon className="size-4" aria-hidden="true" />
+        </span>
       </div>
-      <p className="mt-3 font-mono text-3xl font-semibold tracking-tight text-ink">
+      <p className="mt-4 font-mono text-[1.9rem] font-semibold leading-none tracking-tight text-ink">
         {formatNumber(value)}
       </p>
-      <p className="mt-2 text-xs leading-5 text-secondary">{hint}</p>
+      <p className="mt-2.5 text-xs leading-5 text-secondary">{hint}</p>
       <Link
         href={href}
         className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-strong"
       >
         Lihat detail
-        <ArrowRight className="size-3" aria-hidden="true" />
+        <ArrowRight
+          className="size-3 transition-transform group-hover:translate-x-0.5"
+          aria-hidden="true"
+        />
       </Link>
     </Card>
   );
@@ -72,11 +83,14 @@ function TrendChart({ overview }: { overview: DashboardOverview }) {
             <span className="text-[11px] font-medium text-ink">
               {formatNumber(point.count)}
             </span>
-            <div className="flex h-28 w-full items-end rounded bg-canvas/70">
+            <div className="flex h-28 w-full items-end rounded-lg bg-canvas/70">
               <div
-                className={`w-full rounded-t ${point.count ? "bg-primary" : "bg-border"}`}
+                className={`w-full rounded-t-md transition-all duration-300 ${
+                  point.count ? "bg-primary" : "bg-border"
+                }`}
                 style={{
                   height: point.count ? `${Math.max((point.count / max) * 100, 6)}%` : "3%",
+                  backgroundImage: point.count ? "var(--rv-gradient-primary)" : undefined,
                 }}
               />
             </div>
@@ -116,10 +130,13 @@ function DistributionList({
               {formatNumber(entry.count)}
             </span>
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-canvas">
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-canvas">
             <div
-              className="h-full rounded-full bg-primary/70"
-              style={{ width: `${(entry.count / max) * 100}%` }}
+              className="h-full rounded-full bg-primary/70 transition-all duration-300"
+              style={{
+                width: `${(entry.count / max) * 100}%`,
+                backgroundImage: "var(--rv-gradient-primary)",
+              }}
             />
           </div>
         </li>
@@ -171,11 +188,7 @@ export function OperationalOverview() {
         >
           {error}
         </p>
-        <button
-          type="button"
-          onClick={() => void load()}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-ink hover:bg-canvas"
-        >
+        <button type="button" onClick={() => void load()} className="rv-btn-subtle mt-3">
           <RefreshCw className="size-3.5" aria-hidden="true" />
           Coba lagi
         </button>
@@ -264,11 +277,7 @@ export function OperationalOverview() {
             title="Tren inspeksi"
             description="Jumlah inspeksi berdasarkan tanggal inspeksi, enam bulan terakhir (WIB)."
             actions={
-              <button
-                type="button"
-                onClick={() => void load()}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink hover:bg-canvas"
-              >
+              <button type="button" onClick={() => void load()} className="rv-btn-subtle">
                 <RefreshCw className="size-3" aria-hidden="true" />
                 Muat ulang
               </button>
@@ -327,9 +336,9 @@ export function OperationalOverview() {
             />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-left text-sm">
+              <table className="rv-table min-w-[560px]">
                 <thead>
-                  <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
+                  <tr>
                     <th scope="col" className="px-5 py-2.5 font-semibold">
                       Referensi
                     </th>
@@ -346,10 +355,7 @@ export function OperationalOverview() {
                 </thead>
                 <tbody>
                   {overview.recent_inspections.map((inspection) => (
-                    <tr
-                      key={inspection.id}
-                      className="border-b border-border last:border-0"
-                    >
+                    <tr key={inspection.id}>
                       <td className="px-5 py-2.5">
                         <Link
                           href={`/inspections/${inspection.id}`}

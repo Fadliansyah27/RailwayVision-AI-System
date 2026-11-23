@@ -62,7 +62,7 @@ export function ScopeManagement({
           description="Batas visibilitas hierarkis. Pengguna hanya dapat menjangkau catatan pada atau di bawah jalur cakupannya."
         />
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-sm">
+          <table className="rv-table min-w-[520px]">
             <thead>
               <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
                 <th scope="col" className="px-5 py-3 font-semibold">

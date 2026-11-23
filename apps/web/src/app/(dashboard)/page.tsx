@@ -68,24 +68,18 @@ export default function OverviewPage() {
         description="Satu ruang kerja untuk bukti inspeksi, penyaringan berbantuan AI, verifikasi manusia yang berwenang, dan pemantauan tindakan perbaikan. Antarmuka terhubung ke API langsung; catatan bersifat sintetis dan diberi label SINTETIS."
         actions={
           <>
-            <Link
-              href="/inspections"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-strong"
-            >
+            <Link href="/inspections" className="rv-btn-primary">
               Buka inspeksi
               <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
-            <Link
-              href="/system-status"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-semibold text-ink hover:bg-canvas"
-            >
+            <Link href="/system-status" className="rv-btn-secondary">
               Lihat status sistem
             </Link>
           </>
         }
       />
 
-      <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-soft px-4 py-3">
+      <div className="flex items-start gap-3 rounded-2xl border border-warning/25 bg-warning-soft/80 px-4 py-3.5 shadow-[var(--rv-shadow-xs)]">
         <Info className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
         <p className="text-sm leading-6 text-ink">
           <span className="font-semibold">Angka dasbor dihitung langsung dari PostgreSQL.</span>{" "}
@@ -135,9 +129,9 @@ export default function OverviewPage() {
             description="Modul tersedia hanya setelah gerbang penerimaannya terverifikasi."
           />
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="rv-table">
               <thead>
-                <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
+                <tr>
                   <th scope="col" className="px-5 py-3 font-semibold">
                     Modul
                   </th>
@@ -151,7 +145,7 @@ export default function OverviewPage() {
               </thead>
               <tbody>
                 {DELIVERY_STATUS.map((row) => (
-                  <tr key={row.module} className="border-b border-border last:border-0">
+                  <tr key={row.module}>
                     <td className="px-5 py-3 text-ink">{row.module}</td>
                     <td className="px-5 py-3 font-mono text-xs text-secondary">{row.phase}</td>
                     <td className="px-5 py-3">

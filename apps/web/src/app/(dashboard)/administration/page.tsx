@@ -8,7 +8,7 @@ import { PasswordResetManagement } from "@/components/admin/password-reset-manag
 import { RoleManagement } from "@/components/admin/role-management";
 import { ScopeManagement } from "@/components/admin/scope-management";
 import { UserManagement } from "@/components/admin/user-management";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, PageHeader, TabBar, TabButton } from "@/components/ui";
 import {
   apiRequest,
   ApiError,
@@ -87,31 +87,17 @@ export default function AdministrationPage() {
         description="Kelola akun SINTETIS, matriks izin yang ditegakkan server, dan cakupan organisasi. Setiap perubahan ditulis API ke riwayat aktivitas."
       />
 
-      <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Bagian administrasi">
+      <TabBar label="Bagian administrasi">
         {TABS.map((item) => (
-          <button
+          <TabButton
             key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
+            active={tab === item.id}
             onClick={() => setTab(item.id)}
-            className={`rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
-              tab === item.id
-                ? "border-primary bg-primary text-white"
-                : "border-border bg-surface text-ink hover:bg-canvas"
-            }`}
-          >
-            <span className="block font-semibold">{item.label}</span>
-            <span
-              className={`block text-[10px] ${
-                tab === item.id ? "text-white/75" : "text-secondary"
-              }`}
-            >
-              {item.description}
-            </span>
-          </button>
+            title={item.label}
+            description={item.description}
+          />
         ))}
-      </div>
+      </TabBar>
 
       {loading ? (
         <Card className="flex items-center gap-2 p-8 text-sm text-secondary">

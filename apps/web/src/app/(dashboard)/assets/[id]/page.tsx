@@ -298,7 +298,7 @@ export default function AssetDetailPage() {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="rv-table">
               <thead>
                 <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
                   <th scope="col" className="px-5 py-3 font-semibold">

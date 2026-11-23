@@ -65,9 +65,11 @@ function ServiceTile({
 }) {
   const showIcon = state !== undefined;
   return (
-    <div className="rounded-lg border border-border bg-canvas/60 p-4">
+    <div className="rounded-xl border border-border/70 bg-canvas/50 p-4 transition-colors hover:border-border hover:bg-canvas/80">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-secondary">{icon}</div>
+        <div className="flex size-8 items-center justify-center rounded-lg bg-surface text-secondary ring-1 ring-border/70">
+          {icon}
+        </div>
         <Chip tone={tone}>
           {showIcon ? <StateIcon tone={tone} className="size-3.5" /> : null}
           {label}
@@ -152,7 +154,7 @@ export function SystemStatusPanel() {
             type="button"
             onClick={refresh}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-ink hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-60"
+            className="rv-btn-subtle"
           >
             {loading ? (
               <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
@@ -168,7 +170,7 @@ export function SystemStatusPanel() {
         {error && !snapshot ? (
           <div
             role="alert"
-            className="flex flex-col gap-3 rounded-lg border border-critical/20 bg-critical-soft p-4 sm:flex-row sm:items-start"
+            className="flex flex-col gap-3 rounded-2xl border border-critical/20 bg-critical-soft p-4 sm:flex-row sm:items-start"
           >
             <WifiOff className="mt-0.5 size-5 shrink-0 text-critical" aria-hidden="true" />
             <div className="flex-1">
@@ -177,7 +179,7 @@ export function SystemStatusPanel() {
               <button
                 type="button"
                 onClick={refresh}
-                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-strong"
+                className="rv-btn-primary mt-3"
               >
                 <RefreshCw className="size-3.5" aria-hidden="true" />
                 Coba sambung ulang
@@ -191,7 +193,7 @@ export function SystemStatusPanel() {
             {[0, 1, 2, 3].map((index) => (
               <div
                 key={index}
-                className="h-[118px] animate-pulse rounded-lg border border-border bg-canvas"
+                className="h-[118px] animate-pulse rounded-xl border border-border bg-canvas"
               >
                 <span className="sr-only">Memeriksa layanan…</span>
               </div>
@@ -202,7 +204,7 @@ export function SystemStatusPanel() {
         {snapshot && summary ? (
           <>
             <div
-              className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4 ${
+              className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 ${
                 summary.tone === "success"
                   ? "border-success/20 bg-success-soft"
                   : summary.tone === "warning"
@@ -225,7 +227,7 @@ export function SystemStatusPanel() {
             {error ? (
               <p
                 role="status"
-                className="rounded-lg border border-warning/20 bg-warning-soft px-3 py-2 text-xs leading-5 text-ink"
+                className="rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-xs leading-5 text-ink"
               >
                 Menampilkan status terakhir yang diketahui. Pembaruan terbaru gagal; coba lagi saat
                 API dapat dijangkau.
@@ -282,7 +284,7 @@ export function SystemStatusPanel() {
               </span>
             </div>
 
-            <div className="flex items-start gap-2 rounded-lg border border-ai/20 bg-ai-soft px-3 py-2.5">
+            <div className="flex items-start gap-2 rounded-xl border border-ai/20 bg-ai-soft px-3 py-2.5">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-ai" aria-hidden="true" />
               <p className="text-xs leading-5 text-ink">
                 {snapshot.meta?.ai_disclaimer ?? FALLBACK_DISCLAIMER}

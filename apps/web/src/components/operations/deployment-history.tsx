@@ -230,7 +230,7 @@ export function DeploymentHistory({
           ) : null}
           {records.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-sm">
+              <table className="rv-table min-w-[720px]">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
                     <th className="py-2 pr-3 font-semibold">Waktu</th>

@@ -70,7 +70,7 @@ export function Pagination({
   const last = Math.min(page * pageSize, total);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/80 bg-canvas/30 px-5 py-3">
       <p className="text-xs text-secondary">
         {total === 0 ? "Tidak ada catatan" : `Menampilkan ${first}–${last} dari ${total}`}
       </p>
@@ -79,7 +79,7 @@ export function Pagination({
           type="button"
           onClick={() => onPage(page - 1)}
           disabled={page <= 1}
-          className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1 text-xs font-semibold text-ink hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50"
+          className="rv-btn-subtle disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ChevronLeft className="size-3.5" aria-hidden="true" />
           Sebelumnya
@@ -91,7 +91,7 @@ export function Pagination({
           type="button"
           onClick={() => onPage(page + 1)}
           disabled={page >= pages}
-          className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1 text-xs font-semibold text-ink hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50"
+          className="rv-btn-subtle disabled:cursor-not-allowed disabled:opacity-50"
         >
           Berikutnya
           <ChevronRight className="size-3.5" aria-hidden="true" />

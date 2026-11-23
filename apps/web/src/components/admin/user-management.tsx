@@ -663,7 +663,7 @@ export function UserManagement({
 
           {users && users.items.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left text-sm">
+              <table className="rv-table min-w-[760px]">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
                     <th scope="col" className="px-3 py-2 font-semibold">

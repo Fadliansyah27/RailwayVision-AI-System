@@ -138,7 +138,7 @@ export default function AuditPage() {
           {events && events.items.length > 0 ? (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[860px] text-left text-sm">
+                <table className="rv-table min-w-[860px]">
                   <thead>
                     <tr className="border-b border-border text-xs uppercase tracking-wide text-secondary">
                       <th scope="col" className="px-3 py-2 font-semibold">
@@ -178,7 +178,10 @@ export default function AuditPage() {
                             <>
                               <span className="text-ink">{event.target_type}</span>
                               {event.target_id ? (
-                                <span className="block font-mono text-[10px]">
+                                <span
+                                  className="block max-w-[20ch] truncate font-mono text-[10px]"
+                                  title={event.target_id}
+                                >
                                   {event.target_id}
                                 </span>
                               ) : null}
@@ -193,7 +196,16 @@ export default function AuditPage() {
                           </Chip>
                         </td>
                         <td className="px-3 py-2.5 font-mono text-[10px] text-secondary">
-                          {event.request_id ?? "—"}
+                          {event.request_id ? (
+                            <span
+                              className="block max-w-[26ch] truncate"
+                              title={event.request_id}
+                            >
+                              {event.request_id}
+                            </span>
+                          ) : (
+                            "—"
+                          )}
                         </td>
                       </tr>
                     ))}

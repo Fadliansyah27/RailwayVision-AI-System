@@ -20,7 +20,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   if (status !== "authenticated") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-canvas">
-        <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white">
+        <div
+          className="flex size-11 items-center justify-center rounded-xl text-sm font-semibold text-white shadow-lg shadow-primary/25"
+          style={{ backgroundImage: "var(--rv-gradient-primary)" }}
+        >
           RV
         </div>
         <div className="flex items-center gap-2 text-sm text-secondary">
