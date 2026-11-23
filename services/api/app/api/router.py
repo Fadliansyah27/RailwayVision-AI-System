@@ -11,6 +11,7 @@ from app.api.routes import (
     maintenance,
     media,
     meta,
+    ops,
     reports,
     users,
 )
@@ -28,3 +29,4 @@ api_router.include_router(ai_registry.router)
 api_router.include_router(audit.router)
 api_router.include_router(maintenance.router)
 api_router.include_router(reports.router)
+api_router.include_router(ops.router)

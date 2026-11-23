@@ -24,7 +24,7 @@ logger = logging.getLogger("railwayvision.app")
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    configure_logging(settings.log_level)
+    configure_logging(settings.log_level, settings.ops_log_buffer_entries)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:

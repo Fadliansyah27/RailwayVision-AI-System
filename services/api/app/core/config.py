@@ -58,6 +58,12 @@ class Settings(BaseSettings):
     seed_demo_data: bool = False
     demo_seed_password: str | None = None
 
+    # Operations console. The backup status is read from a status file written by an
+    # external backup job; nothing is inferred or reported as healthy by default.
+    backup_status_file: str | None = None
+    backup_max_age_hours: int = 24
+    ops_log_buffer_entries: int = 500
+
     @field_validator("log_level")
     @classmethod
     def validate_log_level(cls, value: str) -> str:
@@ -65,6 +71,13 @@ class Settings(BaseSettings):
         if normalized not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
             raise ValueError("LOG_LEVEL must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL")
         return normalized
+
+    @field_validator("backup_max_age_hours", "ops_log_buffer_entries")
+    @classmethod
+    def validate_positive_ops_limits(cls, value: int) -> int:
+        if value < 1:
+            raise ValueError("Operations console limits must be positive")
+        return value
 
     @field_validator("cors_allowed_origins")
     @classmethod

@@ -33,6 +33,7 @@ class PermissionCode(StrEnum):
     USERS_MANAGE = "users:manage"
     MODELS_MANAGE = "models:manage"
     NOTIFICATIONS_READ = "notifications:read"
+    OPS_MANAGE = "ops:manage"
 
 
 ALL_PERMISSIONS: tuple[tuple[str, str], ...] = (
@@ -58,6 +59,10 @@ ALL_PERMISSIONS: tuple[tuple[str, str], ...] = (
     (PermissionCode.USERS_MANAGE, "Kelola pengguna, peran, dan cakupan"),
     (PermissionCode.MODELS_MANAGE, "Kelola registri model AI"),
     (PermissionCode.NOTIFICATIONS_READ, "Lihat notifikasi"),
+    (
+        PermissionCode.OPS_MANAGE,
+        "Kelola konsol operasi, deployment, dan reset data demo",
+    ),
 )
 
 ROLE_DEFINITIONS: dict[str, tuple[str, str, tuple[str, ...]]] = {

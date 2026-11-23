@@ -114,6 +114,9 @@ class MinioStorage:
         await self.put_bytes(self.quarantine_bucket, quarantine_key, data, content_type)
         return quarantine_key
 
+    async def delete_object(self, bucket: str, key: str) -> None:
+        await self._run(self.client.remove_object, bucket, key)
+
 
 _storage: MinioStorage | None = None
 
