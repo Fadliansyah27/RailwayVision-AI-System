@@ -1,6 +1,7 @@
 "use client";
 
 import { KeyRound, Loader2, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
@@ -73,13 +74,23 @@ export default function LoginPage() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar px-10 py-10 text-white lg:flex">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-[#0b0b0f] px-10 py-10 text-white lg:flex">
+        <Image
+          src="/login-halim-whoosh.png"
+          alt="Kereta cepat Whoosh berhenti di peron Stasiun Halim"
+          fill
+          priority
+          quality={90}
+          sizes="(min-width: 1024px) 51vw, 100vw"
+          className="object-cover"
+          style={{ objectPosition: "72% 58%" }}
+        />
         <div
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 10%, rgba(198,31,51,0.35), transparent 45%), radial-gradient(circle at 90% 80%, rgba(168,25,45,0.30), transparent 42%)",
-          }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0b0f]/90 via-[#0b0b0f]/35 to-[#0b0b0f]/10"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0b0f]/70 via-[#0b0b0f]/15 to-transparent"
           aria-hidden="true"
         />
         <div className="relative flex items-center gap-3">
